@@ -224,9 +224,12 @@ export class ResultsService {
   /**
    * Team display names and logos.
    *
-   * A committed JSON asset rather than a table, matching how the roster and the sponsors are
-   * maintained here. It changes once or twice a season, it belongs in review alongside the logo
-   * files it references, and keeping it in the repo means adding a club needs no database access.
+   * A committed JSON asset, and deliberately not a database table — the schema has none.
+   * LeagueSphere exposes only short forms ("Nürn", "LLions") and no logos at all, so these are
+   * the club's own, they change once or twice a season, and they belong in review alongside the
+   * logo files they name. Keeping them here means adding a club is a pull request rather than a
+   * database write, and nothing has to be seeded before the site works. Same arrangement as the
+   * roster and the sponsors.
    * `shareReplay` because every gameday and every table row looks teams up.
    */
   readonly teams$: Observable<ReadonlyMap<number, ResultsTeam>> = this.#http
