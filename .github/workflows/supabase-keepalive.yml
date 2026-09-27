@@ -1,7 +1,15 @@
 # Free-plan Supabase projects pause after ~7 days with no database activity, and a paused
-# project stops resolving in DNS — which takes down all three contact forms. This site
-# never queries Postgres on its own (Supabase only hosts the Edge Functions), so a
-# scheduled read of public.heartbeat supplies the activity that keeps the project awake.
+# project stops resolving in DNS — which takes down all three contact forms and the results
+# pages with them. A scheduled read of public.heartbeat supplies the activity that keeps the
+# project awake.
+#
+# Kept deliberately, even though the results sync now writes to results_sync_state every
+# minute and that is database activity in its own right. The sync is exactly what stops if
+# LeagueSphere is unreachable for a week, a secret is rotated or the cron job is unscheduled
+# — and that is precisely when the project would quietly drift towards a pause with nobody
+# watching. One read a day is a rounding error against the Free-tier quota and it fails
+# loudly, so it stays as the backstop rather than being retired on the assumption that
+# something else covers it.
 #
 # Needs one repository secret: SUPABASE_URL is public and inlined below, but the anon key
 # is kept in SUPABASE_ANON_KEY so rotating it does not require editing this file.

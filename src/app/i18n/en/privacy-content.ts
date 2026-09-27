@@ -4,7 +4,7 @@ const LINK = 'class="text-accent dark:text-[var(--brand-amber)] underline hover:
 
 export const privacyContent: PrivacyContent = {
   title: 'Privacy Policy',
-  updated: 'Last updated: 25 September 2026',
+  updated: 'Last updated: 27 September 2026',
   tocHeading: 'Contents',
   cookieSettingsIntro:
     'You can change or withdraw your consent here at any time. Changes take effect immediately and apply to future page views.',
@@ -53,11 +53,13 @@ export const privacyContent: PrivacyContent = {
             'profiles. Fonts are served from our own server, so simply opening a page creates no ' +
             'connection to Google.'
         },
-        { type: 'p', text: 'Personal data arises in essentially three places:' },
+        { type: 'p', text: 'Personal data arises in essentially four places:' },
         {
           type: 'ul',
           items: [
             'when you open the website (server log data, in particular your IP address),',
+            'when you open the results pages, because your browser fetches the match data from ' +
+              'our database at Supabase in Frankfurt am Main,',
             'when you submit one of our forms (contact, trial training, membership application),',
             'when you consent to the Google Maps embeds on the training page.'
           ]
@@ -191,6 +193,42 @@ export const privacyContent: PrivacyContent = {
             'necessary functions. Nothing is pre-selected: without your active consent, no ' +
             'preferences are stored and no maps are loaded. You can change or withdraw your consent ' +
             'at the top of this page at any time, with effect for the future.'
+        }
+      ]
+    },
+    {
+      id: 'ergebnisse',
+      heading: 'Results, tables and the live ticker',
+      blocks: [
+        {
+          type: 'p',
+          text:
+            'The results pages show fixtures, results and league tables for both our teams. ' +
+            'That data sits in our own database at Supabase, in their Frankfurt am Main data ' +
+            'centre. When you open a results page your browser fetches it from there, which — ' +
+            'as with any page request — transmits your IP address. The live ticker additionally ' +
+            'holds an open connection to that database for as long as you keep the page open, ' +
+            'so the score updates without a reload.'
+        },
+        {
+          type: 'p',
+          text:
+            'The legal basis is our legitimate interest under Art. 6(1)(f) GDPR in showing our ' +
+            "teams' results up to date. No cookies are set and no usage behaviour is analysed."
+        },
+        {
+          type: 'p',
+          text:
+            'The match data itself comes from LeagueSphere, our association\'s match platform. ' +
+            'Only a server-side service of ours fetches it, at regular intervals. Your browser ' +
+            'never contacts LeagueSphere and no data about you is transmitted there.'
+        },
+        {
+          type: 'p',
+          text:
+            'Until September 2026 this section embedded a display from an external provider ' +
+            '(GitHub Pages, USA). We have removed that embed; opening the results pages no ' +
+            'longer contacts any third party.'
         }
       ]
     },
@@ -337,7 +375,8 @@ export const privacyContent: PrivacyContent = {
             ['Netlify, Inc. (USA)', 'Hosting and delivery of the website', 'USA / global CDN'],
             [
               'Supabase Inc. (USA)',
-              'Server functions that receive the form submissions',
+              'Database and server functions: delivers the fixtures and tables on the results ' +
+                'pages, and receives the form submissions',
               'Data centre in Frankfurt am Main (eu-central-1)'
             ],
             ['Resend (USA)', 'Sending the notification emails', 'USA'],

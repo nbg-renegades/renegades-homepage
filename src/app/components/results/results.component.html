@@ -49,86 +49,65 @@
     </div>
 
     <!-- Tab Content -->
-    @if (native()) {
-      @switch (tab()) {
-        @case ('tabelle') {
-          @if (standings() === undefined) {
-            <p class="py-10 text-center text-gray-500 dark:text-gray-400">
-              {{ 'results.loading' | translate }}
-            </p>
-          } @else if (standingsFailed()) {
-            <p role="status" class="py-10 text-center text-gray-500 dark:text-gray-400">
-              {{ 'results.error' | translate }}
-            </p>
-          } @else {
-            <app-standings-table
-              [entries]="standings()!"
-              [teamId]="team().teamId"
-              [teams]="teams()"
-            />
-          }
-        }
-        @case ('live') {
-          @if (liveState() === null) {
-            <p class="py-10 text-center text-gray-500 dark:text-gray-400">
-              {{ 'results.loading' | translate }}
-            </p>
-          } @else {
-            <app-live-ticker
-              [state]="liveState()!"
-              [teams]="teams()"
-              [scheduleLink]="('/ergebnisse/' + team().slug + '/spielplan') | localePath"
-            />
-          }
-        }
-        @default {
-          @if (gamedays() === undefined) {
-            <p class="py-10 text-center text-gray-500 dark:text-gray-400">
-              {{ 'results.loading' | translate }}
-            </p>
-          } @else if (scheduleFailed()) {
-            <p role="status" class="py-10 text-center text-gray-500 dark:text-gray-400">
-              {{ 'results.error' | translate }}
-            </p>
-          } @else {
-            <app-gameday-list
-              [gamedays]="gamedays()!"
-              [teamId]="team().teamId"
-              [teams]="teams()"
-            />
-          }
+    @switch (tab()) {
+      @case ('tabelle') {
+        @if (standings() === undefined) {
+          <p class="py-10 text-center text-gray-500 dark:text-gray-400">
+            {{ 'results.loading' | translate }}
+          </p>
+        } @else if (standingsFailed()) {
+          <p role="status" class="py-10 text-center text-gray-500 dark:text-gray-400">
+            {{ 'results.error' | translate }}
+          </p>
+        } @else {
+          <app-standings-table
+            [entries]="standings()!"
+            [teamId]="team().teamId"
+            [teams]="teams()"
+          />
         }
       }
+      @case ('live') {
+        @if (liveState() === null) {
+          <p class="py-10 text-center text-gray-500 dark:text-gray-400">
+            {{ 'results.loading' | translate }}
+          </p>
+        } @else {
+          <app-live-ticker
+            [state]="liveState()!"
+            [teams]="teams()"
+            [scheduleLink]="('/ergebnisse/' + team().slug + '/spielplan') | localePath"
+          />
+        }
+      }
+      @default {
+        @if (gamedays() === undefined) {
+          <p class="py-10 text-center text-gray-500 dark:text-gray-400">
+            {{ 'results.loading' | translate }}
+          </p>
+        } @else if (scheduleFailed()) {
+          <p role="status" class="py-10 text-center text-gray-500 dark:text-gray-400">
+            {{ 'results.error' | translate }}
+          </p>
+        } @else {
+          <app-gameday-list
+            [gamedays]="gamedays()!"
+            [teamId]="team().teamId"
+            [teams]="teams()"
+          />
+        }
+      }
+    }
 
-      <!--
-        Always shown when we know it. The whole failure design is that the site keeps serving the
-        last good data during an upstream outage, which is only honest if the page says how old
-        that data is.
-      -->
-      @if (updatedAtLabel() !== null && tab() !== 'live') {
-        <p class="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">
-          {{ 'results.updatedAt' | translate: { time: updatedAtLabel()! } }}
-        </p>
-      }
-    } @else {
-      <!--
-        The old third-party widget, still serving whichever tabs are not native yet. Goes away
-        with the final cutover, along with the postMessage height and theme handshake it needs.
-      -->
-      <div class="rounded-xl overflow-hidden">
-        @if (iframeUrl(); as url) {
-          <iframe
-            #widgetIframe
-            [src]="url"
-            [style.height.px]="iframeHeight()"
-            [style.border]="0"
-            class="w-full"
-            scrolling="no"
-            [title]="'results.tab.' + tab() | translate"
-            loading="lazy"
-          ></iframe>
-        }
-      </div>
+    <!--
+      Always shown when we know it. The whole failure design is that the site keeps serving the
+      last good data during an upstream outage, which is only honest if the page says how old
+      that data is. The live tab prints its own last-play time instead.
+    -->
+    @if (updatedAtLabel() !== null && tab() !== 'live') {
+      <p class="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">
+        {{ 'results.updatedAt' | translate: { time: updatedAtLabel()! } }}
+      </p>
     }
 
   </div>

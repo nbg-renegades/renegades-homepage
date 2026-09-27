@@ -1,60 +1,41 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   computed,
   effect,
   inject,
   OnDestroy,
-  OnInit,
-  PLATFORM_ID,
-  signal,
-  untracked,
-  viewChild,
 } from '@angular/core';
-import { isPlatformBrowser, NgClass } from '@angular/common';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { NgClass } from '@angular/common';
 import { ActivatedRoute, Params, RouterLink } from '@angular/router';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LocalePathPipe } from '../../pipes/locale-path.pipe';
 import { MetaService } from '../../services/meta.service';
-import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
 import { ResultsService, type ResultsTeam } from '../../services/results.service';
+import { ResultsLiveService, type LiveState } from '../../services/results-live.service';
 import { SITE_ORIGIN } from '../../i18n/locale';
 import { GamedayListComponent } from './gameday-list.component';
 import { LiveTickerComponent } from './live-ticker.component';
 import { StandingsTableComponent } from './standings-table.component';
-import {
-  isNative,
-  TABS,
-  tabFromParam,
-  teamBySlug,
-  type Tab,
-} from './results.config';
+import { TABS, tabFromParam, teamBySlug, type Tab } from './results.config';
 import { clubToday, formatUpdatedAt } from './results.format';
-import { ResultsLiveService, type LiveState } from '../../services/results-live.service';
-
-const WIDGET_ORIGIN = 'https://claudiost.github.io';
-const WIDGET_BASE = 'https://claudiost.github.io/renegades-scores/widget.html';
-const MIN_HEIGHT = 400;
-// Accent per theme, mirroring the `accent` / `--brand-amber` tokens of the site.
-const WIDGET_ACCENT_LIGHT = '8a5d00';
-const WIDGET_ACCENT_DARK = 'ffc03a';
 
 /**
- * The results section.
+ * The results section: schedule, league table and live ticker, all from our own database.
  *
- * Mid-migration: the schedule and the table render from our own database, the live tab still
- * embeds the old third-party widget. `isNative()` decides per tab, so either side can be switched
- * back without a deploy (`?native=none`), and everything to do with the iframe — the origin
- * constants, the height and theme `postMessage` handshake — goes away with the last tab.
+ * This used to embed a third-party widget in an iframe and negotiate its height and theme over
+ * `postMessage`. That is gone, and with it the request every visitor's browser made to a personal
+ * GitHub Pages account each time they opened the page. Everything here is server-rendered from
+ * Postgres, so the results are in the HTML rather than behind a frame — indexable, and readable
+ * without JavaScript — and no visitor's browser ever talks to LeagueSphere. Only the scheduled
+ * sync function does that.
  *
- * The data is fetched with `HttpClient`, which means it is fetched during server rendering too and
- * arrives in the HTML. Angular's transfer cache then replays it on hydration, so the browser makes
- * no request of its own for the same data.
+ * The data is fetched with `HttpClient`, so it is fetched during server rendering too. Angular's
+ * transfer cache then replays it on hydration, and the browser makes no request of its own for
+ * what the server already delivered.
  */
 @Component({
   selector: 'app-results',
@@ -71,12 +52,9 @@ const WIDGET_ACCENT_DARK = 'ffc03a';
   templateUrl: './results.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResultsComponent implements OnInit, OnDestroy {
+export class ResultsComponent implements OnDestroy {
   #meta = inject(MetaService);
-  #sanitizer = inject(DomSanitizer);
-  #platformId = inject(PLATFORM_ID);
   #route = inject(ActivatedRoute);
-  #theme = inject(ThemeService);
   #language = inject(LanguageService);
   #results = inject(ResultsService);
   #live = inject(ResultsLiveService);
@@ -84,67 +62,26 @@ export class ResultsComponent implements OnInit, OnDestroy {
   readonly tabs: readonly Tab[] = TABS;
 
   readonly #params = toSignal(this.#route.params, { initialValue: {} as Params });
-  readonly #query = toSignal(this.#route.queryParams, { initialValue: {} as Params });
 
   readonly team = computed(() => teamBySlug(this.#params()['team']));
   readonly tab = computed<Tab>(() => tabFromParam(this.#params()['tab']));
 
-  /** Which rendering this tab gets: ours, or the embedded widget. */
-  readonly native = computed(() => isNative(this.tab(), this.#query()['native']));
-
   // ── Data ───────────────────────────────────────────────────────────────────
 
   /**
-   * Each tab fetches only what it shows, and nothing at all while the widget is on screen.
+   * Each tab fetches only what it shows.
    *
    * Tabs are separate URLs, so a visitor only ever sees one of them per page load; fetching the
-   * other's data would be a request per view that nobody reads. `null` here means "not wanted",
-   * which is distinct from a request that failed.
+   * others' data would be a request per view that nobody reads. `null` means "not this tab".
    */
-  readonly #scheduleWanted = computed(() =>
-    this.native() && this.tab() !== 'tabelle' ? this.team() : null
-  );
-
-  readonly #standingsWanted = computed(() =>
-    this.native() && this.tab() === 'tabelle' ? this.team() : null
-  );
-
-  readonly #liveWanted = computed(() =>
-    this.native() && this.tab() === 'live' ? this.team() : null
-  );
+  readonly #scheduleWanted = computed(() => (this.tab() === 'spielplan' ? this.team() : null));
+  readonly #standingsWanted = computed(() => (this.tab() === 'tabelle' ? this.team() : null));
+  readonly #liveWanted = computed(() => (this.tab() === 'live' ? this.team() : null));
 
   /**
-   * Today in the club's zone, resolved once per render.
-   *
-   * Deliberately not recomputed on a timer: a page open across midnight showing the gameday it
-   * was opened on is correct, and swapping the content under a visitor at 00:00 would not be.
-   */
-  readonly #today = clubToday();
-
-  /**
-   * Today's games, updating over Realtime while this tab is open.
-   *
-   * Subscribing opens the channel and unsubscribing closes it, so switching tab or leaving the
-   * page tears it down — `toSignal` unsubscribes when the component is destroyed.
-   */
-  readonly liveState = toSignal(
-    toObservable(this.#liveWanted).pipe(
-      switchMap((team) => team === null
-        ? of(null)
-        : this.#live.liveState(team.teamId, this.#today)),
-    ),
-    { initialValue: null as LiveState | null },
-  );
-
-  /** The tab's dot turns red only while something is actually being played. */
-  readonly hasLiveGame = computed(() =>
-    (this.liveState()?.games ?? []).some((view) => view.live !== null && !view.live.finished)
-  );
-
-  /**
-   * `undefined` means still loading or not wanted, and `null` means the request failed, which the
-   * template tells apart — an empty array is a legitimate answer ("no gamedays yet") and must not
-   * read as an error.
+   * `undefined` means still loading or not this tab, and `null` means the request failed, which
+   * the template tells apart — an empty array is a legitimate answer ("no gamedays yet") and must
+   * not read as an error.
    */
   readonly gamedays = toSignal(
     toObservable(this.#scheduleWanted).pipe(
@@ -164,21 +101,36 @@ export class ResultsComponent implements OnInit, OnDestroy {
     { initialValue: undefined },
   );
 
-  readonly teams = toSignal(
-    toObservable(this.native).pipe(
-      switchMap((native) => native
-        ? this.#results.teams$.pipe(catchError(() => of(new Map<number, ResultsTeam>())))
-        : of(new Map<number, ResultsTeam>())),
+  /**
+   * Today in the club's zone, resolved once per render.
+   *
+   * Deliberately not recomputed on a timer: a page open across midnight showing the gameday it was
+   * opened on is correct, and swapping the content under a visitor at 00:00 would not be.
+   */
+  readonly #today = clubToday();
+
+  /**
+   * Today's games, updating over Realtime while the live tab is open.
+   *
+   * Subscribing opens the channel and unsubscribing closes it, so switching tab or leaving the
+   * page tears it down — `toSignal` unsubscribes when the component is destroyed.
+   */
+  readonly liveState = toSignal(
+    toObservable(this.#liveWanted).pipe(
+      switchMap((team) => team === null
+        ? of(null)
+        : this.#live.liveState(team.teamId, this.#today)),
     ),
+    { initialValue: null as LiveState | null },
+  );
+
+  readonly teams = toSignal(
+    this.#results.teams$.pipe(catchError(() => of(new Map<number, ResultsTeam>()))),
     { initialValue: new Map<number, ResultsTeam>() },
   );
 
   readonly #lastUpdatedAt = toSignal(
-    toObservable(this.native).pipe(
-      switchMap((native) => native
-        ? this.#results.lastUpdatedAt().pipe(catchError(() => of(null)))
-        : of(null)),
-    ),
+    this.#results.lastUpdatedAt().pipe(catchError(() => of(null))),
     { initialValue: null },
   );
 
@@ -190,36 +142,10 @@ export class ResultsComponent implements OnInit, OnDestroy {
   readonly scheduleFailed = computed(() => this.gamedays() === null);
   readonly standingsFailed = computed(() => this.standings() === null);
 
-  // ── The widget, for whatever is not native yet ─────────────────────────────
-
-  readonly iframeHeight = signal(MIN_HEIGHT);
-
-  readonly iframeUrl = computed<SafeResourceUrl | null>(() => {
-    if (this.native()) return null;
-
-    const view = this.tab() === 'tabelle' ? 'table' : this.tab() === 'live' ? 'live' : 'spielplan';
-    const id = this.team().teamId;
-    // Read untracked: theme changes are pushed via postMessage instead of reloading the iframe.
-    const theme = untracked(() => this.#theme.theme());
-    return this.#sanitizer.bypassSecurityTrustResourceUrl(
-      `${WIDGET_BASE}?t=${id}&view=${view}&color=${WIDGET_ACCENT_LIGHT}&color_dark=${WIDGET_ACCENT_DARK}&theme=${theme}`,
-    );
-  });
-
-  readonly iframeRef = viewChild<ElementRef<HTMLIFrameElement>>('widgetIframe');
-
-  readonly #syncWidgetTheme = effect(() => {
-    const theme = this.#theme.theme();
-    this.iframeRef()?.nativeElement.contentWindow?.postMessage(
-      { type: 'setTheme', theme },
-      WIDGET_ORIGIN,
-    );
-  });
-
-  readonly #resetHeight = effect(() => {
-    this.iframeUrl(); // track URL changes (team or tab switch)
-    untracked(() => this.iframeHeight.set(MIN_HEIGHT));
-  });
+  /** The tab's dot turns red only while something is actually being played. */
+  readonly hasLiveGame = computed(() =>
+    (this.liveState()?.games ?? []).some((view) => view.live !== null && !view.live.finished)
+  );
 
   // ── Meta ───────────────────────────────────────────────────────────────────
 
@@ -237,8 +163,8 @@ export class ResultsComponent implements OnInit, OnDestroy {
    * `SportsEvent` for the fixtures still to be played.
    *
    * Upcoming only: a schema.org event in the past is noise, and Google's own guidance is to mark
-   * up what a visitor could still attend. A gameday rather than a game, because that is what has
-   * a start time and a place — an individual game's kickoff shifts all day.
+   * up what a visitor could still attend. A gameday rather than a game, because that is what has a
+   * start time and a place — an individual game's kickoff shifts all day.
    */
   readonly #upcomingJsonLd = effect(() => {
     const gamedays = this.gamedays();
@@ -276,27 +202,8 @@ export class ResultsComponent implements OnInit, OnDestroy {
     })));
   });
 
-  // ── postMessage plumbing for the widget ────────────────────────────────────
-
-  readonly #messageHandler = (event: MessageEvent) => {
-    if (event.origin !== WIDGET_ORIGIN) return;
-    const { type, height } = event.data ?? {};
-    if (type !== 'iframeHeight' || typeof height !== 'number') return;
-    if (event.source === this.iframeRef()?.nativeElement.contentWindow) {
-      this.iframeHeight.set(Math.max(height, MIN_HEIGHT));
-    }
-  };
-
-  ngOnInit(): void {
-    if (isPlatformBrowser(this.#platformId)) {
-      window.addEventListener('message', this.#messageHandler);
-    }
-  }
-
   ngOnDestroy(): void {
-    if (isPlatformBrowser(this.#platformId)) {
-      window.removeEventListener('message', this.#messageHandler);
-    }
+    // Page-scoped, so it must not follow the visitor onto the next route.
     this.#meta.removeJsonLd('results-events');
   }
 }

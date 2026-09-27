@@ -4,7 +4,7 @@ const LINK = 'class="text-accent dark:text-[var(--brand-amber)] underline hover:
 
 export const privacyContent: PrivacyContent = {
   title: 'Datenschutzerklärung',
-  updated: 'Stand: 25. September 2026',
+  updated: 'Stand: 27. September 2026',
   tocHeading: 'Inhaltsübersicht',
   cookieSettingsIntro:
     'Hier können Sie Ihre Einwilligung jederzeit anpassen oder widerrufen. Die Änderung wirkt sofort und gilt für künftige Seitenaufrufe.',
@@ -55,12 +55,14 @@ export const privacyContent: PrivacyContent = {
         },
         {
           type: 'p',
-          text: 'Personenbezogene Daten entstehen im Wesentlichen an drei Stellen:'
+          text: 'Personenbezogene Daten entstehen im Wesentlichen an vier Stellen:'
         },
         {
           type: 'ul',
           items: [
             'beim Aufruf der Website (Server-Logdaten, insbesondere die IP-Adresse),',
+            'beim Aufruf der Ergebnisseiten, weil Ihr Browser die Spieldaten aus unserer ' +
+              'Datenbank bei Supabase in Frankfurt am Main abruft,',
             'wenn Sie eines unserer Formulare absenden (Kontakt, Probetraining, Mitgliedsantrag),',
             'wenn Sie in die Anzeige der Google-Maps-Karten auf der Trainingsseite einwilligen.'
           ]
@@ -195,6 +197,45 @@ export const privacyContent: PrivacyContent = {
             'hinaus einwilligen möchten. Es ist nichts vorausgewählt: Ohne Ihre aktive Zustimmung ' +
             'werden weder Präferenzen gespeichert noch Karten geladen. Ihre Einwilligung können Sie ' +
             'oben auf dieser Seite jederzeit mit Wirkung für die Zukunft ändern oder widerrufen.'
+        }
+      ]
+    },
+    {
+      id: 'ergebnisse',
+      heading: 'Ergebnisse, Tabellen und Live-Ticker',
+      blocks: [
+        {
+          type: 'p',
+          text:
+            'Auf den Ergebnisseiten zeigen wir Spielpläne, Ergebnisse und Tabellen unserer ' +
+            'beiden Mannschaften. Diese Daten liegen in unserer eigenen Datenbank bei Supabase ' +
+            'im Rechenzentrum Frankfurt am Main. Wenn Sie eine Ergebnisseite aufrufen, ruft Ihr ' +
+            'Browser sie dort ab – dabei wird, wie bei jedem Seitenaufruf, Ihre IP-Adresse ' +
+            'übertragen. Beim Live-Ticker besteht zusätzlich eine offene Verbindung zu dieser ' +
+            'Datenbank, solange Sie die Seite geöffnet haben, damit sich der Spielstand ohne ' +
+            'Neuladen aktualisiert.'
+        },
+        {
+          type: 'p',
+          text:
+            'Rechtsgrundlage ist unser berechtigtes Interesse nach Art. 6 Abs. 1 lit. f DSGVO, ' +
+            'die Ergebnisse unserer Mannschaften aktuell darzustellen. Es werden dabei keine ' +
+            'Cookies gesetzt und kein Nutzungsverhalten ausgewertet.'
+        },
+        {
+          type: 'p',
+          text:
+            'Die Spieldaten selbst stammen von LeagueSphere, der Spielplattform unseres ' +
+            'Verbandes. Diese Daten holt ausschließlich ein Serverdienst von uns in ' +
+            'regelmäßigen Abständen ab. Ihr Browser nimmt zu LeagueSphere zu keinem Zeitpunkt ' +
+            'Kontakt auf, und es werden keine Daten über Sie dorthin übermittelt.'
+        },
+        {
+          type: 'p',
+          text:
+            'Bis September 2026 war an dieser Stelle eine Anzeige eines externen Anbieters ' +
+            'eingebunden (GitHub Pages, USA). Diese Einbindung haben wir entfernt; beim Aufruf ' +
+            'der Ergebnisseiten wird seitdem kein Drittanbieter mehr kontaktiert.'
         }
       ]
     },
@@ -345,7 +386,8 @@ export const privacyContent: PrivacyContent = {
             ['Netlify, Inc. (USA)', 'Hosting und Auslieferung der Website', 'USA / weltweites CDN'],
             [
               'Supabase Inc. (USA)',
-              'Serverfunktionen, die die Formulareingaben entgegennehmen',
+              'Datenbank und Serverfunktionen: liefert die Spiel- und Tabellendaten der ' +
+                'Ergebnisseiten aus und nimmt die Formulareingaben entgegen',
               'Rechenzentrum in Frankfurt am Main (eu-central-1)'
             ],
             ['Resend (USA)', 'Versand der Benachrichtigungs-E-Mails', 'USA'],

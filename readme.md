@@ -10,7 +10,7 @@ Official website for the Nürnberg Renegades Flag Football Club.
 | --- | --- |
 | Framework | Angular 20 with SSR |
 | Styling | TailwindCSS |
-| Database & Auth | Supabase (form submissions only) |
+| Database | Supabase — Postgres for the results section, plus Edge Functions for the forms and the results sync |
 | Email | Resend (via Supabase Edge Functions) |
 | Hosting | Netlify (Edge Functions + CDN) |
 | Fonts | Manrope + Sora, self-hosted from `src/assets/fonts` (no Google Fonts request) |
@@ -29,7 +29,7 @@ The app uses full Angular SSR (no build-time prerendering) configured in `src/ap
 | `/team` | Server |
 | `/club` | Server |
 | `/training` | Server |
-| `/ergebnisse`, `/ergebnisse/:team`, `/ergebnisse/:team/:tab` | Server |
+| `/ergebnisse`, `/ergebnisse/:team`, `/ergebnisse/:team/:tab` | Server — the results are fetched during rendering, so they are in the HTML |
 | `/sponsoring` | Server |
 | `/contact` | Server |
 | `/faq` | Server |
@@ -101,7 +101,15 @@ Browser request
 │   │   │   ├── legal/             # Impressum + Datenschutz
 │   │   │   ├── navbar/
 │   │   │   ├── responsive-image/
-│   │   │   ├── results/           # Results/standings for both teams
+│   │   │   ├── results/           # Schedule, league table and live ticker
+│   │   │   │                      #   results.component      container, tabs, JSON-LD
+│   │   │   │                      #   gameday-list           past/upcoming, "show more"
+│   │   │   │                      #   game-card              one game, play-by-play toggle
+│   │   │   │                      #   play-by-play           the structured log
+│   │   │   │                      #   standings-table        the published table
+│   │   │   │                      #   live-ticker            today's games, over Realtime
+│   │   │   │                      #   team-logo              logo, or initials
+│   │   │   │                      #   results.config/.format
 │   │   │   ├── sponsoring/
 │   │   │   ├── team/
 │   │   │   └── training/          # Training info + tryout form
@@ -112,6 +120,8 @@ Browser request
 │   │   │   ├── membership.service.ts
 │   │   │   ├── meta.service.ts       # Per-locale canonical + hreflang, meta tags, JSON-LD
 │   │   │   ├── recaptcha.service.ts
+│   │   │   ├── results.service.ts       # Reads the results_* tables over PostgREST
+│   │   │   ├── results-live.service.ts  # Realtime channel for the live tab (browser only)
 │   │   │   ├── sponsor.service.ts    # Reads src/assets/data/sponsors.json
 │   │   │   ├── storage.service.ts    # localStorage + cookie wrapper (SSR-safe)
 │   │   │   ├── supabase.service.ts
@@ -124,18 +134,25 @@ Browser request
 │   │   ├── app.config.server.ts   # Server providers + render modes
 │   │   └── app.routes.ts
 │   ├── assets/
-│   │   ├── data/                  # team-members.json, sponsors.json
+│   │   ├── data/                  # team-members.json, sponsors.json, results-teams.json
+│   │   ├── logos/                 # Club logos for the results section (96px webp/svg)
 │   │   └── images/
 │   ├── environments/
 │   │   └── environment.ts         # Only environment file — ships to prod as-is
 │   ├── llms.txt                    # AI-agent discovery file
 │   └── global_styles.css
+├── scripts/
+│   ├── optimize-images.js
+│   └── results-parity/            # Fixture upstream, gameday replay, parity checks
 ├── supabase/
 │   ├── config.toml                # Project ref + per-function settings (committed)
 │   └── functions/
+│       ├── _shared/leaguesphere/         # Client, schema, mappers, scoring, standings,
+│       │                                 #   schedule, time, store — pure and tested
 │       ├── send-contact-email/           # Contact form → Resend
 │       ├── send-membership-application/  # Membership form → Resend
-│       └── send-tryout-email/            # Tryout request → Resend
+│       ├── send-tryout-email/            # Tryout request → Resend
+│       └── sync-leaguesphere/            # Scheduled results sync (cron-only)
 ├── server.ts                      # SSR server entry
 ├── netlify.toml
 └── tailwind.config.js
@@ -234,6 +251,7 @@ supabase link --project-ref ekmdcqcjvodsnaqpsgun
 supabase functions deploy send-contact-email
 supabase functions deploy send-membership-application
 supabase functions deploy send-tryout-email
+supabase functions deploy sync-leaguesphere
 
 # Set Edge Function secrets. These are project-wide, not per-function, so a name
 # collision with the performance app's secrets would break one app or the other.
@@ -241,7 +259,33 @@ supabase secrets set RESEND_API_KEY=your-resend-api-key
 supabase secrets set NOTIFICATION_EMAILS=email1@example.com,email2@example.com
 supabase secrets set RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
 supabase secrets set HOMEPAGE_ALLOWED_ORIGINS=https://www.nuernberg-renegades.de,https://nuernberg-renegades.de,https://*.netlify.app
+
+# The results sync. Must match the results_sync_cron_secret in Vault, or every
+# call the cron job makes is rejected with 403.
+supabase secrets set RESULTS_SYNC_CRON_SECRET=<a long random string>
 ```
+
+`sync-leaguesphere` is not reachable from a browser and must not become so. `verify_jwt` keeps
+the gateway from passing anonymous calls through, but the anon key is public and ships in this
+bundle, so the real gate is the `x-cron-secret` header — which lives only in Vault and in the
+function's own secrets. Without it, anyone could burn the hourly upstream budget and leave the
+results page stale.
+
+The cron job reads its credentials from Vault at call time, so no secret appears in a migration,
+in `cron.job`, or in `cron.job_run_details`. Create them once, in the SQL editor:
+
+```sql
+select vault.create_secret(
+  'https://ekmdcqcjvodsnaqpsgun.supabase.co/functions/v1/sync-leaguesphere',
+  'results_sync_function_url', 'Endpoint the results sync cron job calls');
+select vault.create_secret('<service role key>',
+  'results_sync_service_key', 'Bearer token for the results sync cron job');
+select vault.create_secret('<the same random string as above>',
+  'results_sync_cron_secret', 'Shared secret proving a sync request came from cron');
+```
+
+Until all three exist the job logs a warning each minute and does nothing, which is the intended
+unconfigured state rather than an error.
 
 `HOMEPAGE_ALLOWED_ORIGINS` is the CORS allow list for this site's three functions
 (`supabase/functions/_shared/cors.ts`). Unset, it falls back to the production origins
@@ -261,17 +305,18 @@ two applications:
 
 | | This site ([`nbg-renegades/renegades-homepage`](https://github.com/nbg-renegades/renegades-homepage)) | Performance app ([`nbg-renegades/renegades-performance`](https://github.com/nbg-renegades/renegades-performance)) |
 |---|---|---|
-| Tables | `heartbeat` | `profiles`, `user_roles`, `player_positions`, `performance_entries` |
-| Edge functions | the three `send-*` above | `create-user`, `delete-user`, `get-dashboard-stats`, `get-performance-averages`, `get-performance-benchmarks`, `get-player-neighborhood`, `reset-user-password` |
-| Secrets | `RESEND_API_KEY`, `NOTIFICATION_EMAILS`, `RECAPTCHA_SECRET_KEY`, `HOMEPAGE_ALLOWED_ORIGINS` | `ALLOWED_ORIGINS` |
+| Tables | `heartbeat`, `results_*` (seven) | `profiles`, `user_roles`, `player_positions`, `performance_entries` |
+| Edge functions | the three `send-*` above, plus `sync-leaguesphere` | `create-user`, `delete-user`, `get-dashboard-stats`, `get-performance-averages`, `get-performance-benchmarks`, `get-player-neighborhood`, `reset-user-password` |
+| Secrets | `RESEND_API_KEY`, `NOTIFICATION_EMAILS`, `RECAPTCHA_SECRET_KEY`, `HOMEPAGE_ALLOWED_ORIGINS`, `RESULTS_SYNC_CRON_SECRET` | `ALLOWED_ORIGINS` |
 | Auth users | none; the forms are anonymous | club members, with real personal data |
 
 Three consequences:
 
-- **The performance repo owns the schema.** `supabase/migrations/` lives there, including
-  this site's `heartbeat` migration, which is kept byte for byte. This repo no longer has
-  a migrations directory. Any schema change for either app goes through a pull request
-  there.
+- **The performance repo owns the schema.** `supabase/migrations/` lives there, including this
+  site's `heartbeat` migration and the three that create the `results_*` tables, the RLS policies,
+  the grants and the pg_cron job. This repo has no migrations directory. Any schema change for
+  either app goes through a pull request there, and `supabase db push` is run from there — never
+  from here.
 - **The API keys are shared.** Both apps authenticate with the project's legacy `eyJ…`
   keys — this site's is committed in `src/environments/environment.ts`, and the keepalive
   uses the `SUPABASE_ANON_KEY` repository secret. Rotating them, or disabling them under
@@ -293,10 +338,16 @@ touched and the inactivity clock never resets on its own.
 supply that activity. It needs a `SUPABASE_ANON_KEY` repository secret, and it fails loudly
 rather than silently if the project is paused or the key is rotated.
 
-This site's only table is `public.heartbeat`, which exists solely for the keepalive above
-and is read by nothing in the application. Team roster and sponsor data live in
-`src/assets/data/team-members.json` and `src/assets/data/sponsors.json`; this site uses
-Supabase only to host the Edge Functions that send transactional email.
+The results sync now writes to `results_sync_state` every minute, which is database activity in
+its own right, so the keepalive is technically redundant. It stays anyway: the sync is exactly
+what stops if LeagueSphere is unreachable for a week, a secret is rotated or the cron job is
+unscheduled — precisely when the project would drift towards a pause with nobody watching. One
+read a day costs nothing and fails loudly.
+
+`public.heartbeat` exists solely for the keepalive above and is read by nothing in the
+application. The `results_*` tables are the site's real data and are described under
+[Results](#results). Team roster, sponsor data and the results teams' names and logos live in
+`src/assets/data/`; the database holds only what the sync writes.
 
 Row Level Security still matters, even though this site performs no database reads or
 writes of its own: the project now also holds the performance app's tables, with club
@@ -314,20 +365,165 @@ Keep it that way — a policy loosened in the performance repo is a policy this 
    `VITE_RECAPTCHA_SITE_KEY` — that variable was never wired up, see the note in
    `environment.ts`.
 
+## Results
+
+`/ergebnisse/:team/:tab` shows the schedule, the league table and a live ticker for both teams,
+rendered server-side from our own Postgres. It used to be a third-party widget in an iframe; see
+[Third parties and privacy](#third-parties-and-privacy) for why that mattered.
+
+### How the data gets here
+
+```text
+pg_cron (every minute)
+    └─ pg_net ──► Edge Function `sync-leaguesphere`
+                    │  reads leaguesphere.app, validates, maps
+                    ▼
+                  Postgres: results_gamedays, results_games, results_game_events,
+                            results_standings, results_live_games, results_live_ticks,
+                            results_sync_state
+                    │                                   │
+                    │ PostgREST (anon, SELECT only)     │ Realtime
+                    ▼                                   ▼
+                  Angular SSR ─────────────────► the live tab in the browser
+```
+
+The function decides on each tick what is actually due, so most minutes it does nothing: hourly
+when there is no gameday, every ten minutes inside one, and the liveticker every minute while a
+gameday is running. `/api/snapshot/` allows 60 requests an hour per IP and the client holds
+itself to 30.
+
+**Nothing upstream is trusted.** Every response is validated against a schema before anything is
+written. On a mismatch the sync records the error and writes nothing, so the site keeps serving
+the last good data with a visible "Stand:" timestamp rather than being emptied by a bad deploy at
+the other end.
+
+### Things that will bite you
+
+- **`league` and `season` in `/api/snapshot/` are primary keys, not names.** `season=2026` is a
+  400; the 2026 season is id `6`. The league ids are in
+  `supabase/functions/_shared/leaguesphere/config.ts`.
+- **`/api/league-table/` takes slugs, and they are not our config keys.** The first team's league
+  is `dffl`; `dkb-dffl` is a 404.
+- **`final_score` is never null** — it is `{home: 0, away: 0}` for a game nobody has played. Use
+  `status === 'beendet'`.
+- **`pa` is points *against*.** A team's own score is `fh + sh`, which is its opponent's `pa`.
+- **Player number 0 exists.** Test event presence against null, never truthiness.
+- **Gameday dates and kickoff times carry no timezone** and mean German wall-clock time.
+  `_shared/leaguesphere/time.ts` resolves them; do not compare them against a UTC clock.
+
+### Standings come from upstream, not from us
+
+`results_standings` stores `/api/league-table/` verbatim. The sync also computes the table itself
+on every run and logs the differences, but those numbers are never displayed.
+
+The reason is that the two leagues do not share a ruleset. FF BL divides win points by games
+played and our own computation reproduces the published table exactly, all 23 teams. DKB DFFL
+divides by a fixed 30 and weights a win by the opponent's league, using configuration no public
+endpoint exposes — we reproduce its games, W/D/L and points for and against exactly, but not its
+quotient. Publishing our own figures there would mean publishing wrong ones.
+
+### Adding a league season
+
+Add an entry to `LEAGUE_SEASONS` in `supabase/functions/_shared/leaguesphere/config.ts`:
+
+```ts
+{
+  key: 'ff-bl',              // ours; appears in results_standings.league_key
+  season: '2027',
+  leaguePk: 18,              // /api/snapshot/?league=
+  seasonPk: 7,               // /api/snapshot/?season=  — a PK, not a year
+  leagueDisplay: 'FF BL',    // the only league name a gameday carries
+  tableSlug: 'ff-bl',        // /api/league-table/<slug>/<season>/
+  name: 'FF BL 2027',
+  excludeGamedayIds: [],     // playoff gamedays that must not count
+  promotionRestricted: [],   // second teams, greyed out in the table
+  standingsSource: 'official',
+}
+```
+
+Then map the team to it in `src/app/components/results/results.config.ts`. Find the primary keys
+by fetching one gameday of that league and reading its `league` and `season` fields. Deploy the
+function afterwards — the config ships inside it.
+
+### Team names and logos
+
+Club-maintained, in this repo, not in the database:
+
+- `src/assets/data/results-teams.json` — `{ id, name, short_name?, logo? }` per club, keyed by
+  LeagueSphere's team id.
+- `src/assets/logos/<team id>.webp` (or `.svg`) — 96px, which is twice the largest size they
+  render at.
+
+LeagueSphere exposes only short forms ("Nürn", "LLions") and no logos at all, so both are ours.
+A club with no logo falls back to its initials, which is a normal state — eight of the clubs our
+teams meet have none. Keep the logos out of `src/assets/images`: that pipeline is built for 640w+
+photographs and will generate responsive variants nobody needs.
+
+### Reading the sync state
+
+`results_sync_state` has one row per upstream scope and is **not readable with the anon key** —
+it holds upstream error strings. Query it from the SQL editor or with the service role:
+
+```sql
+select source, last_ok_at, last_error, calls_last_hour
+from results_sync_state order by source;
+```
+
+`last_ok_at` null or old with a `last_error` set means the site is serving stale data and saying
+so. A `schema mismatch` there is the interesting case: LeagueSphere changed shape, and the
+message names the exact field. The function logs every upstream call with its status and duration
+under *Edge Functions → sync-leaguesphere → Logs*.
+
+If `last_ok_at` goes past two hours during a gameday, or 26 hours otherwise, the function emails
+`NOTIFICATION_EMAILS` through the same Resend setup the forms use — once per incident.
+
+### Working on it without touching the real API
+
+`scripts/results-parity/` has the tooling, and its readme has the full recipe:
+
+- `fixture-upstream.ts` serves the recorded fixtures as if they were LeagueSphere, so UI work
+  never spends the 60-an-hour snapshot budget.
+- `replay-live.ts` replays a recorded gameday tick by tick, which is the only way to exercise the
+  live tab outside an actual gameday.
+- `compare-widget.py` and `compare-playbyplay.py` check our data against the old widget's
+  snapshot.
+
+The domain logic has Deno tests driven by recorded fixtures:
+
+```bash
+cd supabase/functions && deno task test
+```
+
+
 ## Third parties and privacy
 
 The privacy policy makes concrete promises about what this site does and does not load.
 They are easy to break by accident, so they are written down here.
 
-**No third-party request happens on page load.** Opening any page contacts nothing but our
-own origin. Verify with the browser network panel after a change: every request should be
-same-origin. The three things that can talk to a third party are all deliberate:
+**Nothing loads from a third party on page view.** Verify with the browser network panel after
+a change. What talks to someone else, and when:
 
 | What | When it loads | Gate |
 | --- | --- | --- |
 | Google reCAPTCHA | Only on the three pages with a form, and only once the visitor focuses the form (`(focusin)` → `RecaptchaService.preload()`) | Art. 6(1)(f), no consent prompt |
 | Google Maps | Only on `/training` | Consent category `maps` |
-| Supabase + Resend | Only on form submit | — |
+| Resend | Only on form submit, and only server-side | — |
+| Supabase (our own Postgres, Frankfurt) | On form submit, **and on every `/ergebnisse` view** to read the results | Art. 6(1)(f) |
+
+`/ergebnisse` is the exception to "nothing but our own origin", and it is deliberate: the results
+come from our database rather than being baked into the bundle. It is a processor we already use,
+in Frankfurt, under a Art. 28 agreement, and the privacy policy says so.
+
+This replaced something worse. The results pages used to embed
+`claudiost.github.io/renegades-scores/widget.html` in an iframe, so every visitor's IP went to
+GitHub Pages — a personal account, in the US — on every view, undisclosed and with no consent
+gate. Removing the iframe removed that. **Do not reintroduce an embed here**; the results render
+natively and server-side now.
+
+**LeagueSphere is never contacted by a visitor's browser.** Only the scheduled
+`sync-leaguesphere` Edge Function talks to it. That is a hard constraint, not an implementation
+detail: the upstream API is rate-limited per IP and its CORS allow-list is empty, so a
+browser-side fetch would be both rude and broken.
 
 Do not move the reCAPTCHA load back into `RecaptchaService`'s constructor: the service is
 `providedIn: 'root'`, so that contacted Google for every visitor who merely opened a page
@@ -353,6 +549,8 @@ field when the substance changes.
 ## Features
 
 - Two teams: 1st team in the 1. DFFL, 2nd team in the Bayernliga
+- Results section rendered server-side from our own database: schedule with play-by-play,
+  league tables, and a live ticker that updates over Realtime without polling
 - Multilingual (DE at `/`, EN at `/en`) with per-locale canonical + hreflang; SSR-aware theme preference (`Sec-CH-Prefers-Color-Scheme`)
 - Dark / Light mode
 - FAQ page with `FAQPage` JSON-LD schema
