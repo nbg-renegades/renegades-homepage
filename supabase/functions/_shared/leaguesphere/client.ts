@@ -25,7 +25,31 @@ export const UPSTREAM_ANON_LIMIT_PER_MINUTE = 120;
 export const SNAPSHOT_CALL_CAP_PER_HOUR = 30;
 
 export const DEFAULT_TIMEOUT_MS = 20_000;
-export const BASE_URL = 'https://leaguesphere.app';
+
+/**
+ * Where LeagueSphere is.
+ *
+ * Overridable through `LEAGUESPHERE_BASE_URL` so a recorded gameday can be replayed against a
+ * local stand-in (see `scripts/results-parity/replay-live.ts`) without the live tab being
+ * something we only ever find out about during a real game. Unset — which is every deployed
+ * environment — it is the real thing.
+ */
+export const BASE_URL = readBaseUrl();
+
+function readBaseUrl(): string {
+  const configured = safeEnv('LEAGUESPHERE_BASE_URL');
+  if (configured === undefined || configured === '') return 'https://leaguesphere.app';
+  return configured.replace(/\/$/, '');
+}
+
+/** `Deno.env` throws without `--allow-env`, and the pure modules are tested without it. */
+function safeEnv(name: string): string | undefined {
+  try {
+    return Deno.env.get(name);
+  } catch {
+    return undefined;
+  }
+}
 
 export type FetchResult<T> =
   /** 200 with a body that still has to be validated by `schema.ts`. */

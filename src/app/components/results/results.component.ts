@@ -25,6 +25,7 @@ import { LanguageService } from '../../services/language.service';
 import { ResultsService, type ResultsTeam } from '../../services/results.service';
 import { SITE_ORIGIN } from '../../i18n/locale';
 import { GamedayListComponent } from './gameday-list.component';
+import { LiveTickerComponent } from './live-ticker.component';
 import { StandingsTableComponent } from './standings-table.component';
 import {
   isNative,
@@ -33,7 +34,8 @@ import {
   teamBySlug,
   type Tab,
 } from './results.config';
-import { formatUpdatedAt } from './results.format';
+import { clubToday, formatUpdatedAt } from './results.format';
+import { ResultsLiveService, type LiveState } from '../../services/results-live.service';
 
 const WIDGET_ORIGIN = 'https://claudiost.github.io';
 const WIDGET_BASE = 'https://claudiost.github.io/renegades-scores/widget.html';
@@ -64,6 +66,7 @@ const WIDGET_ACCENT_DARK = 'ffc03a';
     LocalePathPipe,
     GamedayListComponent,
     StandingsTableComponent,
+    LiveTickerComponent,
   ],
   templateUrl: './results.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -76,6 +79,7 @@ export class ResultsComponent implements OnInit, OnDestroy {
   #theme = inject(ThemeService);
   #language = inject(LanguageService);
   #results = inject(ResultsService);
+  #live = inject(ResultsLiveService);
 
   readonly tabs: readonly Tab[] = TABS;
 
@@ -103,6 +107,38 @@ export class ResultsComponent implements OnInit, OnDestroy {
 
   readonly #standingsWanted = computed(() =>
     this.native() && this.tab() === 'tabelle' ? this.team() : null
+  );
+
+  readonly #liveWanted = computed(() =>
+    this.native() && this.tab() === 'live' ? this.team() : null
+  );
+
+  /**
+   * Today in the club's zone, resolved once per render.
+   *
+   * Deliberately not recomputed on a timer: a page open across midnight showing the gameday it
+   * was opened on is correct, and swapping the content under a visitor at 00:00 would not be.
+   */
+  readonly #today = clubToday();
+
+  /**
+   * Today's games, updating over Realtime while this tab is open.
+   *
+   * Subscribing opens the channel and unsubscribing closes it, so switching tab or leaving the
+   * page tears it down — `toSignal` unsubscribes when the component is destroyed.
+   */
+  readonly liveState = toSignal(
+    toObservable(this.#liveWanted).pipe(
+      switchMap((team) => team === null
+        ? of(null)
+        : this.#live.liveState(team.teamId, this.#today)),
+    ),
+    { initialValue: null as LiveState | null },
+  );
+
+  /** The tab's dot turns red only while something is actually being played. */
+  readonly hasLiveGame = computed(() =>
+    (this.liveState()?.games ?? []).some((view) => view.live !== null && !view.live.finished)
   );
 
   /**

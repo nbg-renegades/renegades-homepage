@@ -32,7 +32,14 @@ export class SupabaseService {
     }
 
     this._loading ??= import('@supabase/supabase-js').then(({ createClient }) => {
-      this._client = createClient(environment.supabase.url, environment.supabase.key);
+      this._client = createClient(environment.supabase.url, environment.supabase.key, {
+        // Nobody logs in on this site: the forms post anonymously and the results tables are
+        // read with the public anon key. Leaving auth persistence on made supabase-js contend
+        // for a Navigator LockManager lock ("lock:sb-…-auth-token") that immediately failed and
+        // logged an error on every page with a Supabase client, and kept a refresh timer alive
+        // for a session that never exists.
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      });
       return this._client;
     });
 

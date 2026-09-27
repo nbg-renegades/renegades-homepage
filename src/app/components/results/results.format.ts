@@ -77,6 +77,36 @@ export function formatUpdatedAt(instant: string, lang: Lang): string {
   }, 'updated').format(parsed);
 }
 
+/**
+ * Today's date in the club's zone, as `YYYY-MM-DD`.
+ *
+ * Not the visitor's date and not the server's. Gameday dates are German wall-clock dates, and
+ * both the Netlify edge (UTC) and a visitor in another zone would otherwise disagree with them —
+ * between midnight and 02:00 German time a UTC-derived "today" is still yesterday, so the live
+ * tab would show the previous gameday. Mirrors `clubToday` in the sync function.
+ */
+export function clubToday(now: Date = new Date()): string {
+  const parts = formatter('de', {
+    timeZone: 'Europe/Berlin',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }, 'clubToday').formatToParts(now);
+  const get = (type: string) => parts.find((part) => part.type === type)?.value ?? '';
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+
+/** The time of day a tick happened, in club time. */
+export function formatTickTime(instant: string, lang: Lang): string {
+  const parsed = new Date(instant);
+  if (Number.isNaN(parsed.getTime())) return '';
+  return formatter(lang, {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Berlin',
+  }, 'tick').format(parsed);
+}
+
 /** A score, or an en dash when the game has not been played. */
 export function formatScore(home: number | null, away: number | null): string {
   if (home === null || away === null) return '–';

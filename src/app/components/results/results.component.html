@@ -36,7 +36,11 @@
             [attr.aria-current]="tab() === t ? 'page' : null"
           >
             @if (t === 'live') {
-              <span class="inline-block w-2 h-2 rounded-full bg-gray-400"></span>
+              <!-- Red and pulsing only when a game is actually running; grey otherwise. -->
+              <span
+                class="inline-block w-2 h-2 rounded-full"
+                [ngClass]="hasLiveGame() ? 'bg-red-600 animate-pulse' : 'bg-gray-400'"
+              ></span>
             }
             {{ 'results.tab.' + t | translate }}
           </a>
@@ -64,6 +68,15 @@
             />
           }
         }
+        @case ('live') {
+          @if (liveState() === null) {
+            <p class="py-10 text-center text-gray-500 dark:text-gray-400">
+              {{ 'results.loading' | translate }}
+            </p>
+          } @else {
+            <app-live-ticker [state]="liveState()!" [teams]="teams()" />
+          }
+        }
         @default {
           @if (gamedays() === undefined) {
             <p class="py-10 text-center text-gray-500 dark:text-gray-400">
@@ -88,7 +101,7 @@
         last good data during an upstream outage, which is only honest if the page says how old
         that data is.
       -->
-      @if (updatedAtLabel() !== null) {
+      @if (updatedAtLabel() !== null && tab() !== 'live') {
         <p class="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">
           {{ 'results.updatedAt' | translate: { time: updatedAtLabel()! } }}
         </p>

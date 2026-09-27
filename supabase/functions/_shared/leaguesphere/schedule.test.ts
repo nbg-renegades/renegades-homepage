@@ -68,12 +68,33 @@ Deno.test('with no game today the snapshot runs hourly, not every ten minutes', 
   assertEquals(due.reason, 'hourly refresh');
 });
 
-Deno.test('the liveticker is never polled when no game is running', () => {
+Deno.test('the liveticker is never polled on a day with no gameday', () => {
   const due = whatIsDue(input({
     lastOkAt: { ...allFresh(), liveticker: ago(24 * HOURLY_MS) },
     todaysKickoffs: [],
   }));
   assert(!due.tasks.includes('liveticker'));
+});
+
+Deno.test('the liveticker starts with the gameday window, not with the first stored score', () => {
+  // "In progress" comes from the snapshot, which refreshes every ten minutes. Waiting for it
+  // would leave the live tab dark for the first minutes of a real game.
+  const due = whatIsDue(input({
+    todaysKickoffs: ['15:30:00'],
+    gameInProgress: false,
+    lastOkAt: { ...allFresh(), liveticker: ago(LIVE_INTERVAL_MS) },
+  }));
+  assert(due.tasks.includes('liveticker'));
+  assertEquals(due.reason, 'inside the gameday window');
+});
+
+Deno.test('the liveticker stops once every game is finished', () => {
+  const due = whatIsDue(input({
+    todaysKickoffs: ['09:00:00'],
+    gamedayFinished: true,
+    lastOkAt: { ...allFresh(), liveticker: ago(24 * HOURLY_MS) },
+  }));
+  assert(!due.tasks.includes('liveticker'), 'nothing left to tick');
 });
 
 // ── Gameday window ───────────────────────────────────────────────────────────

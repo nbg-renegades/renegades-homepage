@@ -22,6 +22,7 @@ import {
   mapTeamSnapshot,
   toGameEventRows,
   toLiveGameRows,
+  toLiveTickRows,
   involvesTrackedTeam,
   todaysTrackedGameIds,
   type ScoreDisagreement,
@@ -252,6 +253,10 @@ async function syncTeamSnapshot(
   const gamedays: UpstreamGameday[] = [];
   const notes: string[] = [];
   let anyFresh = false;
+  // Scopes that fetched and parsed cleanly, held back until the write succeeds. Marking one
+  // successful before the rows land would let a persistent write failure look like a healthy
+  // sync and back the whole thing off for an hour.
+  const pendingSuccess: { source: string; etag: string | null }[] = [];
 
   for (const scope of scopes) {
     await store.recordAttempt(scope.source, now);
@@ -266,7 +271,7 @@ async function syncTeamSnapshot(
 
     if (result.kind === 'not-modified') {
       notes.push(`${scope.source}: 304`);
-      // Still a success: what we hold is current.
+      // Still a success, and nothing to write: what we hold is already current.
       await store.recordSuccess(
         scope.source,
         now,
@@ -305,37 +310,53 @@ async function syncTeamSnapshot(
 
     gamedays.push(...parsed.value.gamedays);
     anyFresh = true;
-    await store.recordSuccess(
-      scope.source,
-      now,
-      unquoteEtag(result.etag),
-      client.ledger.callsInLastHour('snapshot'),
-    );
+    pendingSuccess.push({ source: scope.source, etag: unquoteEtag(result.etag) });
     notes.push(`${scope.source}: ${parsed.value.gamedays.length} gameday(s)`);
   }
 
   if (!anyFresh) return notes.join(', ');
 
   const mapped = mapTeamSnapshot(gamedays, today);
-  // Parents before children: a game row's foreign key needs its gameday to exist.
-  await store.saveGamedays(mapped.gamedays);
-  await store.saveGames(mapped.games);
 
-  // Play-by-play is replaced per game rather than upserted, because upstream can delete an
-  // entry and an upsert would leave the stale row behind.
-  for (const gameday of gamedays) {
-    for (const game of gameday.games.filter(involvesTrackedTeam)) {
-      if (game.log === null) continue;
-      await store.replaceGameEvents(game.id, toGameEventRows(game));
+  try {
+    // Parents before children: a game row's foreign key needs its gameday to exist.
+    await store.saveGamedays(mapped.gamedays);
+    await store.saveGames(mapped.games);
+
+    // Play-by-play is replaced per game rather than upserted, because upstream can delete an
+    // entry and an upsert would leave the stale row behind.
+    for (const gameday of gamedays) {
+      for (const game of gameday.games.filter(involvesTrackedTeam)) {
+        if (game.log === null) continue;
+        await store.replaceGameEvents(game.id, toGameEventRows(game));
+      }
     }
+
+    // Keep the live tables to today's games only.
+    await store.pruneLiveGames([...todaysTrackedGameIds(gamedays, today)]);
+  } catch (cause) {
+    // The fetch was fine and the data was valid; we could not store it. Leaving `last_ok_at`
+    // and the ETag alone means the next tick retries with the same conditional request rather
+    // than believing it is already up to date.
+    const message = cause instanceof Error ? cause.message : String(cause);
+    for (const pending of pendingSuccess) {
+      await store.recordFailure(pending.source, now, `write failed: ${message}`);
+    }
+    throw cause;
+  }
+
+  for (const pending of pendingSuccess) {
+    await store.recordSuccess(
+      pending.source,
+      now,
+      pending.etag,
+      client.ledger.callsInLastHour('snapshot'),
+    );
   }
 
   for (const disagreement of mapped.disagreements) {
     disagreements.push(describeDisagreement(disagreement));
   }
-
-  // Keep the live table to today's games only.
-  await store.pruneLiveGames([...todaysTrackedGameIds(gamedays, today)]);
 
   return `${notes.join(', ')} → ${mapped.gamedays.length} gameday(s), ${mapped.games.length} game(s), ${mapped.events.length} event(s)`;
 }
@@ -388,11 +409,24 @@ async function syncLiveticker(
     return message;
   }
 
-  const rows = toLiveGameRows(parsed.value, new Set(gameIds));
-  await store.saveLiveGames(rows);
+  const known = new Set(gameIds);
+  const rows = toLiveGameRows(parsed.value, known);
+  const ticks = toLiveTickRows(parsed.value, known);
+
+  try {
+    await store.saveLiveGames(rows);
+    // Ticks after the score: a browser watching Realtime sees the score move, then the play that
+    // caused it, which is the order it happens in.
+    await store.saveLiveTicks(ticks);
+  } catch (cause) {
+    const message = cause instanceof Error ? cause.message : String(cause);
+    await store.recordFailure(source, now, `write failed: ${message}`);
+    throw cause;
+  }
+
   await store.recordSuccess(source, now, unquoteEtag(result.etag), 0);
 
-  return `${rows.length} live game(s) of ${parsed.value.length} returned`;
+  return `${rows.length} live game(s) of ${parsed.value.length} returned, ${ticks.length} tick(s)`;
 }
 
 /** The published tables — the standings we actually display. */

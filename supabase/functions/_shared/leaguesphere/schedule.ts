@@ -107,10 +107,17 @@ export function whatIsDue(input: ScheduleInput): Due {
   const inWindow = isGamedayWindow(input);
   const snapshotInterval = inWindow && !input.gamedayFinished ? GAMEDAY_INTERVAL_MS : HOURLY_MS;
 
-  if (input.gameInProgress) {
+  // Polled for the whole gameday window, not only once a game is known to be running.
+  //
+  // "In progress" is read from our own `games` rows, and those come from the snapshot, which is
+  // only refreshed every ten minutes. Gating the ticker on it meant that at a real kickoff the
+  // live tab stayed dark until the next snapshot happened to notice — up to ten minutes of a
+  // game nobody could follow. The liveticker costs nothing against the snapshot budget and is
+  // cached 60 s upstream, so polling it across the window is free and correct.
+  if (!input.gamedayFinished && (input.gameInProgress || inWindow)) {
     if (isDue(input, 'liveticker', LIVE_INTERVAL_MS)) {
       tasks.push('liveticker');
-      reasons.push('a game is in progress');
+      reasons.push(input.gameInProgress ? 'a game is in progress' : 'inside the gameday window');
     }
   }
 

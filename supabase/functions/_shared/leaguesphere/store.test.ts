@@ -170,16 +170,41 @@ Deno.test('standings are replaced per league season, not globally', async () => 
   assert(!('leagueKey' in written), 'camelCase keys must not reach PostgREST');
 });
 
-Deno.test('pruning live games keeps today’s and clears the rest', async () => {
+Deno.test('pruning live games clears both live tables, keeping today’s', async () => {
   const { store, calls } = storeWith();
 
   await store.pruneLiveGames([8983, 8985]);
+  // The scores and their ticks have to go together, or the tab shows a feed for a game it no
+  // longer has a score for.
+  assertEquals(calls.map((call) => call.method), ['DELETE', 'DELETE']);
+  assertStringIncludes(calls[0].path, '/results_live_games');
   assertStringIncludes(calls[0].path, 'game_id=not.in.(8983,8985)');
+  assertStringIncludes(calls[1].path, '/results_live_ticks');
+  assertStringIncludes(calls[1].path, 'game_id=not.in.(8983,8985)');
 
+  calls.length = 0;
   await store.pruneLiveGames([]);
-  // Nothing to keep means clear the table, and the filter must still match every row:
+  // Nothing to keep means clear both, and the filter must still match every row:
   // PostgREST refuses an unfiltered DELETE.
+  assertStringIncludes(calls[0].path, 'game_id=gte.0');
   assertStringIncludes(calls[1].path, 'game_id=gte.0');
+});
+
+Deno.test('live ticks are upserted on their own key, so re-delivery is free', async () => {
+  const { store, calls } = storeWith();
+  await store.saveLiveTicks([{
+    game_id: 9149,
+    tick_key: 'Touchdown: #75|2026-09-27T11:40:10.009392+00:00',
+    text: 'Touchdown: #75',
+    side: 'home',
+    occurred_at: '2026-09-27T11:40:10.009Z',
+    points: 6,
+    is_marker: false,
+  }]);
+
+  assertEquals(calls[0].method, 'POST');
+  assertStringIncludes(calls[0].path, 'on_conflict=game_id%2Ctick_key');
+  assertStringIncludes(calls[0].prefer ?? '', 'resolution=merge-duplicates');
 });
 
 // ── Sync state ───────────────────────────────────────────────────────────────

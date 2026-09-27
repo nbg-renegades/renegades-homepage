@@ -19,6 +19,7 @@ import type {
   GameRow,
   GamedayRow,
   LiveGameRow,
+  LiveTickRow,
 } from './mappers.ts';
 import type { StandingsRow } from './standings.ts';
 import type { Task } from './schedule.ts';
@@ -179,12 +180,23 @@ export class ResultsStore {
     await this.upsert('results_live_games', withTimestamp(rows), 'game_id');
   }
 
-  /** Clears live rows for games that are no longer today's. Keeps the table tiny. */
+  /**
+   * Live ticks.
+   *
+   * Upserted rather than replaced: the key is the tick itself, so re-delivering the same five
+   * ticks every minute is a no-op, and a tick that has scrolled out of upstream's window stays.
+   */
+  async saveLiveTicks(rows: readonly LiveTickRow[]): Promise<void> {
+    await this.upsert('results_live_ticks', rows, 'game_id,tick_key');
+  }
+
+  /** Clears live rows for games that are no longer today's. Keeps both tables tiny. */
   async pruneLiveGames(keepGameIds: readonly number[]): Promise<void> {
     const filter = keepGameIds.length === 0
       ? 'game_id=gte.0'
       : `game_id=not.in.(${keepGameIds.join(',')})`;
     await this.deleteWhere('results_live_games', filter);
+    await this.deleteWhere('results_live_ticks', filter);
   }
 
   /** Kickoff times of our games on a given date, for the scheduler. */

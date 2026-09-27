@@ -21,7 +21,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { map, shareReplay, type Observable } from 'rxjs';
+import { map, of, shareReplay, type Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LOGO_BASE_PATH } from '../components/results/results.config';
 
@@ -97,6 +97,23 @@ export interface GameEvent {
   readonly isMarker: boolean;
 }
 
+export interface LiveGame {
+  readonly gameId: number;
+  readonly homeScore: number;
+  readonly awayScore: number;
+  readonly lastTickAt: string | null;
+  readonly finished: boolean;
+}
+
+export interface LiveTick {
+  readonly gameId: number;
+  readonly text: string;
+  readonly side: 'home' | 'away' | null;
+  readonly occurredAt: string;
+  readonly points: number;
+  readonly isMarker: boolean;
+}
+
 /** When the data was last confirmed current, so the page can say "Stand: …". */
 export interface SyncFreshness {
   readonly lastOkAt: string | null;
@@ -156,6 +173,23 @@ interface GameEventRowDto {
   score_home: number;
   score_away: number;
   is_deleted: boolean;
+  is_marker: boolean;
+}
+
+interface LiveGameRowDto {
+  game_id: number;
+  home_score: number;
+  away_score: number;
+  last_tick_at: string | null;
+  finished: boolean;
+}
+
+interface LiveTickRowDto {
+  game_id: number;
+  text: string;
+  side: string | null;
+  occurred_at: string;
+  points: number;
   is_marker: boolean;
 }
 
@@ -238,6 +272,56 @@ export class ResultsService {
     return this.#http
       .get<StandingsRowDto[]>(`${this.#restUrl}/results_standings?${params}`, { headers: this.#headers })
       .pipe(map((rows) => rows.map(toStandingsEntry)));
+  }
+
+  /**
+   * Our team's games on one date.
+   *
+   * The live tab's scope. Filtered on the date rather than on `phase`, because `phase` is written
+   * by the sync and a gameday that finished minutes ago is already `past` — which is right for
+   * the schedule but would empty the live tab the moment the last whistle went, before anyone
+   * had read the final score.
+   */
+  todaysGames(teamId: number, date: string): Observable<readonly ResultsGame[]> {
+    const params = new URLSearchParams({
+      select: `id,date,games:results_games!inner(${GAME_COLUMNS})`,
+      date: `eq.${date}`,
+      'games.or': `(home_team_id.eq.${teamId},away_team_id.eq.${teamId})`,
+    });
+
+    return this.#http
+      .get<{ games: GameRow[] | null }[]>(
+        `${this.#restUrl}/results_gamedays?${params}`,
+        { headers: this.#headers },
+      )
+      .pipe(map((rows) => rows.flatMap((row) => (row.games ?? []).map(toGame)).sort(byKickoff)));
+  }
+
+  /** Live scores for the given games. Empty until a game actually starts. */
+  liveGames(gameIds: readonly number[]): Observable<readonly LiveGame[]> {
+    if (gameIds.length === 0) return of([]);
+    const params = new URLSearchParams({
+      select: 'game_id,home_score,away_score,last_tick_at,finished',
+      game_id: `in.(${gameIds.join(',')})`,
+    });
+
+    return this.#http
+      .get<LiveGameRowDto[]>(`${this.#restUrl}/results_live_games?${params}`, { headers: this.#headers })
+      .pipe(map((rows) => rows.map(toLiveGame)));
+  }
+
+  /** Live ticks for the given games, newest first. */
+  liveTicks(gameIds: readonly number[]): Observable<readonly LiveTick[]> {
+    if (gameIds.length === 0) return of([]);
+    const params = new URLSearchParams({
+      select: 'game_id,text,side,occurred_at,points,is_marker',
+      game_id: `in.(${gameIds.join(',')})`,
+      order: 'occurred_at.desc',
+    });
+
+    return this.#http
+      .get<LiveTickRowDto[]>(`${this.#restUrl}/results_live_ticks?${params}`, { headers: this.#headers })
+      .pipe(map((rows) => rows.map(toLiveTick)));
   }
 
   /** Play-by-play for one game, oldest first. Fetched when a game card is expanded. */
@@ -341,6 +425,27 @@ function toGameEvent(row: GameEventRowDto): GameEvent {
     scoreHome: row.score_home,
     scoreAway: row.score_away,
     isDeleted: row.is_deleted,
+    isMarker: row.is_marker,
+  };
+}
+
+function toLiveGame(row: LiveGameRowDto): LiveGame {
+  return {
+    gameId: row.game_id,
+    homeScore: row.home_score,
+    awayScore: row.away_score,
+    lastTickAt: row.last_tick_at,
+    finished: row.finished,
+  };
+}
+
+function toLiveTick(row: LiveTickRowDto): LiveTick {
+  return {
+    gameId: row.game_id,
+    text: row.text,
+    side: row.side === 'home' || row.side === 'away' ? row.side : null,
+    occurredAt: row.occurred_at,
+    points: row.points,
     isMarker: row.is_marker,
   };
 }

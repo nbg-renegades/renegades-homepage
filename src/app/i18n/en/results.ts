@@ -50,4 +50,14 @@ export const results = {
   'results.standings.promotionRestrictedTitle': 'Not eligible for promotion',
   'results.standings.promotionRestrictedNote':
     'Second teams are not eligible for promotion and are shown greyed out.',
+
+  // Live
+  'results.live.noGames': 'There is no gameday today. The live ticker shows games while they are being played.',
+  'results.live.inProgress': 'Live',
+  'results.live.finished': 'Finished',
+  'results.live.scheduled': 'Scheduled',
+  'results.live.connected': 'Updating automatically',
+  'results.live.unavailable': 'Automatic updates unavailable — please reload',
+  'results.live.notLive': 'Showing stored data',
+  'results.live.lastUpdate': 'Last play',
 };

@@ -50,4 +50,14 @@ export const results = {
   'results.standings.promotionRestrictedTitle': 'Nicht aufstiegsberechtigt',
   'results.standings.promotionRestrictedNote':
     'Zweite Mannschaften sind nicht aufstiegsberechtigt und werden grau dargestellt.',
+
+  // Live
+  'results.live.noGames': 'Heute ist kein Spieltag. Der Live-Ticker zeigt an Spieltagen die laufenden Spiele.',
+  'results.live.inProgress': 'Läuft',
+  'results.live.finished': 'Beendet',
+  'results.live.scheduled': 'Angesetzt',
+  'results.live.connected': 'Aktualisiert sich automatisch',
+  'results.live.unavailable': 'Automatische Aktualisierung nicht verfügbar — bitte neu laden',
+  'results.live.notLive': 'Stand der gespeicherten Daten',
+  'results.live.lastUpdate': 'Letzte Aktion',
 };

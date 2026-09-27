@@ -17,6 +17,10 @@ import {
 import {
   buildPlayByPlay,
   checkSideScores,
+  dedupeTicks,
+  isMarkerTick,
+  tickKey,
+  tickPoints,
   type ScoredEvent,
 } from './scoring.ts';
 import type {
@@ -73,6 +77,17 @@ export interface GameEventRow {
   readonly score_home: number;
   readonly score_away: number;
   readonly is_deleted: boolean;
+  readonly is_marker: boolean;
+}
+
+/** One live tick, keyed so repeated deliveries of the same tick collapse on upsert. */
+export interface LiveTickRow {
+  readonly game_id: number;
+  readonly tick_key: string;
+  readonly text: string;
+  readonly side: 'home' | 'away' | null;
+  readonly occurred_at: string;
+  readonly points: number;
   readonly is_marker: boolean;
 }
 
@@ -276,6 +291,41 @@ export function toLiveGameRows(
     }));
 }
 
+/**
+ * Live ticks for the games we hold, flattened across games.
+ *
+ * Keyed by `text|time` rather than by position: the liveticker is cached 60 s upstream and its
+ * default response repeats the five newest ticks, so consecutive polls overlap almost entirely.
+ * An upsert on that key makes re-delivery free and needs no read first.
+ *
+ * A tick whose instant upstream cannot be parsed is dropped rather than stored with a made-up
+ * time, because `occurred_at` is what orders the feed and drives "last update".
+ */
+export function toLiveTickRows(
+  live: readonly UpstreamLiveGame[],
+  knownGameIds: ReadonlySet<number>,
+): readonly LiveTickRow[] {
+  const rows: LiveTickRow[] = [];
+  for (const game of live) {
+    if (!knownGameIds.has(game.gameId)) continue;
+    for (const tick of dedupeTicks(game.ticks)) {
+      const occurredAt = Date.parse(tick.time);
+      if (Number.isNaN(occurredAt)) continue;
+      rows.push({
+        game_id: game.gameId,
+        tick_key: tickKey(tick),
+        text: tick.text,
+        side: tick.team,
+        occurred_at: new Date(occurredAt).toISOString(),
+        // A marker never scores, whatever its text happens to start with.
+        points: tick.team === null ? 0 : tickPoints(tick.text),
+        is_marker: isMarkerTick(tick),
+      });
+    }
+  }
+  return rows;
+}
+
 /** The newest tick's instant. Ticks arrive newest-first, but that is not relied on. */
 function latestTickTime(game: UpstreamLiveGame): string | null {
   let latest: string | null = null;
@@ -312,9 +362,14 @@ export function mapTeamSnapshot(
   gamedays: readonly UpstreamGameday[],
   today: string,
 ): MappedSnapshot {
-  const gamedayRows: GamedayRow[] = [];
-  const gameRows: GameRow[] = [];
-  const eventRows: GameEventRow[] = [];
+  // Keyed by id, not appended. The caller concatenates two snapshot scopes — everything but
+  // drafts, then drafts — and upstream treats them as disjoint, but nothing guarantees it: one
+  // gameday in both would otherwise reach Postgres twice in a single statement and fail the
+  // whole batch with "ON CONFLICT DO UPDATE command cannot affect row a second time", losing
+  // every other gameday with it. The later copy wins, which is the fresher of the two.
+  const gamedayRows = new Map<number, GamedayRow>();
+  const gameRows = new Map<number, GameRow>();
+  const eventRows = new Map<number, readonly GameEventRow[]>();
   const disagreements: ScoreDisagreement[] = [];
 
   for (const gameday of gamedays) {
@@ -322,15 +377,20 @@ export function mapTeamSnapshot(
     // A gameday can reach us for a team we no longer track; it then has nothing to show.
     if (ours.length === 0) continue;
 
-    gamedayRows.push(toGamedayRow(gameday, today));
+    gamedayRows.set(gameday.id, toGamedayRow(gameday, today));
     for (const game of ours) {
-      gameRows.push(toGameRow(game));
-      eventRows.push(...toGameEventRows(game));
+      gameRows.set(game.id, toGameRow(game));
+      eventRows.set(game.id, toGameEventRows(game));
       disagreements.push(...findScoreDisagreements(game));
     }
   }
 
-  return { gamedays: gamedayRows, games: gameRows, events: eventRows, disagreements };
+  return {
+    gamedays: [...gamedayRows.values()],
+    games: [...gameRows.values()],
+    events: [...eventRows.values()].flat(),
+    disagreements,
+  };
 }
 
 /**

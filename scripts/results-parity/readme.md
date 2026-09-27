@@ -72,3 +72,53 @@ progressions that are a subsequence of the widget's and end on the same score: 4
 
 The five games that appear on only one side are all on 2026-09-19: that gameday was rebuilt
 upstream after the widget's snapshot was taken on 2026-08-07, so its game ids changed.
+
+## Replaying a gameday (`replay-live.ts`)
+
+The live tab is the one part that cannot be checked by waiting for the data to look right — it
+only does anything while a game is being played. `replay-live.ts` stands in for LeagueSphere and
+hands out a progressively longer prefix of a recorded tick history, so a whole gameday can be run
+through the real sync function in a minute.
+
+Realtime is needed for this, which a bare PostgREST container does not provide, so use the full
+local stack. If another local Supabase project is already running, give this one its own ports in
+`supabase/config.toml` first (and put the file back afterwards — it is committed).
+
+```bash
+supabase start                      # note the API URL, ANON_KEY and SERVICE_ROLE_KEY it prints
+# apply the three results migrations from the performance repo, then:
+docker exec supabase_db_<ref> psql -U postgres -c "select cron.unschedule('results-sync-leaguesphere');"
+
+deno run --allow-net --allow-read scripts/results-parity/replay-live.ts --port 8787
+
+cd supabase/functions
+LEAGUESPHERE_BASE_URL=http://localhost:8787 \
+SUPABASE_URL=<API URL> SUPABASE_SERVICE_ROLE_KEY=<service role key> \
+RESULTS_SYNC_CRON_SECRET=local-test-cron-secret \
+  deno run --allow-net --allow-env --allow-read sync-leaguesphere/index.ts
+```
+
+Then, with `/ergebnisse/1-mannschaft/live?native=all` open in a browser pointed at the local stack,
+repeat:
+
+```bash
+curl -X POST http://localhost:8787/advance
+# the live ticker is due once a minute; this stands in for that minute passing
+docker exec supabase_db_<ref> psql -U postgres -c \
+  "update public.results_sync_state set last_ok_at = last_ok_at - interval '2 minutes' where source='liveticker';"
+curl -X POST http://localhost:8000/ -H 'x-cron-secret: local-test-cron-secret'
+```
+
+### Result on 2026-09-27
+
+The score walked the recorded game from 0:0 to 39:26 over 41 ticks and ended `finished`, and the
+open page updated **748 ms** after the sync returned, without a reload. Letting the snapshot catch
+up afterwards moved the game to `beendet` and its gameday to `past`, so it left the live tab and
+appeared under "Gespielte Spieltage".
+
+Running this is also what found three defects that no unit test would have: the two snapshot
+scopes were concatenated without deduplicating, so a gameday in both failed the whole write; the
+sync marked a scope successful before its rows were written, so a failing write looked healthy and
+backed off for an hour; and the live ticker was gated on a game already being known to be in
+progress, which is only known from the ten-minute snapshot — at a real kickoff the tab would have
+stayed dark for up to ten minutes.

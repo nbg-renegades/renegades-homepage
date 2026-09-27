@@ -13,6 +13,7 @@ import {
   toGameEventRows,
   toGameRow,
   toLiveGameRows,
+  toLiveTickRows,
 } from './mappers.ts';
 import { loadFixture } from './__fixtures__/load.ts';
 
@@ -353,4 +354,99 @@ Deno.test('every mapped row uses only columns the tables actually have', async (
     const missing = columns.filter((column) => !produced.has(column));
     assertEquals(missing, [], `${table}: column(s) never written`);
   }
+});
+
+// ── Live ticks ───────────────────────────────────────────────────────────────
+
+Deno.test('live ticks are mapped for known games only, keyed by text and time', async () => {
+  const parsed = parseLiveticker(await loadFixture('liveticker.get-all-ticks-for.json'));
+  assert(parsed.ok);
+
+  assertEquals(toLiveTickRows(parsed.value, new Set()), []);
+
+  const rows = toLiveTickRows(parsed.value, new Set([9149]));
+  assert(rows.length > 0);
+  assertEquals(rows.every((r) => r.game_id === 9149), true);
+
+  // The key is what makes re-delivery idempotent, so it must be unique per tick.
+  const keys = new Set(rows.map((r) => r.tick_key));
+  assertEquals(keys.size, rows.length);
+  assert(rows.every((r) => r.tick_key.includes('|')));
+});
+
+Deno.test('a marker tick is stored with no side and no points', async () => {
+  const parsed = parseLiveticker(await loadFixture('liveticker.get-all-ticks-for.json'));
+  assert(parsed.ok);
+  const rows = toLiveTickRows(parsed.value, new Set([9149]));
+
+  const finished = rows.find((r) => r.text === 'Spiel beendet');
+  assert(finished !== undefined);
+  assertEquals(finished.side, null);
+  assertEquals(finished.points, 0);
+  assertEquals(finished.is_marker, true);
+});
+
+Deno.test('scoring ticks carry their points, failed conversions carry none', async () => {
+  const parsed = parseLiveticker(await loadFixture('liveticker.get-all-ticks-for.json'));
+  assert(parsed.ok);
+  const rows = toLiveTickRows(parsed.value, new Set([9149, 9150]));
+
+  const touchdowns = rows.filter((r) => r.text.startsWith('Touchdown'));
+  assert(touchdowns.length > 0);
+  assertEquals(touchdowns.every((r) => r.points === 6), true);
+
+  // The sum of the ticks' points has to be the score upstream reports for that side.
+  for (const game of parsed.value) {
+    const mine = rows.filter((r) => r.game_id === game.gameId);
+    const home = mine.filter((r) => r.side === 'home').reduce((s, r) => s + r.points, 0);
+    const away = mine.filter((r) => r.side === 'away').reduce((s, r) => s + r.points, 0);
+    assertEquals({ home, away }, { home: game.home.score, away: game.away.score }, `game ${game.gameId}`);
+  }
+});
+
+Deno.test('overlapping polls of the 5-tick window produce the same rows', async () => {
+  const parsed = parseLiveticker(await loadFixture('liveticker.default-5-ticks.json'));
+  assert(parsed.ok);
+  const known = new Set(parsed.value.map((g) => g.gameId));
+
+  const first = toLiveTickRows(parsed.value, known);
+  // A later poll that shares four of five ticks must not invent new keys for them.
+  const overlapping = parsed.value.map((g) => ({ ...g, ticks: g.ticks.slice(1) }));
+  const second = toLiveTickRows(overlapping, known);
+
+  const firstKeys = new Set(first.map((r) => r.tick_key));
+  assert(second.every((r) => firstKeys.has(r.tick_key)));
+});
+
+Deno.test('a tick with an unparseable time is dropped rather than given a made-up one', () => {
+  const rows = toLiveTickRows([{
+    gameId: 1,
+    status: '2. Halbzeit',
+    home: { name: 'A', score: 0 },
+    away: { name: 'B', score: 0 },
+    ticks: [
+      { text: 'Touchdown: #1', team: 'home', time: 'not a time' },
+      { text: 'Touchdown: #2', team: 'home', time: '2026-09-27T11:40:10.009392+00:00' },
+    ],
+  }], new Set([1]));
+
+  assertEquals(rows.length, 1);
+  assertEquals(rows[0].text, 'Touchdown: #2');
+});
+
+Deno.test('a gameday returned by both snapshot scopes is written once, not twice', async () => {
+  const gamedays = await teamSnapshot();
+
+  // The sync concatenates the no-status and the status=DRAFT responses. Upstream treats them as
+  // disjoint; if it ever did not, the duplicate would reach Postgres in one statement and fail
+  // the whole batch with "ON CONFLICT DO UPDATE command cannot affect row a second time".
+  const mapped = mapTeamSnapshot([...gamedays, ...gamedays], '2026-09-27');
+  const once = mapTeamSnapshot(gamedays, '2026-09-27');
+
+  assertEquals(mapped.gamedays.length, once.gamedays.length);
+  assertEquals(mapped.games.length, once.games.length);
+  assertEquals(mapped.events.length, once.events.length);
+
+  assertEquals(new Set(mapped.gamedays.map((g) => g.id)).size, mapped.gamedays.length);
+  assertEquals(new Set(mapped.games.map((g) => g.id)).size, mapped.games.length);
 });
