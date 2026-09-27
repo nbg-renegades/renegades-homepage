@@ -40,20 +40,22 @@ export function tabFromParam(param: string | null | undefined): Tab {
 /**
  * Which tabs render from our own database instead of the embedded widget.
  *
- * All off for now, deliberately. The tables live in the shared Supabase project and are created
- * by a migration in the performance repo, which nothing applies automatically — until someone
- * runs `supabase db push` there and deploys `sync-leaguesphere`, a native tab would query tables
- * that do not exist and show the error state instead of the widget. Turn `spielplan` and
- * `tabelle` on in the same change that confirms the sync has run.
+ * Schedule and table are on: the schema is applied, `sync-leaguesphere` is deployed and a real
+ * sync has written 16 gamedays, 49 games, 682 play-by-play rows and 39 table rows, verified
+ * against the published tables.
  *
- * Until then `?native=all` previews the native rendering on the real site without changing what
- * anyone else sees. The switch is per tab so the schedule and table can go live while the live
- * ticker is still being built, and so either can be turned back off on its own if a real gameday
- * shows up something the fixtures did not. All of this goes away with the final cutover.
+ * `live` stays off deliberately. There is no gameday for about six months, so it would spend
+ * that time showing an empty state while opening a Realtime connection for every visitor who
+ * landed on it. Turn it on a week or two before the first gameday, which also puts a human in
+ * front of it close enough to the day to notice anything the replay could not.
+ *
+ * `?native=none` falls back to the widget without a deploy, and `?native=all` previews whatever
+ * is still off. The switch is per tab so either side can be moved on its own. All of this goes
+ * away with the final cutover, along with the iframe.
  */
 export const NATIVE_TABS: Readonly<Record<Tab, boolean>> = {
-  spielplan: false,
-  tabelle: false,
+  spielplan: true,
+  tabelle: true,
   live: false,
 };
 
