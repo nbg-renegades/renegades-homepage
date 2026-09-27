@@ -1,0 +1,5252 @@
+{
+ "generated_at": "2026-09-27T16:30:30.481417+00:00",
+ "scope": {
+  "league": null,
+  "season": null,
+  "team": [
+   159,
+   287
+  ],
+  "date_from": null,
+  "date_to": null,
+  "status": null,
+  "include": [
+   "games",
+   "logs"
+  ],
+  "count": 4
+ },
+ "gamedays": [
+  {
+   "id": 645,
+   "name": "Nürnberg Renegades",
+   "season": 6,
+   "season_display": "2026",
+   "league": 7,
+   "league_display": "DKB DFFL",
+   "date": "2026-05-09",
+   "start": "10:00",
+   "format": "CUSTOM",
+   "author": 10,
+   "address": "Hofer Straße 30, 90411 Nürnberg",
+   "status": "PUBLISHED",
+   "has_designer_state": false,
+   "games": [
+    {
+     "id": 7372,
+     "gameday": 645,
+     "scheduled": "10:00:00",
+     "field": 1,
+     "officials": 159,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14567,
+       "team_id": 20,
+       "team_name": "Spatz",
+       "fh": 20,
+       "sh": 14,
+       "pa": 32,
+       "isHome": true
+      },
+      {
+       "id": 14568,
+       "team_id": 48,
+       "team_name": "Kelk",
+       "fh": 20,
+       "sh": 12,
+       "pa": 34,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 20,
+      "away": 20
+     },
+     "final_score": {
+      "home": 34,
+      "away": 32
+     },
+     "log": {
+      "gameId": 7372,
+      "isFirstHalf": false,
+      "home": {
+       "id": 20,
+       "name": "Spatz",
+       "score": 34,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 5,
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "td": 44,
+          "pat2": 5
+         },
+         {
+          "sequence": 1,
+          "td": 14,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 44,
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "td": 4,
+          "pat2": 5
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 48,
+       "name": "Kelk",
+       "score": 32,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 4,
+          "pat2": null
+         },
+         {
+          "sequence": 4,
+          "td": 15,
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 26,
+          "pat2": 26
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 22,
+          "pat1": null
+         },
+         {
+          "sequence": 8,
+          "td": 4,
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7373,
+     "gameday": 645,
+     "scheduled": "10:00:00",
+     "field": 2,
+     "officials": 243,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14569,
+       "team_id": 22,
+       "team_name": "Lions",
+       "fh": 7,
+       "sh": 7,
+       "pa": 42,
+       "isHome": true
+      },
+      {
+       "id": 14570,
+       "team_id": 30,
+       "team_name": "Wall",
+       "fh": 28,
+       "sh": 14,
+       "pa": 14,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 7,
+      "away": 28
+     },
+     "final_score": {
+      "home": 14,
+      "away": 42
+     },
+     "log": {
+      "gameId": 7373,
+      "isFirstHalf": true,
+      "home": {
+       "id": 22,
+       "name": "Lions",
+       "score": 14,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "td": 80,
+          "pat1": 25
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 80,
+          "pat1": 2
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 30,
+       "name": "Wall",
+       "score": 42,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 3,
+          "pat2": 0
+         },
+         {
+          "sequence": 6,
+          "td": 3,
+          "pat2": 77
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 4,
+          "td": 3,
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "td": 3,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 23,
+          "pat2": null
+         },
+         {
+          "sequence": 9,
+          "td": 17,
+          "pat2": 0
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7374,
+     "gameday": 645,
+     "scheduled": "11:10:00",
+     "field": 1,
+     "officials": 20,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14571,
+       "team_id": 112,
+       "team_name": "LLions",
+       "fh": 28,
+       "sh": 24,
+       "pa": 32,
+       "isHome": true
+      },
+      {
+       "id": 14572,
+       "team_id": 159,
+       "team_name": "Nürn",
+       "fh": 19,
+       "sh": 13,
+       "pa": 52,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 28,
+      "away": 19
+     },
+     "final_score": {
+      "home": 52,
+      "away": 32
+     },
+     "log": {
+      "gameId": 7374,
+      "isFirstHalf": true,
+      "home": {
+       "id": 112,
+       "name": "LLions",
+       "score": 52,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 3,
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "td": 3,
+          "pat2": 19
+         },
+         {
+          "sequence": 4,
+          "td": 19,
+          "pat2": 3
+         },
+         {
+          "sequence": 2,
+          "td": 30,
+          "pat2": null
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 24,
+        "entries": [
+         {
+          "sequence": 18,
+          "td": 19,
+          "pat2": 19
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 16,
+          "td": 3,
+          "pat2": 30
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 11,
+          "td": 1,
+          "pat2": 30
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 159,
+       "name": "Nürn",
+       "score": 32,
+       "firsthalf": {
+        "score": 19,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 8,
+          "pat2": null
+         },
+         {
+          "sequence": 5,
+          "td": 18,
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "td": 23,
+          "pat1": 8
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 0,
+          "pat2": null
+         },
+         {
+          "sequence": 13,
+          "td": 8,
+          "pat1": 18
+         },
+         {
+          "sequence": 12,
+          "td": 8,
+          "isDeleted": true,
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7375,
+     "gameday": 645,
+     "scheduled": "11:10:00",
+     "field": 2,
+     "officials": 22,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14573,
+       "team_id": 115,
+       "team_name": "Dukes",
+       "fh": 6,
+       "sh": 0,
+       "pa": 46,
+       "isHome": true
+      },
+      {
+       "id": 14574,
+       "team_id": 243,
+       "team_name": "Erlangen",
+       "fh": 26,
+       "sh": 20,
+       "pa": 6,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 26
+     },
+     "final_score": {
+      "home": 6,
+      "away": 46
+     },
+     "log": {
+      "gameId": 7375,
+      "isFirstHalf": false,
+      "home": {
+       "id": 115,
+       "name": "Dukes",
+       "score": 6,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 2,
+          "td": 24,
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 243,
+       "name": "Erlangen",
+       "score": 46,
+       "firsthalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 4,
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 5,
+          "td": 23,
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "td": 23,
+          "pat2": 23
+         },
+         {
+          "sequence": 1,
+          "td": 5,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 23,
+          "pat2": 5
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 12,
+          "td": 23,
+          "pat2": null
+         },
+         {
+          "sequence": 10,
+          "td": 23,
+          "pat2": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7376,
+     "gameday": 645,
+     "scheduled": "12:20:00",
+     "field": 2,
+     "officials": 112,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14575,
+       "team_id": 30,
+       "team_name": "Wall",
+       "fh": 12,
+       "sh": 14,
+       "pa": 6,
+       "isHome": true
+      },
+      {
+       "id": 14576,
+       "team_id": 20,
+       "team_name": "Spatz",
+       "fh": 6,
+       "sh": 0,
+       "pa": 26,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 12,
+      "away": 6
+     },
+     "final_score": {
+      "home": 26,
+      "away": 6
+     },
+     "log": {
+      "gameId": 7376,
+      "isFirstHalf": false,
+      "home": {
+       "id": 30,
+       "name": "Wall",
+       "score": 26,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 4,
+          "td": 3,
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 3,
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 10,
+          "td": 3,
+          "pat2": 3
+         },
+         {
+          "sequence": 8,
+          "td": 0,
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 20,
+       "name": "Spatz",
+       "score": 6,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "td": 44,
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7377,
+     "gameday": 645,
+     "scheduled": "12:20:00",
+     "field": 1,
+     "officials": 115,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14577,
+       "team_id": 48,
+       "team_name": "Kelk",
+       "fh": 8,
+       "sh": 8,
+       "pa": 33,
+       "isHome": true
+      },
+      {
+       "id": 14578,
+       "team_id": 22,
+       "team_name": "Lions",
+       "fh": 21,
+       "sh": 12,
+       "pa": 16,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 8,
+      "away": 21
+     },
+     "final_score": {
+      "home": 16,
+      "away": 33
+     },
+     "log": {
+      "gameId": 7377,
+      "isFirstHalf": true,
+      "home": {
+       "id": 48,
+       "name": "Kelk",
+       "score": 16,
+       "firsthalf": {
+        "score": 8,
+        "entries": [
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 2,
+          "td": 22,
+          "pat2": 15
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 8,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 4,
+          "pat2": 15
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 22,
+       "name": "Lions",
+       "score": 33,
+       "firsthalf": {
+        "score": 21,
+        "entries": [
+         {
+          "sequence": 5,
+          "td": 25,
+          "pat1": 80
+         },
+         {
+          "sequence": 3,
+          "td": 2,
+          "pat2": null
+         },
+         {
+          "sequence": 1,
+          "td": 5,
+          "pat2": 25
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 12,
+          "td": 80,
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 10,
+          "td": 5,
+          "pat2": null
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7378,
+     "gameday": 645,
+     "scheduled": "13:30:00",
+     "field": 2,
+     "officials": 30,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14579,
+       "team_id": 159,
+       "team_name": "Nürn",
+       "fh": 13,
+       "sh": 7,
+       "pa": 27,
+       "isHome": true
+      },
+      {
+       "id": 14580,
+       "team_id": 115,
+       "team_name": "Dukes",
+       "fh": 12,
+       "sh": 15,
+       "pa": 20,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 13,
+      "away": 12
+     },
+     "final_score": {
+      "home": 20,
+      "away": 27
+     },
+     "log": {
+      "gameId": 7378,
+      "isFirstHalf": true,
+      "home": {
+       "id": 159,
+       "name": "Nürn",
+       "score": 20,
+       "firsthalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 7,
+          "td": 8,
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 2,
+          "td": 18,
+          "pat1": 18
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 10,
+          "td": 8,
+          "pat1": 23
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 115,
+       "name": "Dukes",
+       "score": 27,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 24,
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Interception",
+          "isDeleted": true
+         },
+         {
+          "sequence": 1,
+          "td": 4,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 15,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 14,
+          "pat1": 31
+         },
+         {
+          "sequence": 11,
+          "td": 31,
+          "pat2": 24
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7379,
+     "gameday": 645,
+     "scheduled": "13:30:00",
+     "field": 1,
+     "officials": 48,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14581,
+       "team_id": 243,
+       "team_name": "Erlangen",
+       "fh": 32,
+       "sh": 14,
+       "pa": 52,
+       "isHome": true
+      },
+      {
+       "id": 14582,
+       "team_id": 112,
+       "team_name": "LLions",
+       "fh": 30,
+       "sh": 22,
+       "pa": 46,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 32,
+      "away": 30
+     },
+     "final_score": {
+      "home": 46,
+      "away": 52
+     },
+     "log": {
+      "gameId": 7379,
+      "isFirstHalf": true,
+      "home": {
+       "id": 243,
+       "name": "Erlangen",
+       "score": 46,
+       "firsthalf": {
+        "score": 32,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 23,
+          "pat2": 23
+         },
+         {
+          "sequence": 5,
+          "td": 23,
+          "pat2": 11
+         },
+         {
+          "sequence": 3,
+          "td": 5,
+          "pat2": 22
+         },
+         {
+          "sequence": 1,
+          "td": 9,
+          "pat2": 5
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 23,
+          "pat2": 23
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 11,
+          "td": 23,
+          "pat1": null
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 112,
+       "name": "LLions",
+       "score": 52,
+       "firsthalf": {
+        "score": 30,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 19,
+          "pat2": 1
+         },
+         {
+          "sequence": 7,
+          "td": 19,
+          "pat2": 19
+         },
+         {
+          "sequence": 6,
+          "td": 19,
+          "isDeleted": true,
+          "pat1": 19
+         },
+         {
+          "sequence": 4,
+          "td": 30,
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 3,
+          "pat2": 3
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 22,
+        "entries": [
+         {
+          "sequence": 17,
+          "Safety (+2)": 2
+         },
+         {
+          "sequence": 16,
+          "td": 1,
+          "pat2": null
+         },
+         {
+          "sequence": 14,
+          "td": 30,
+          "pat2": null
+         },
+         {
+          "sequence": 12,
+          "td": 19,
+          "pat2": 1
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7380,
+     "gameday": 645,
+     "scheduled": "14:40:00",
+     "field": 1,
+     "officials": 20,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14583,
+       "team_id": 115,
+       "team_name": "Dukes",
+       "fh": 19,
+       "sh": 13,
+       "pa": 46,
+       "isHome": true
+      },
+      {
+       "id": 14584,
+       "team_id": 30,
+       "team_name": "Wall",
+       "fh": 28,
+       "sh": 18,
+       "pa": 32,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 19,
+      "away": 28
+     },
+     "final_score": {
+      "home": 32,
+      "away": 46
+     },
+     "log": {
+      "gameId": 7380,
+      "isFirstHalf": true,
+      "home": {
+       "id": 115,
+       "name": "Dukes",
+       "score": 32,
+       "firsthalf": {
+        "score": 19,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 14,
+          "pat1": 4
+         },
+         {
+          "sequence": 6,
+          "td": 24,
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 4,
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 4,
+          "pat1": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 13,
+          "td": 4,
+          "pat1": 14
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 30,
+       "name": "Wall",
+       "score": 46,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 18,
+          "pat2": 3
+         },
+         {
+          "sequence": 5,
+          "td": 0,
+          "pat2": 0
+         },
+         {
+          "sequence": 3,
+          "td": 0,
+          "pat2": null
+         },
+         {
+          "sequence": 1,
+          "td": 0,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 3,
+          "pat2": null
+         },
+         {
+          "sequence": 12,
+          "td": 3,
+          "pat2": null
+         },
+         {
+          "sequence": 10,
+          "td": 77,
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7381,
+     "gameday": 645,
+     "scheduled": "14:40:00",
+     "field": 2,
+     "officials": 22,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14585,
+       "team_id": 112,
+       "team_name": "LLions",
+       "fh": 28,
+       "sh": 15,
+       "pa": 40,
+       "isHome": true
+      },
+      {
+       "id": 14586,
+       "team_id": 48,
+       "team_name": "Kelk",
+       "fh": 20,
+       "sh": 20,
+       "pa": 43,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 28,
+      "away": 20
+     },
+     "final_score": {
+      "home": 43,
+      "away": 40
+     },
+     "log": {
+      "gameId": 7381,
+      "isFirstHalf": false,
+      "home": {
+       "id": 112,
+       "name": "LLions",
+       "score": 43,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 30,
+          "pat2": 1
+         },
+         {
+          "sequence": 5,
+          "td": 3,
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "td": 1,
+          "pat1": null
+         },
+         {
+          "sequence": 1,
+          "td": 30,
+          "pat2": 19
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 15,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 30,
+          "pat2": 19
+         },
+         {
+          "sequence": 9,
+          "td": 1,
+          "pat1": 30
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 48,
+       "name": "Kelk",
+       "score": 40,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 26,
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 26,
+          "pat2": 26
+         },
+         {
+          "sequence": 2,
+          "td": 15,
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 12,
+          "td": 4,
+          "pat2": null
+         },
+         {
+          "sequence": 10,
+          "td": 4,
+          "pat2": 26
+         },
+         {
+          "sequence": 8,
+          "td": 4,
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7382,
+     "gameday": 645,
+     "scheduled": "15:50:00",
+     "field": 1,
+     "officials": 115,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14587,
+       "team_id": 159,
+       "team_name": "Nürn",
+       "fh": 7,
+       "sh": 6,
+       "pa": 48,
+       "isHome": true
+      },
+      {
+       "id": 14588,
+       "team_id": 20,
+       "team_name": "Spatz",
+       "fh": 26,
+       "sh": 22,
+       "pa": 13,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 7,
+      "away": 26
+     },
+     "final_score": {
+      "home": 13,
+      "away": 48
+     },
+     "log": {
+      "gameId": 7382,
+      "isFirstHalf": true,
+      "home": {
+       "id": 159,
+       "name": "Nürn",
+       "score": 13,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 18,
+          "pat1": 18
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 10,
+          "td": 8,
+          "pat1": null
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 20,
+       "name": "Spatz",
+       "score": 48,
+       "firsthalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 44,
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "td": 0,
+          "pat2": 5
+         },
+         {
+          "sequence": 4,
+          "td": 9,
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 2,
+          "td": 0,
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 22,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 14,
+          "pat2": 5
+         },
+         {
+          "sequence": 11,
+          "td": 44,
+          "pat2": 14
+         },
+         {
+          "sequence": 9,
+          "td": 14,
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7383,
+     "gameday": 645,
+     "scheduled": "15:50:00",
+     "field": 2,
+     "officials": 112,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14589,
+       "team_id": 243,
+       "team_name": "Erlangen",
+       "fh": 20,
+       "sh": 12,
+       "pa": 32,
+       "isHome": true
+      },
+      {
+       "id": 14590,
+       "team_id": 22,
+       "team_name": "Lions",
+       "fh": 12,
+       "sh": 20,
+       "pa": 32,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 20,
+      "away": 12
+     },
+     "final_score": {
+      "home": 32,
+      "away": 32
+     },
+     "log": {
+      "gameId": 7383,
+      "isFirstHalf": true,
+      "home": {
+       "id": 243,
+       "name": "Erlangen",
+       "score": 32,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 5,
+          "td": 23,
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "td": 23,
+          "pat2": null
+         },
+         {
+          "sequence": 1,
+          "td": 4,
+          "pat2": 5
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 4,
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 7,
+          "td": 5,
+          "pat1": null
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 22,
+       "name": "Lions",
+       "score": 32,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 4,
+          "td": 25,
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "td": 25,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 80,
+          "pat2": 22
+         },
+         {
+          "sequence": 8,
+          "td": 22,
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "td": 25,
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": 844,
+   "name": "FF BL Spieltag in Rödental",
+   "season": 6,
+   "season_display": "2026",
+   "league": 18,
+   "league_display": "FF BL",
+   "date": "2026-05-23",
+   "start": "10:00",
+   "format": "6_2",
+   "author": 205,
+   "address": "Adresse folgt in der Einladung",
+   "status": "PUBLISHED",
+   "has_designer_state": true,
+   "games": [
+    {
+     "id": 8933,
+     "gameday": 844,
+     "scheduled": "10:00:00",
+     "field": 1,
+     "officials": 501,
+     "stage": "Liga",
+     "standing": "Game 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17687,
+       "team_id": 391,
+       "team_name": "Rödental",
+       "fh": 0,
+       "sh": 6,
+       "pa": 65,
+       "isHome": true
+      },
+      {
+       "id": 17688,
+       "team_id": 393,
+       "team_name": "Erlangen2",
+       "fh": 29,
+       "sh": 36,
+       "pa": 6,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 29
+     },
+     "final_score": {
+      "home": 6,
+      "away": 65
+     },
+     "log": {
+      "gameId": 8933,
+      "isFirstHalf": false,
+      "home": {
+       "id": 391,
+       "name": "Rödental",
+       "score": 6,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 20,
+          "td": 1,
+          "pat1": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 393,
+       "name": "Erlangen2",
+       "score": 65,
+       "firsthalf": {
+        "score": 29,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 85,
+          "pat1": 85
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 9,
+          "td": 69,
+          "pat2": 35
+         },
+         {
+          "sequence": 7,
+          "td": 82,
+          "pat1": 82
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 3,
+          "td": 25,
+          "pat1": 15
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 36,
+        "entries": [
+         {
+          "sequence": 23,
+          "td": 51,
+          "pat2": 25
+         },
+         {
+          "sequence": 22,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 21,
+          "td": 85,
+          "pat1": 85
+         },
+         {
+          "sequence": 19,
+          "td": 25,
+          "pat1": 10
+         },
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 17,
+          "td": 15,
+          "pat1": null
+         },
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 15,
+          "td": 25,
+          "pat2": 82
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8934,
+     "gameday": 844,
+     "scheduled": "11:10:00",
+     "field": 1,
+     "officials": 393,
+     "stage": "Liga",
+     "standing": "Game 2",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17689,
+       "team_id": 501,
+       "team_name": "Ramsenthal2",
+       "fh": 6,
+       "sh": 12,
+       "pa": 46,
+       "isHome": true
+      },
+      {
+       "id": 17690,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 20,
+       "sh": 26,
+       "pa": 18,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 20
+     },
+     "final_score": {
+      "home": 18,
+      "away": 46
+     },
+     "log": {
+      "gameId": 8934,
+      "isFirstHalf": false,
+      "home": {
+       "id": 501,
+       "name": "Ramsenthal2",
+       "score": 18,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 99,
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 17,
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "td": 18,
+          "pat1": null
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 46,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 19,
+          "pat1": 99
+         },
+         {
+          "sequence": 5,
+          "td": 7,
+          "pat1": 6
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 3,
+          "td": 99,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 32,
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "td": 6,
+          "pat1": 19
+         },
+         {
+          "sequence": 11,
+          "td": 6,
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "td": 19,
+          "pat1": 32
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8935,
+     "gameday": 844,
+     "scheduled": "12:20:00",
+     "field": 1,
+     "officials": 391,
+     "stage": "Liga",
+     "standing": "Game 3",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17691,
+       "team_id": 393,
+       "team_name": "Erlangen2",
+       "fh": 25,
+       "sh": 43,
+       "pa": 12,
+       "isHome": true
+      },
+      {
+       "id": 17692,
+       "team_id": 501,
+       "team_name": "Ramsenthal2",
+       "fh": 12,
+       "sh": 0,
+       "pa": 68,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 25,
+      "away": 12
+     },
+     "final_score": {
+      "home": 68,
+      "away": 12
+     },
+     "log": {
+      "gameId": 8935,
+      "isFirstHalf": false,
+      "home": {
+       "id": 393,
+       "name": "Erlangen2",
+       "score": 68,
+       "firsthalf": {
+        "score": 25,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 82,
+          "pat2": null
+         },
+         {
+          "sequence": 5,
+          "td": 17,
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "td": 82,
+          "pat1": null
+         },
+         {
+          "sequence": 1,
+          "td": 17,
+          "pat1": 15
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 43,
+        "entries": [
+         {
+          "sequence": 20,
+          "td": 35,
+          "pat1": 69
+         },
+         {
+          "sequence": 18,
+          "td": 10,
+          "pat2": 82
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 16,
+          "td": 15,
+          "pat2": 35
+         },
+         {
+          "sequence": 14,
+          "td": 85,
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 12,
+          "td": 10,
+          "pat2": null
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 10,
+          "td": 35,
+          "pat2": 85
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 501,
+       "name": "Ramsenthal2",
+       "score": 12,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 17,
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 99,
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "isDeleted": true
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8936,
+     "gameday": 844,
+     "scheduled": "13:30:00",
+     "field": 1,
+     "officials": 501,
+     "stage": "Liga",
+     "standing": "Game 4",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17693,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 0,
+       "sh": 7,
+       "pa": 19,
+       "isHome": true
+      },
+      {
+       "id": 17694,
+       "team_id": 393,
+       "team_name": "Erlangen2",
+       "fh": 13,
+       "sh": 6,
+       "pa": 7,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 13
+     },
+     "final_score": {
+      "home": 7,
+      "away": 19
+     },
+     "log": {
+      "gameId": 8936,
+      "isFirstHalf": false,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 7,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 19,
+          "pat1": 19
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 393,
+       "name": "Erlangen2",
+       "score": 19,
+       "firsthalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 25,
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 85,
+          "pat1": 85
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 8,
+          "td": 85,
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8937,
+     "gameday": 844,
+     "scheduled": "14:40:00",
+     "field": 1,
+     "officials": 393,
+     "stage": "Liga",
+     "standing": "Game 5",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17695,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 20,
+       "sh": 20,
+       "pa": 15,
+       "isHome": true
+      },
+      {
+       "id": 17696,
+       "team_id": 391,
+       "team_name": "Rödental",
+       "fh": 6,
+       "sh": 9,
+       "pa": 40,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 20,
+      "away": 6
+     },
+     "final_score": {
+      "home": 40,
+      "away": 15
+     },
+     "log": {
+      "gameId": 8937,
+      "isFirstHalf": false,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 40,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 19,
+          "pat1": 7
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 5,
+          "td": 32,
+          "pat1": 6
+         },
+         {
+          "sequence": 3,
+          "td": 32,
+          "pat1": null
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 18,
+          "td": 42,
+          "pat1": 32
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 14,
+          "td": 32,
+          "pat1": 19
+         },
+         {
+          "sequence": 10,
+          "td": 33,
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 391,
+       "name": "Rödental",
+       "score": 15,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 1,
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 9,
+        "entries": [
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 13,
+          "td": 1,
+          "pat1": 1
+         },
+         {
+          "sequence": 12,
+          "Safety (+2)": 1
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8938,
+     "gameday": 844,
+     "scheduled": "15:50:00",
+     "field": 1,
+     "officials": 287,
+     "stage": "Liga",
+     "standing": "Game 6",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17697,
+       "team_id": 391,
+       "team_name": "Rödental",
+       "fh": 12,
+       "sh": 14,
+       "pa": 0,
+       "isHome": true
+      },
+      {
+       "id": 17698,
+       "team_id": 501,
+       "team_name": "Ramsenthal2",
+       "fh": 0,
+       "sh": 0,
+       "pa": 26,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 12,
+      "away": 0
+     },
+     "final_score": {
+      "home": 26,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8938,
+      "isFirstHalf": false,
+      "home": {
+       "id": 391,
+       "name": "Rödental",
+       "score": 26,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 6,
+          "td": 7,
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 4,
+          "td": 20,
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 14,
+          "td": 7,
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "td": 48,
+          "pat2": 1
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 501,
+       "name": "Ramsenthal2",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": 852,
+   "name": "FF BL Spieltag in Königsbrunn",
+   "season": 6,
+   "season_display": "2026",
+   "league": 18,
+   "league_display": "FF BL",
+   "date": "2026-06-20",
+   "start": "10:00",
+   "format": "6_2",
+   "author": 205,
+   "address": "Königsbrunn",
+   "status": "PUBLISHED",
+   "has_designer_state": true,
+   "games": [
+    {
+     "id": 8981,
+     "gameday": 852,
+     "scheduled": "10:00:00",
+     "field": 1,
+     "officials": 493,
+     "stage": "Liga",
+     "standing": "Game 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17783,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 28,
+       "sh": 25,
+       "pa": 12,
+       "isHome": true
+      },
+      {
+       "id": 17784,
+       "team_id": 389,
+       "team_name": "Gendorf",
+       "fh": 6,
+       "sh": 6,
+       "pa": 53,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 28,
+      "away": 6
+     },
+     "final_score": {
+      "home": 53,
+      "away": 12
+     },
+     "log": {
+      "gameId": 8981,
+      "isFirstHalf": false,
+      "home": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 53,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 24,
+          "pat1": 84
+         },
+         {
+          "sequence": 7,
+          "td": 56,
+          "pat1": 8
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "td": 24,
+          "pat2": 8
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 1,
+          "td": 8,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 25,
+        "entries": [
+         {
+          "sequence": 17,
+          "td": 84,
+          "pat1": 61
+         },
+         {
+          "sequence": 15,
+          "td": 84,
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "td": 84,
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "td": 24,
+          "pat1": null
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 389,
+       "name": "Gendorf",
+       "score": 12,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 6,
+          "td": 5,
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 12,
+          "td": 5,
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8982,
+     "gameday": 852,
+     "scheduled": "10:00:00",
+     "field": 2,
+     "officials": 287,
+     "stage": "Liga",
+     "standing": "Game 2",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17785,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 6,
+       "sh": 7,
+       "pa": 0,
+       "isHome": true
+      },
+      {
+       "id": 17786,
+       "team_id": 315,
+       "team_name": "Passau",
+       "fh": 0,
+       "sh": 0,
+       "pa": 13,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 0
+     },
+     "final_score": {
+      "home": 13,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8982,
+      "isFirstHalf": false,
+      "home": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 13,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 92,
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 86,
+          "pat1": 92
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 315,
+       "name": "Passau",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8983,
+     "gameday": 852,
+     "scheduled": "11:10:00",
+     "field": 1,
+     "officials": 254,
+     "stage": "Liga",
+     "standing": "Game 3",
+     "status": "Geplant",
+     "results": [
+      {
+       "id": 17787,
+       "team_id": 389,
+       "team_name": "Gendorf",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": true
+      },
+      {
+       "id": 17788,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 0
+     },
+     "final_score": {
+      "home": 0,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8983,
+      "isFirstHalf": true,
+      "home": {
+       "id": 389,
+       "name": "Gendorf",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      },
+      "away": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      }
+     }
+    },
+    {
+     "id": 8984,
+     "gameday": 852,
+     "scheduled": "11:10:00",
+     "field": 2,
+     "officials": 223,
+     "stage": "Liga",
+     "standing": "Game 4",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17789,
+       "team_id": 315,
+       "team_name": "Passau",
+       "fh": 13,
+       "sh": 7,
+       "pa": 39,
+       "isHome": true
+      },
+      {
+       "id": 17790,
+       "team_id": 493,
+       "team_name": "Fursty2",
+       "fh": 19,
+       "sh": 20,
+       "pa": 20,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 13,
+      "away": 19
+     },
+     "final_score": {
+      "home": 20,
+      "away": 39
+     },
+     "log": {
+      "gameId": 8984,
+      "isFirstHalf": false,
+      "home": {
+       "id": 315,
+       "name": "Passau",
+       "score": 20,
+       "firsthalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 4,
+          "td": 21,
+          "pat1": 12
+         },
+         {
+          "sequence": 2,
+          "td": 12,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 10,
+          "td": 21,
+          "pat1": 10
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 493,
+       "name": "Fursty2",
+       "score": 39,
+       "firsthalf": {
+        "score": 19,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 28,
+          "pat1": null
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 5,
+          "td": 4,
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "td": 18,
+          "pat1": 31
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 28,
+          "pat1": 75
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 13,
+          "td": 31,
+          "pat1": 31
+         },
+         {
+          "sequence": 11,
+          "td": 75,
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8985,
+     "gameday": 852,
+     "scheduled": "12:20:00",
+     "field": 1,
+     "officials": 315,
+     "stage": "Liga",
+     "standing": "Game 5",
+     "status": "Geplant",
+     "results": [
+      {
+       "id": 17791,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": true
+      },
+      {
+       "id": 17792,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 0
+     },
+     "final_score": {
+      "home": 0,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8985,
+      "isFirstHalf": true,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      },
+      "away": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      }
+     }
+    },
+    {
+     "id": 8986,
+     "gameday": 852,
+     "scheduled": "12:20:00",
+     "field": 2,
+     "officials": 389,
+     "stage": "Liga",
+     "standing": "Game 6",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17793,
+       "team_id": 493,
+       "team_name": "Fursty2",
+       "fh": 7,
+       "sh": 0,
+       "pa": 34,
+       "isHome": true
+      },
+      {
+       "id": 17794,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 20,
+       "sh": 14,
+       "pa": 7,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 7,
+      "away": 20
+     },
+     "final_score": {
+      "home": 7,
+      "away": 34
+     },
+     "log": {
+      "gameId": 8986,
+      "isFirstHalf": false,
+      "home": {
+       "id": 493,
+       "name": "Fursty2",
+       "score": 7,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 10,
+          "pat1": 28
+         },
+         {
+          "sequence": 9,
+          "td": 18
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 22,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 34,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 12,
+          "pat1": 85
+         },
+         {
+          "sequence": 11,
+          "td": 85
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 6,
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "td": 98
+         },
+         {
+          "sequence": 3,
+          "pat1": 86
+         },
+         {
+          "sequence": 2,
+          "td": 85
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 21,
+          "pat1": 86
+         },
+         {
+          "sequence": 20,
+          "td": 85
+         },
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 16,
+          "pat1": 86
+         },
+         {
+          "sequence": 15,
+          "td": 85
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8987,
+     "gameday": 852,
+     "scheduled": "13:30:00",
+     "field": 1,
+     "officials": 493,
+     "stage": "Liga",
+     "standing": "Game 7",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17795,
+       "team_id": 389,
+       "team_name": "Gendorf",
+       "fh": 18,
+       "sh": 0,
+       "pa": 27,
+       "isHome": true
+      },
+      {
+       "id": 17796,
+       "team_id": 315,
+       "team_name": "Passau",
+       "fh": 14,
+       "sh": 13,
+       "pa": 18,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 18,
+      "away": 14
+     },
+     "final_score": {
+      "home": 18,
+      "away": 27
+     },
+     "log": {
+      "gameId": 8987,
+      "isFirstHalf": false,
+      "home": {
+       "id": 389,
+       "name": "Gendorf",
+       "score": 18,
+       "firsthalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 7,
+          "td": 19,
+          "pat2": null
+         },
+         {
+          "sequence": 5,
+          "td": 5,
+          "pat2": null
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 1,
+          "td": 5,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 315,
+       "name": "Passau",
+       "score": 27,
+       "firsthalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 11,
+          "pat1": 10
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 2,
+          "td": 10,
+          "pat1": 16
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 15,
+          "td": 12,
+          "pat1": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 11,
+          "td": 12,
+          "pat1": 16
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8988,
+     "gameday": 852,
+     "scheduled": "13:30:00",
+     "field": 2,
+     "officials": 223,
+     "stage": "Liga",
+     "standing": "Game 8",
+     "status": "Geplant",
+     "results": [
+      {
+       "id": 17797,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": true
+      },
+      {
+       "id": 17798,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 0
+     },
+     "final_score": {
+      "home": 0,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8988,
+      "isFirstHalf": true,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      },
+      "away": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      }
+     }
+    },
+    {
+     "id": 8989,
+     "gameday": 852,
+     "scheduled": "14:40:00",
+     "field": 1,
+     "officials": 315,
+     "stage": "Liga",
+     "standing": "Game 9",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17799,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 25,
+       "sh": 26,
+       "pa": 6,
+       "isHome": true
+      },
+      {
+       "id": 17800,
+       "team_id": 493,
+       "team_name": "Fursty2",
+       "fh": 0,
+       "sh": 6,
+       "pa": 51,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 25,
+      "away": 0
+     },
+     "final_score": {
+      "home": 51,
+      "away": 6
+     },
+     "log": {
+      "gameId": 8989,
+      "isFirstHalf": false,
+      "home": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 51,
+       "firsthalf": {
+        "score": 25,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 84,
+          "pat1": null
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 7,
+          "td": 84,
+          "pat1": 56
+         },
+         {
+          "sequence": 5,
+          "td": 8,
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "td": 24,
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 17,
+          "td": 56,
+          "pat1": null
+         },
+         {
+          "sequence": 15,
+          "td": 24,
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "td": 24,
+          "pat1": 8
+         },
+         {
+          "sequence": 11,
+          "td": 24,
+          "pat1": 35
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 493,
+       "name": "Fursty2",
+       "score": 6,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 84,
+          "isDeleted": true,
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 18,
+          "pat2": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": 893,
+   "name": "FF BL Spieltag in Oberammergau",
+   "season": 6,
+   "season_display": "2026",
+   "league": 18,
+   "league_display": "FF BL",
+   "date": "2026-07-25",
+   "start": "10:00",
+   "format": "6_2",
+   "author": 205,
+   "address": "Oberammergau",
+   "status": "PUBLISHED",
+   "has_designer_state": true,
+   "games": [
+    {
+     "id": 9344,
+     "gameday": 893,
+     "scheduled": "10:00:00",
+     "field": 1,
+     "officials": 287,
+     "stage": "FF BL",
+     "standing": "Game 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18509,
+       "team_id": 235,
+       "team_name": "Oberammergau",
+       "fh": 18,
+       "sh": 12,
+       "pa": 33,
+       "isHome": true
+      },
+      {
+       "id": 18510,
+       "team_id": 502,
+       "team_name": "Neustadt",
+       "fh": 15,
+       "sh": 18,
+       "pa": 30,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 18,
+      "away": 15
+     },
+     "final_score": {
+      "home": 30,
+      "away": 33
+     },
+     "log": {
+      "gameId": 9344,
+      "isFirstHalf": false,
+      "home": {
+       "id": 235,
+       "name": "Oberammergau",
+       "score": 30,
+       "firsthalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 27,
+          "pat1": null
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 6,
+          "td": 7,
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 65,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 17,
+          "td": 7,
+          "pat2": null
+         },
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 13,
+          "td": 59,
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 502,
+       "name": "Neustadt",
+       "score": 33,
+       "firsthalf": {
+        "score": 15,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 80,
+          "pat2": 99
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 5,
+          "td": 23,
+          "pat1": 80
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 15,
+          "Safety (+2)": 8
+         },
+         {
+          "sequence": 14,
+          "td": 23,
+          "pat2": 23
+         },
+         {
+          "sequence": 12,
+          "td": 8,
+          "pat2": 99
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9345,
+     "gameday": 893,
+     "scheduled": "10:00:00",
+     "field": 2,
+     "officials": 152,
+     "stage": "FF BL",
+     "standing": "Game 2",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18511,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 14,
+       "sh": 13,
+       "pa": 21,
+       "isHome": true
+      },
+      {
+       "id": 18512,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 7,
+       "sh": 14,
+       "pa": 27,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 14,
+      "away": 7
+     },
+     "final_score": {
+      "home": 27,
+      "away": 21
+     },
+     "log": {
+      "gameId": 9345,
+      "isFirstHalf": false,
+      "home": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 27,
+       "firsthalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 85,
+          "pat1": 71
+         },
+         {
+          "sequence": 3,
+          "td": 92,
+          "pat1": 92
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 5,
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "td": 5,
+          "pat1": 85
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 21,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 2,
+          "td": 24,
+          "pat1": 24
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 24,
+          "pat1": 8
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 10,
+          "td": 35,
+          "pat1": 24
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9346,
+     "gameday": 893,
+     "scheduled": "11:10:00",
+     "field": 1,
+     "officials": 254,
+     "stage": "FF BL",
+     "standing": "Game 3",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18513,
+       "team_id": 502,
+       "team_name": "Neustadt",
+       "fh": 18,
+       "sh": 6,
+       "pa": 32,
+       "isHome": true
+      },
+      {
+       "id": 18514,
+       "team_id": 152,
+       "team_name": "Ingol",
+       "fh": 20,
+       "sh": 12,
+       "pa": 24,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 18,
+      "away": 20
+     },
+     "final_score": {
+      "home": 24,
+      "away": 32
+     },
+     "log": {
+      "gameId": 9346,
+      "isFirstHalf": false,
+      "home": {
+       "id": 502,
+       "name": "Neustadt",
+       "score": 24,
+       "firsthalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 23,
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 8,
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 8,
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 11,
+          "td": 8,
+          "pat1": null
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 152,
+       "name": "Ingol",
+       "score": 32,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 5,
+          "td": 59,
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "td": 32,
+          "pat2": 5
+         },
+         {
+          "sequence": 1,
+          "td": 33,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 10,
+          "td": 18,
+          "pat2": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 8,
+          "td": 32,
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9347,
+     "gameday": 893,
+     "scheduled": "11:10:00",
+     "field": 2,
+     "officials": 235,
+     "stage": "FF BL",
+     "standing": "Game 4",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18515,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 6,
+       "sh": 14,
+       "pa": 27,
+       "isHome": true
+      },
+      {
+       "id": 18516,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 7,
+       "sh": 20,
+       "pa": 20,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 7
+     },
+     "final_score": {
+      "home": 20,
+      "away": 27
+     },
+     "log": {
+      "gameId": 9347,
+      "isFirstHalf": false,
+      "home": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 20,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 24,
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 7,
+          "pat2": 35
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 10,
+          "td": 25,
+          "pat1": null
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 27,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 9,
+          "pat1": 99
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 19,
+          "pat1": 6
+         },
+         {
+          "sequence": 12,
+          "td": 33,
+          "pat1": 9
+         },
+         {
+          "sequence": 9,
+          "td": 6,
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9348,
+     "gameday": 893,
+     "scheduled": "12:20:00",
+     "field": 1,
+     "officials": 223,
+     "stage": "FF BL",
+     "standing": "Game 5",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18517,
+       "team_id": 152,
+       "team_name": "Ingol",
+       "fh": 24,
+       "sh": 20,
+       "pa": 6,
+       "isHome": true
+      },
+      {
+       "id": 18518,
+       "team_id": 235,
+       "team_name": "Oberammergau",
+       "fh": 0,
+       "sh": 6,
+       "pa": 44,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 24,
+      "away": 0
+     },
+     "final_score": {
+      "home": 44,
+      "away": 6
+     },
+     "log": {
+      "gameId": 9348,
+      "isFirstHalf": false,
+      "home": {
+       "id": 152,
+       "name": "Ingol",
+       "score": 44,
+       "firsthalf": {
+        "score": 24,
+        "entries": [
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 10,
+          "td": 18,
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 8,
+          "td": 5,
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "td": 18,
+          "pat2": null
+         },
+         {
+          "sequence": 4,
+          "td": 18,
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 32,
+          "pat1": 5
+         },
+         {
+          "sequence": 14,
+          "td": 32,
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "td": 59,
+          "pat1": 59
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 235,
+       "name": "Oberammergau",
+       "score": 6,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 17,
+          "td": 59,
+          "pat2": null
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9349,
+     "gameday": 893,
+     "scheduled": "12:20:00",
+     "field": 2,
+     "officials": 502,
+     "stage": "FF BL",
+     "standing": "Game 6",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18519,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 0,
+       "sh": 13,
+       "pa": 33,
+       "isHome": true
+      },
+      {
+       "id": 18520,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 19,
+       "sh": 14,
+       "pa": 13,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 19
+     },
+     "final_score": {
+      "home": 13,
+      "away": 33
+     },
+     "log": {
+      "gameId": 9349,
+      "isFirstHalf": false,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 13,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 7,
+          "td": 85,
+          "isDeleted": true,
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Interception",
+          "isDeleted": true
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 17,
+          "td": 9,
+          "pat1": 6
+         },
+         {
+          "sequence": 13,
+          "td": 19,
+          "pat1": null
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 33,
+       "firsthalf": {
+        "score": 19,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 92,
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "td": 85,
+          "pat1": 85
+         },
+         {
+          "sequence": 8,
+          "td": 85,
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception",
+          "isDeleted": true
+         },
+         {
+          "sequence": 4,
+          "td": 5,
+          "isDeleted": true,
+          "pat1": 85
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 71,
+          "pat2": 5
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 14,
+          "td": 71,
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9350,
+     "gameday": 893,
+     "scheduled": "13:30:00",
+     "field": 1,
+     "officials": 223,
+     "stage": "FF BL",
+     "standing": "Game 7",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18521,
+       "team_id": 502,
+       "team_name": "Neustadt",
+       "fh": 12,
+       "sh": 0,
+       "pa": 33,
+       "isHome": true
+      },
+      {
+       "id": 18522,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 13,
+       "sh": 20,
+       "pa": 12,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 12,
+      "away": 13
+     },
+     "final_score": {
+      "home": 12,
+      "away": 33
+     },
+     "log": {
+      "gameId": 9350,
+      "isFirstHalf": false,
+      "home": {
+       "id": 502,
+       "name": "Neustadt",
+       "score": 12,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 4,
+          "td": 8,
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "td": 8,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 5,
+          "isDeleted": true,
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 33,
+       "firsthalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 85,
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "td": 5,
+          "pat1": 85
+         },
+         {
+          "sequence": 1,
+          "td": 8,
+          "isDeleted": true,
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 5,
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 10,
+          "td": 23,
+          "pat2": 4
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 8,
+          "td": 92,
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9351,
+     "gameday": 893,
+     "scheduled": "13:30:00",
+     "field": 2,
+     "officials": 235,
+     "stage": "FF BL",
+     "standing": "Game 8",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18523,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 29,
+       "sh": 6,
+       "pa": 0,
+       "isHome": true
+      },
+      {
+       "id": 18524,
+       "team_id": 152,
+       "team_name": "Ingol",
+       "fh": 0,
+       "sh": 0,
+       "pa": 35,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 29,
+      "away": 0
+     },
+     "final_score": {
+      "home": 35,
+      "away": 0
+     },
+     "log": {
+      "gameId": 9351,
+      "isFirstHalf": false,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 35,
+       "firsthalf": {
+        "score": 29,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 19,
+          "pat1": 71
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 9,
+          "td": 71,
+          "pat1": 71
+         },
+         {
+          "sequence": 7,
+          "td": 9,
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "Safety (+2)": 25
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 2,
+          "td": 9,
+          "pat1": 71
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 71,
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 152,
+       "name": "Ingol",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 5,
+          "Safety (+2)": 25,
+          "isDeleted": true
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 1,
+          "td": 9,
+          "isDeleted": true,
+          "pat1": 71
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9352,
+     "gameday": 893,
+     "scheduled": "14:40:00",
+     "field": 1,
+     "officials": 254,
+     "stage": "FF BL",
+     "standing": "Game 9",
+     "status": "2. Halbzeit",
+     "results": [
+      {
+       "id": 18525,
+       "team_id": 235,
+       "team_name": "Oberammergau",
+       "fh": 6,
+       "sh": 13,
+       "pa": 53,
+       "isHome": true
+      },
+      {
+       "id": 18526,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 27,
+       "sh": 26,
+       "pa": 19,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 27
+     },
+     "final_score": {
+      "home": 19,
+      "away": 53
+     },
+     "log": {
+      "gameId": 9352,
+      "isFirstHalf": false,
+      "home": {
+       "id": 235,
+       "name": "Oberammergau",
+       "score": 19,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 27,
+          "pat1": null
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 27,
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "td": 7,
+          "pat1": 27
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 53,
+       "firsthalf": {
+        "score": 27,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 8,
+          "pat2": 24
+         },
+         {
+          "sequence": 6,
+          "td": 35,
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 4,
+          "td": 35,
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 12,
+          "pat1": 8
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception",
+          "isDeleted": true
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 19,
+          "td": 7,
+          "pat2": null
+         },
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 17,
+          "td": 24,
+          "pat1": 24
+         },
+         {
+          "sequence": 15,
+          "td": 12,
+          "pat1": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Interception"
+         },
+         {
+          "sequence": 13,
+          "td": 8,
+          "pat1": 8
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "etag": "3066857c232b9f85c81f4f3fa5701d27"
+}
