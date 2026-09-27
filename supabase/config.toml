@@ -16,3 +16,11 @@ verify_jwt = true
 
 [functions.send-membership-application]
 verify_jwt = true
+
+# The results sync is not a form: nothing in the browser may trigger it. verify_jwt keeps the
+# gateway from passing anonymous calls through, but the anon key is public and ships in this
+# site's bundle, so it is not the real gate — the function additionally requires the
+# x-cron-secret header, which lives only in Vault and in the function's own secrets. Without
+# that, anyone could burn the hourly LeagueSphere budget and leave the results page stale.
+[functions.sync-leaguesphere]
+verify_jwt = true

@@ -297,3 +297,60 @@ Deno.test('the last tick time is the newest instant, whatever order they arrive 
   const newest = Math.max(...game.ticks.map((t) => Date.parse(t.time)));
   assertEquals(Date.parse(normal.last_tick_at ?? ''), newest);
 });
+
+// ── Column parity ────────────────────────────────────────────────────────────
+
+/**
+ * Guards the row shapes against the migration's column names.
+ *
+ * A mapper field that no column matches is not a type error — PostgREST rejects it at runtime
+ * with `Could not find the 'x' column`, which is how `start` (column `start_time`) and
+ * `standing` (column `group_name`) were originally found, by running the function against a real
+ * database. These lists are copied from `20260927170000_results_schema.sql`; update both together.
+ */
+const COLUMNS = {
+  results_gamedays: ['id', 'date', 'start_time', 'name', 'league_display', 'address', 'status', 'phase'],
+  results_games: [
+    'id', 'gameday_id', 'scheduled', 'field', 'stage', 'group_name', 'status', 'finished',
+    'home_team_id', 'away_team_id', 'home_name', 'away_name', 'home_score', 'away_score',
+    'home_ht', 'away_ht',
+  ],
+  results_game_events: [
+    'game_id', 'seq', 'half', 'side', 'text', 'points', 'score_home', 'score_away',
+    'is_deleted', 'is_marker',
+  ],
+  results_live_games: ['game_id', 'home_score', 'away_score', 'last_tick_at', 'finished'],
+} as const;
+
+Deno.test('every mapped row uses only columns the tables actually have', async () => {
+  const gamedays = await teamSnapshot();
+  const mapped = mapTeamSnapshot(gamedays, '2026-06-20');
+  const live = parseLiveticker(await loadFixture('liveticker.default-5-ticks.json'));
+  assert(live.ok);
+
+  // The row interfaces have no index signature, so they are read as plain objects here.
+  const asRows = (rows: readonly object[]): readonly Record<string, unknown>[] =>
+    rows as readonly Record<string, unknown>[];
+
+  const checks: readonly [string, readonly Record<string, unknown>[], readonly string[]][] = [
+    ['results_gamedays', asRows(mapped.gamedays), COLUMNS.results_gamedays],
+    ['results_games', asRows(mapped.games), COLUMNS.results_games],
+    ['results_game_events', asRows(mapped.events), COLUMNS.results_game_events],
+    ['results_live_games', asRows(toLiveGameRows(live.value, new Set([9149, 9150]))), COLUMNS.results_live_games],
+  ];
+
+  for (const [table, rows, columns] of checks) {
+    assert(rows.length > 0, `${table}: nothing to check`);
+    const allowed = new Set<string>(columns);
+
+    const unknown = [...new Set(rows.flatMap((row) => Object.keys(row)))]
+      .filter((key) => !allowed.has(key));
+    assertEquals(unknown, [], `${table}: no such column(s)`);
+
+    // And the other way round, so a column the mapper forgot shows up too. `updated_at` is
+    // added by the store, not the mapper.
+    const produced = new Set(rows.flatMap((row) => Object.keys(row)));
+    const missing = columns.filter((column) => !produced.has(column));
+    assertEquals(missing, [], `${table}: column(s) never written`);
+  }
+});

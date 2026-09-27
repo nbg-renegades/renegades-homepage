@@ -31,7 +31,8 @@ import { FINISHED_STATUS } from './standings.ts';
 export interface GamedayRow {
   readonly id: number;
   readonly date: string;
-  readonly start: string | null;
+  /** Named for the column, which avoids the `start` keyword. */
+  readonly start_time: string | null;
   readonly name: string;
   readonly league_display: string;
   readonly address: string | null;
@@ -45,7 +46,11 @@ export interface GameRow {
   readonly scheduled: string | null;
   readonly field: number | null;
   readonly stage: string | null;
-  readonly standing: string | null;
+  /**
+   * Group within the gameday, e.g. `Gruppe 1`. Upstream calls this field `standing`, which
+   * reads like a league table; the column is `group_name`, and this follows the column.
+   */
+  readonly group_name: string | null;
   readonly status: string;
   readonly finished: boolean;
   readonly home_team_id: number | null;
@@ -137,7 +142,7 @@ export function toGamedayRow(gameday: UpstreamGameday, today: string): GamedayRo
     id: gameday.id,
     date: gameday.date,
     // Upstream serialises `start` as `HH:MM`, but an empty string appears too.
-    start: emptyToNull(gameday.start),
+    start_time: emptyToNull(gameday.start),
     name: gameday.name,
     league_display: gameday.league_display,
     address: normaliseAddress(gameday.address),
@@ -164,7 +169,7 @@ export function toGameRow(game: UpstreamGame): GameRow {
     scheduled: emptyToNull(game.scheduled),
     field: game.field,
     stage: emptyToNull(game.stage),
-    standing: emptyToNull(game.standing),
+    group_name: emptyToNull(game.standing),
     status: game.status,
     finished: isFinished(game),
     home_team_id: home?.team_id ?? null,
