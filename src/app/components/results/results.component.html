@@ -1,12 +1,12 @@
-<main class="main-content bg-secondary dark:bg-dark-secondary text-primary dark:text-white min-h-screen py-12">
+<main class="main-content bg-secondary dark:bg-dark-secondary text-primary dark:text-white min-h-screen py-8 sm:py-12">
   <div class="container mx-auto px-4">
-    <h1 class="text-4xl font-bold mb-2 text-center tracking-tight">
+    <h1 class="text-3xl sm:text-4xl font-bold mb-2 text-center tracking-tight">
       {{ 'results.title' | translate }}
     </h1>
-    <p class="mb-8 text-center text-sm font-semibold text-gray-600 dark:text-gray-300">{{ 'results.subtitle' | translate }}</p>
+    <p class="mb-6 sm:mb-8 text-center text-sm font-semibold text-gray-600 dark:text-gray-300">{{ 'results.subtitle' | translate }}</p>
 
     <!-- Team Selector -->
-    <div class="flex gap-3 mb-8 justify-center">
+    <div class="flex gap-3 mb-6 sm:mb-8 justify-center">
       <a
         [routerLink]="'/ergebnisse/1-mannschaft/' + tab() | localePath"
         class="px-5 py-2 rounded-full font-semibold text-sm transition-colors duration-200"
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Tab Bar -->
-    <div class="border-b border-gray-200 dark:border-white/10 mb-8">
+    <div class="border-b border-gray-200 dark:border-white/10 mb-6 sm:mb-8">
       <nav class="flex">
         @for (t of tabs; track t) {
           <a
@@ -74,7 +74,11 @@
               {{ 'results.loading' | translate }}
             </p>
           } @else {
-            <app-live-ticker [state]="liveState()!" [teams]="teams()" />
+            <app-live-ticker
+              [state]="liveState()!"
+              [teams]="teams()"
+              [scheduleLink]="('/ergebnisse/' + team().slug + '/spielplan') | localePath"
+            />
           }
         }
         @default {

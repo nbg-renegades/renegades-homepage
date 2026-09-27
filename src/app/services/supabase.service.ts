@@ -39,6 +39,15 @@ export class SupabaseService {
         // logged an error on every page with a Supabase client, and kept a refresh timer alive
         // for a session that never exists.
         auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+        realtime: {
+          // Back off instead of retrying once a second forever. The default reconnect is fast,
+          // which is right for a blip mid-game — but a phone left on the live tab somewhere with
+          // a blocked or broken WebSocket was opening one a second for as long as the tab stayed
+          // open. The counter resets on a successful connect, so a real blip still recovers in a
+          // second or two.
+          reconnectAfterMs: (tries: number) =>
+            [1_000, 2_000, 5_000, 10_000, 30_000][tries - 1] ?? 30_000,
+        },
       });
       return this._client;
     });

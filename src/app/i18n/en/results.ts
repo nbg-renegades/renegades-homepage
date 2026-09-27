@@ -59,5 +59,6 @@ export const results = {
   'results.live.connected': 'Updating automatically',
   'results.live.unavailable': 'Automatic updates unavailable — please reload',
   'results.live.notLive': 'Showing stored data',
+  'results.live.toSchedule': 'View the schedule',
   'results.live.lastUpdate': 'Last play',
 };

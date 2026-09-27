@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { LanguageService } from '../../services/language.service';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import type { ResultsTeam } from '../../services/results.service';
 import { isInProgress, type LiveGameView, type LiveState } from '../../services/results-live.service';
@@ -19,11 +20,22 @@ import { formatTickTime, formatUpdatedAt } from './results.format';
 @Component({
   selector: 'app-live-ticker',
   standalone: true,
-  imports: [TranslatePipe, TeamLogoComponent],
+  imports: [TranslatePipe, TeamLogoComponent, RouterLink],
   template: `
     @if (state().games.length === 0) {
       <div class="py-10 text-center">
         <p class="text-gray-500 dark:text-gray-400">{{ 'results.live.noGames' | translate }}</p>
+        <!-- Most days this tab is empty, so it should point somewhere rather than dead-end. -->
+        @if (scheduleLink() !== '') {
+          <a
+            [routerLink]="scheduleLink()"
+            class="inline-block mt-4 px-5 py-2 rounded-full text-sm font-semibold
+                   bg-secondary-dark dark:bg-dark-surface
+                   text-accent dark:text-[var(--brand-amber)]
+                   hover:bg-gray-200 dark:hover:bg-white/10 transition-colors
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >{{ 'results.live.toSchedule' | translate }}</a>
+        }
       </div>
     } @else {
       <!--
@@ -132,6 +144,8 @@ export class LiveTickerComponent {
 
   readonly state = input.required<LiveState>();
   readonly teams = input<ReadonlyMap<number, ResultsTeam>>(new Map());
+  /** Where to send someone when there is nothing on today. */
+  readonly scheduleLink = input<string>('');
 
   /** Most recent first, and capped: a full game is around forty ticks. */
   private static readonly VISIBLE_TICKS = 25;

@@ -40,8 +40,14 @@ import { formatDiff, formatQuotient } from './results.format';
           <h2 class="text-lg font-bold mb-3">{{ group.name }}</h2>
         }
 
-        <div class="overflow-x-auto -mx-4 px-4">
-          <table class="w-full min-w-[34rem] text-sm border-collapse">
+        <!--
+          No horizontal scroll on a phone. The table has ten columns; at 390px that meant SQ —
+          the quotient the whole table is ordered by — sat off-screen behind a sideways scroll
+          nothing hinted at. Below "sm" only rank, club, games and quotient are columns, and the
+          rest appear as a line under the club name, so every number is still on the page.
+        -->
+        <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <table class="w-full text-sm border-collapse">
             <caption class="sr-only">{{ 'results.standings.caption' | translate }}</caption>
             <thead>
               <tr class="border-b border-gray-200 dark:border-white/10 text-left">
@@ -53,6 +59,8 @@ import { formatDiff, formatQuotient } from './results.format';
                   <th
                     scope="col"
                     class="py-2 px-1.5 text-right font-semibold tabular-nums whitespace-nowrap"
+                    [class.hidden]="!column.onMobile"
+                    [class.sm:table-cell]="!column.onMobile"
                   >
                     <abbr
                       class="no-underline"
@@ -73,7 +81,7 @@ import { formatDiff, formatQuotient } from './results.format';
                   [class.text-gray-500]="row.promotionRestricted"
                   [class.dark:text-gray-400]="row.promotionRestricted"
                 >
-                  <td class="py-2 pr-2 text-right tabular-nums">{{ row.rank }}</td>
+                  <td class="py-2 pr-2 align-top text-right tabular-nums">{{ row.rank }}</td>
                   <td class="py-2 px-2">
                     <span class="flex items-center gap-2 min-w-0">
                       <app-team-logo
@@ -95,17 +103,20 @@ import { formatDiff, formatQuotient } from './results.format';
                         >*</abbr>
                       }
                     </span>
+                    <!-- The columns that are hidden at this width, as one compact line. -->
+                    <span class="sm:hidden block mt-0.5 ml-7 text-xs tabular-nums
+                                 text-gray-500 dark:text-gray-400">
+                      {{ detailLine(row) }}
+                    </span>
                   </td>
-                  <td class="py-2 px-1.5 text-right tabular-nums">{{ row.played }}</td>
-                  <td class="py-2 px-1.5 text-right tabular-nums">{{ row.won }}</td>
-                  <td class="py-2 px-1.5 text-right tabular-nums">{{ row.drawn }}</td>
-                  <td class="py-2 px-1.5 text-right tabular-nums">{{ row.lost }}</td>
-                  <td class="py-2 px-1.5 text-right tabular-nums">{{ row.pointsFor }}</td>
-                  <td class="py-2 px-1.5 text-right tabular-nums">{{ row.pointsAgainst }}</td>
-                  <td class="py-2 px-1.5 text-right tabular-nums">{{ diff(row.pointsDiff) }}</td>
-                  <td class="py-2 px-1.5 text-right tabular-nums font-semibold">
-                    {{ quotient(row.quotient) }}
-                  </td>
+                  @for (column of columns; track column.key) {
+                    <td
+                      class="py-2 px-1.5 align-top text-right tabular-nums"
+                      [class.font-semibold]="column.key === 'quotient'"
+                      [class.hidden]="!column.onMobile"
+                      [class.sm:table-cell]="!column.onMobile"
+                    >{{ column.value(row) }}</td>
+                  }
                 </tr>
               }
             </tbody>
@@ -129,17 +140,38 @@ export class StandingsTableComponent {
   readonly teamId = input.required<number>();
   readonly teams = input<ReadonlyMap<number, ResultsTeam>>(new Map());
 
-  /** The abbreviation is the column label; the translation key spells it out. */
-  readonly columns = [
-    { key: 'played', label: 'Sp' },
-    { key: 'won', label: 'S' },
-    { key: 'drawn', label: 'U' },
-    { key: 'lost', label: 'N' },
-    { key: 'pointsFor', label: 'EP' },
-    { key: 'pointsAgainst', label: 'GP' },
-    { key: 'pointsDiff', label: '+/-' },
-    { key: 'quotient', label: 'SQ' },
-  ] as const;
+  /**
+   * The columns, each with its own accessor so a heading and its cells cannot drift apart.
+   *
+   * The abbreviation is the label and the translation key spells it out. `onMobile` marks the
+   * two that stay columns on a narrow screen: games played, and the quotient the table is
+   * ordered by. The rest move into `detailLine`.
+   */
+  readonly columns: readonly {
+    key: string;
+    label: string;
+    onMobile: boolean;
+    value: (row: StandingsEntry) => string | number;
+  }[] = [
+    { key: 'played', label: 'Sp', onMobile: true, value: (row) => row.played },
+    { key: 'won', label: 'S', onMobile: false, value: (row) => row.won },
+    { key: 'drawn', label: 'U', onMobile: false, value: (row) => row.drawn },
+    { key: 'lost', label: 'N', onMobile: false, value: (row) => row.lost },
+    { key: 'pointsFor', label: 'EP', onMobile: false, value: (row) => row.pointsFor },
+    { key: 'pointsAgainst', label: 'GP', onMobile: false, value: (row) => row.pointsAgainst },
+    { key: 'pointsDiff', label: '+/-', onMobile: false, value: (row) => formatDiff(row.pointsDiff) },
+    { key: 'quotient', label: 'SQ', onMobile: true, value: (row) => this.quotient(row.quotient) },
+  ];
+
+  /**
+   * Everything the narrow layout drops, in one line: `18 S · 0 U · 5 N · 855:322 · +533`.
+   *
+   * The same abbreviations the column headings use, so the two readings agree.
+   */
+  detailLine(row: StandingsEntry): string {
+    return `${row.won} S · ${row.drawn} U · ${row.lost} N · ` +
+      `${row.pointsFor}:${row.pointsAgainst} · ${formatDiff(row.pointsDiff)}`;
+  }
 
   /**
    * Split by the group upstream assigns, preserving the published order within each.
