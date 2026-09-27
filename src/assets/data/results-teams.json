@@ -1,0 +1,248 @@
+{
+  "teams": [
+    {
+      "id": 20,
+      "name": "Munich Spatzen",
+      "short_name": "Spatz",
+      "logo": "20.webp"
+    },
+    {
+      "id": 22,
+      "name": "Augsburg Lions",
+      "short_name": "Lions",
+      "logo": "22.webp"
+    },
+    {
+      "id": 24,
+      "name": "1. ASC Badener Greifs",
+      "short_name": "Greifs",
+      "logo": "24.webp"
+    },
+    {
+      "id": 29,
+      "name": "Bamberg Phantoms",
+      "short_name": "Bamb",
+      "logo": "29.webp"
+    },
+    {
+      "id": 30,
+      "name": "Walldorf Wanderers",
+      "short_name": "Wall",
+      "logo": "30.webp"
+    },
+    {
+      "id": 38,
+      "name": "Mülheim Shamrocks",
+      "short_name": "Mülh"
+    },
+    {
+      "id": 41,
+      "name": "Mainz Legionaries",
+      "short_name": "Mainz",
+      "logo": "41.webp"
+    },
+    {
+      "id": 43,
+      "name": "Duisburg Dragons",
+      "short_name": "Duis",
+      "logo": "43.webp"
+    },
+    {
+      "id": 48,
+      "name": "SG Kelkheim Lizzards",
+      "short_name": "Kelk",
+      "logo": "48.webp"
+    },
+    {
+      "id": 69,
+      "name": "Würzburg Wombats",
+      "short_name": "Würz",
+      "logo": "69.webp"
+    },
+    {
+      "id": 112,
+      "name": "Lichtenberg Lions",
+      "short_name": "LLions",
+      "logo": "112.webp"
+    },
+    {
+      "id": 115,
+      "name": "Strelitz Dukes",
+      "short_name": "Dukes",
+      "logo": "115.webp"
+    },
+    {
+      "id": 138,
+      "name": "Aachen Emperors",
+      "short_name": "Aachen",
+      "logo": "138.webp"
+    },
+    {
+      "id": 151,
+      "name": "Regensburg Phoenix",
+      "short_name": "Regen",
+      "logo": "151.webp"
+    },
+    {
+      "id": 152,
+      "name": "Ingolstadt Guardians",
+      "short_name": "Ingol",
+      "logo": "152.webp"
+    },
+    {
+      "id": 158,
+      "name": "Neu-Ulm Spartans",
+      "short_name": "Neu-Ulm",
+      "logo": "158.webp"
+    },
+    {
+      "id": 159,
+      "name": "Nürnberg Renegades",
+      "short_name": "Nürn",
+      "logo": "159.webp"
+    },
+    {
+      "id": 163,
+      "name": "Oldenburg Orcas",
+      "short_name": "Orca",
+      "logo": "163.webp"
+    },
+    {
+      "id": 221,
+      "name": "Ramsenthal RedWings",
+      "short_name": "Ramsenthal",
+      "logo": "221.webp"
+    },
+    {
+      "id": 223,
+      "name": "AFC Königsbrunn Ants",
+      "short_name": "Königsbrunn",
+      "logo": "223.webp"
+    },
+    {
+      "id": 235,
+      "name": "Wolfpack Oberammergau",
+      "short_name": "Oberammergau"
+    },
+    {
+      "id": 238,
+      "name": "Düsseldorf Firecats",
+      "short_name": "Firecats",
+      "logo": "238.webp"
+    },
+    {
+      "id": 243,
+      "name": "Erlangen Sharks",
+      "short_name": "Erlangen",
+      "logo": "243.webp"
+    },
+    {
+      "id": 254,
+      "name": "Munich Spatzen 4",
+      "short_name": "Spatz4",
+      "logo": "254.webp"
+    },
+    {
+      "id": 286,
+      "name": "Augsburg Lions III",
+      "short_name": "Lions3"
+    },
+    {
+      "id": 287,
+      "name": "Nürnberg Renegades II",
+      "short_name": "Nürn2",
+      "logo": "287.webp"
+    },
+    {
+      "id": 315,
+      "name": "Passau Pirates",
+      "short_name": "Passau"
+    },
+    {
+      "id": 379,
+      "name": "Franken Knights",
+      "short_name": "Rothenburg"
+    },
+    {
+      "id": 387,
+      "name": "Bad Tölz Capricorns",
+      "short_name": "BadTölz"
+    },
+    {
+      "id": 389,
+      "name": "Gendorf Crusaders",
+      "short_name": "Gendorf",
+      "logo": "389.webp"
+    },
+    {
+      "id": 391,
+      "name": "Rödental Racoons",
+      "short_name": "Rödental",
+      "logo": "391.webp"
+    },
+    {
+      "id": 392,
+      "name": "Ingolstadt Guardians 2",
+      "short_name": "Ingol2",
+      "logo": "392.webp"
+    },
+    {
+      "id": 393,
+      "name": "Erlangen Sharks 2",
+      "short_name": "Erlangen2",
+      "logo": "393.webp"
+    },
+    {
+      "id": 492,
+      "name": "Erding Bulls II",
+      "short_name": "Erding2",
+      "logo": "492.webp"
+    },
+    {
+      "id": 493,
+      "name": "Fursty Razorbacks II",
+      "short_name": "Fursty2",
+      "logo": "493.webp"
+    },
+    {
+      "id": 494,
+      "name": "München Rangers II",
+      "short_name": "Rangers2",
+      "logo": "494.webp"
+    },
+    {
+      "id": 500,
+      "name": "Neumarkt Wolves",
+      "short_name": "Neumarkt",
+      "logo": "500.webp"
+    },
+    {
+      "id": 501,
+      "name": "Ramsenthal RedWings II",
+      "short_name": "Ramsenthal2",
+      "logo": "501.webp"
+    },
+    {
+      "id": 502,
+      "name": "Neustadt Falcons",
+      "short_name": "Neustadt",
+      "logo": "502.webp"
+    },
+    {
+      "id": 503,
+      "name": "Würzburg Wombats 2",
+      "short_name": "Würz2"
+    },
+    {
+      "id": 505,
+      "name": "Regensburg Phoenix III",
+      "short_name": "Regen3",
+      "logo": "505.webp"
+    },
+    {
+      "id": 567,
+      "name": "Schloßberg Kings",
+      "short_name": "Schloßberg"
+    }
+  ]
+}

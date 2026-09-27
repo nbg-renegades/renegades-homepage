@@ -8,16 +8,16 @@
     <!-- Team Selector -->
     <div class="flex gap-3 mb-8 justify-center">
       <a
-        [routerLink]="'/ergebnisse/1-mannschaft/spielplan' | localePath"
+        [routerLink]="'/ergebnisse/1-mannschaft/' + tab() | localePath"
         class="px-5 py-2 rounded-full font-semibold text-sm transition-colors duration-200"
-        [ngClass]="team() === '1-mannschaft'
+        [ngClass]="team().slug === '1-mannschaft'
           ? 'bg-accent text-white'
           : 'bg-secondary-dark dark:bg-dark-surface text-gray-700 dark:text-gray-300'"
       >{{ 'results.team1' | translate }}</a>
       <a
-        [routerLink]="'/ergebnisse/2-mannschaft/spielplan' | localePath"
+        [routerLink]="'/ergebnisse/2-mannschaft/' + tab() | localePath"
         class="px-5 py-2 rounded-full font-semibold text-sm transition-colors duration-200"
-        [ngClass]="team() === '2-mannschaft'
+        [ngClass]="team().slug === '2-mannschaft'
           ? 'bg-accent text-white'
           : 'bg-secondary-dark dark:bg-dark-surface text-gray-700 dark:text-gray-300'"
       >{{ 'results.team2' | translate }}</a>
@@ -28,11 +28,12 @@
       <nav class="flex">
         @for (t of tabs; track t) {
           <a
-            [routerLink]="('/ergebnisse/' + team() + '/' + t) | localePath"
+            [routerLink]="('/ergebnisse/' + team().slug + '/' + t) | localePath"
             class="px-4 py-3 text-sm font-medium transition-colors duration-200 border-b-2 -mb-px flex items-center gap-2"
             [ngClass]="tab() === t
               ? 'border-accent text-accent dark:text-[var(--brand-amber)]'
               : 'border-transparent text-gray-600 dark:text-gray-300'"
+            [attr.aria-current]="tab() === t ? 'page' : null"
           >
             @if (t === 'live') {
               <span class="inline-block w-2 h-2 rounded-full bg-gray-400"></span>
@@ -44,20 +45,74 @@
     </div>
 
     <!-- Tab Content -->
-    <div class="rounded-xl overflow-hidden">
-      @if (iframeUrl(); as url) {
-        <iframe
-          #widgetIframe
-          [src]="url"
-          [style.height.px]="iframeHeight()"
-          [style.border]="0"
-          class="w-full"
-          scrolling="no"
-          [title]="'results.tab.' + tab() | translate"
-          loading="lazy"
-        ></iframe>
+    @if (native()) {
+      @switch (tab()) {
+        @case ('tabelle') {
+          @if (standings() === undefined) {
+            <p class="py-10 text-center text-gray-500 dark:text-gray-400">
+              {{ 'results.loading' | translate }}
+            </p>
+          } @else if (standingsFailed()) {
+            <p role="status" class="py-10 text-center text-gray-500 dark:text-gray-400">
+              {{ 'results.error' | translate }}
+            </p>
+          } @else {
+            <app-standings-table
+              [entries]="standings()!"
+              [teamId]="team().teamId"
+              [teams]="teams()"
+            />
+          }
+        }
+        @default {
+          @if (gamedays() === undefined) {
+            <p class="py-10 text-center text-gray-500 dark:text-gray-400">
+              {{ 'results.loading' | translate }}
+            </p>
+          } @else if (scheduleFailed()) {
+            <p role="status" class="py-10 text-center text-gray-500 dark:text-gray-400">
+              {{ 'results.error' | translate }}
+            </p>
+          } @else {
+            <app-gameday-list
+              [gamedays]="gamedays()!"
+              [teamId]="team().teamId"
+              [teams]="teams()"
+            />
+          }
+        }
       }
-    </div>
+
+      <!--
+        Always shown when we know it. The whole failure design is that the site keeps serving the
+        last good data during an upstream outage, which is only honest if the page says how old
+        that data is.
+      -->
+      @if (updatedAtLabel() !== null) {
+        <p class="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">
+          {{ 'results.updatedAt' | translate: { time: updatedAtLabel()! } }}
+        </p>
+      }
+    } @else {
+      <!--
+        The old third-party widget, still serving whichever tabs are not native yet. Goes away
+        with the final cutover, along with the postMessage height and theme handshake it needs.
+      -->
+      <div class="rounded-xl overflow-hidden">
+        @if (iframeUrl(); as url) {
+          <iframe
+            #widgetIframe
+            [src]="url"
+            [style.height.px]="iframeHeight()"
+            [style.border]="0"
+            class="w-full"
+            scrolling="no"
+            [title]="'results.tab.' + tab() | translate"
+            loading="lazy"
+          ></iframe>
+        }
+      </div>
+    }
 
   </div>
 </main>
