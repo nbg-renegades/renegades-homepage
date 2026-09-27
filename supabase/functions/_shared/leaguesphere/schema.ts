@@ -388,7 +388,7 @@ function parseGameday(v: Validation, path: string, raw: unknown): UpstreamGameda
   }
 
   // Without `include=games` there is no `games` key at all; treat that as empty.
-  let games: UpstreamGame[] = [];
+  const games: UpstreamGame[] = [];
   if (obj['games'] !== undefined && obj['games'] !== null) {
     const rawGames = array(v, `${path}.games`, obj['games']);
     if (rawGames === null) return null;

@@ -205,7 +205,7 @@ Deno.test('a possession marker keeps its name and carries no players', async () 
   assertEquals(Object.keys(marker.players), []);
 });
 
-Deno.test('a snapshot without include=games yields gamedays with no games', async () => {
+Deno.test('a snapshot without include=games yields gamedays with no games', () => {
   const parsed = parseSnapshot({
     generated_at: '2026-09-27T16:30:30.481417+00:00',
     gamedays: [{
