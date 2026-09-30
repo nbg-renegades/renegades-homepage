@@ -257,6 +257,8 @@ supabase functions deploy sync-leaguesphere
 # collision with the performance app's secrets would break one app or the other.
 supabase secrets set RESEND_API_KEY=your-resend-api-key
 supabase secrets set NOTIFICATION_EMAILS=email1@example.com,email2@example.com
+# Who hears about a stale results sync. Separate from the forms' recipients.
+supabase secrets set RESULTS_ALERT_EMAILS=it@nuernberg-renegades.de
 supabase secrets set RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
 supabase secrets set HOMEPAGE_ALLOWED_ORIGINS=https://www.nuernberg-renegades.de,https://nuernberg-renegades.de,https://*.netlify.app
 
@@ -307,7 +309,7 @@ two applications:
 |---|---|---|
 | Tables | `heartbeat`, `results_*` (seven) | `profiles`, `user_roles`, `player_positions`, `performance_entries` |
 | Edge functions | the three `send-*` above, plus `sync-leaguesphere` | `create-user`, `delete-user`, `get-dashboard-stats`, `get-performance-averages`, `get-performance-benchmarks`, `get-player-neighborhood`, `reset-user-password` |
-| Secrets | `RESEND_API_KEY`, `NOTIFICATION_EMAILS`, `RECAPTCHA_SECRET_KEY`, `HOMEPAGE_ALLOWED_ORIGINS`, `RESULTS_SYNC_CRON_SECRET` | `ALLOWED_ORIGINS` |
+| Secrets | `RESEND_API_KEY`, `NOTIFICATION_EMAILS`, `RECAPTCHA_SECRET_KEY`, `HOMEPAGE_ALLOWED_ORIGINS`, `RESULTS_SYNC_CRON_SECRET`, `RESULTS_ALERT_EMAILS` | `ALLOWED_ORIGINS` |
 | Auth users | none; the forms are anonymous | club members, with real personal data |
 
 Three consequences:
@@ -480,7 +482,8 @@ message names the exact field. The function logs every upstream call with its st
 under *Edge Functions → sync-leaguesphere → Logs*.
 
 If `last_ok_at` goes past two hours during a gameday, or 26 hours otherwise, the function emails
-`NOTIFICATION_EMAILS` through the same Resend setup the forms use — once per incident.
+`RESULTS_ALERT_EMAILS` through the same Resend setup the forms use — once per incident. It does
+not fall back to the forms' `NOTIFICATION_EMAILS`: if the secret is unset, no alert goes out.
 
 ### Working on it without touching the real API
 

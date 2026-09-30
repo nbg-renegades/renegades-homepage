@@ -1,8 +1,10 @@
 /**
  * Tells a human when the results data has gone stale.
  *
- * Reuses the Resend setup and the `NOTIFICATION_EMAILS` recipients the site's three form
- * functions already use, so there is no new service and no new secret.
+ * Reuses the Resend setup the site's three form functions already use, so there is no new
+ * service. The recipients are its own, `RESULTS_ALERT_EMAILS`, and deliberately not the forms'
+ * `NOTIFICATION_EMAILS`: a stale sync is for whoever runs the site, not for the people who
+ * answer contact requests. There is no fallback to those, so an unset secret sends nothing.
  *
  * A stale results page is not an outage: the site keeps serving the last good data and shows how
  * old it is. So this is a nudge, not a page — it is rate-limited to one mail per incident by
@@ -36,14 +38,14 @@ export async function sendStaleDataAlert(
   const log = options.log ?? ((message: string) => console.log(message));
 
   const apiKey = Deno.env.get('RESEND_API_KEY');
-  const recipients = (Deno.env.get('NOTIFICATION_EMAILS') ?? '')
+  const recipients = (Deno.env.get('RESULTS_ALERT_EMAILS') ?? '')
     .split(',')
     .map((address) => address.trim())
     .filter((address) => address !== '');
 
   if (apiKey === undefined || apiKey === '' || recipients.length === 0) {
     // Worth saying out loud, because it means nobody is being told.
-    log('[alert] RESEND_API_KEY or NOTIFICATION_EMAILS missing; not sending the stale-data alert');
+    log('[alert] RESEND_API_KEY or RESULTS_ALERT_EMAILS missing; not sending the stale-data alert');
     return false;
   }
 
