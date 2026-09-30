@@ -21,6 +21,7 @@ import type {
   LiveGameRow,
   LiveTickRow,
 } from './mappers.ts';
+import type { SnapshotBudget } from './client.ts';
 import type { StandingsRow } from './standings.ts';
 import type { Task } from './schedule.ts';
 
@@ -233,19 +234,13 @@ export class ResultsStore {
   }
 
   /** A successful run: stamps `last_ok_at`, stores the new ETag and clears the error. */
-  async recordSuccess(
-    source: string,
-    at: Date,
-    etag: string | null,
-    callsLastHour: number,
-  ): Promise<void> {
+  async recordSuccess(source: string, at: Date, etag: string | null): Promise<void> {
     await this.upsert('results_sync_state', [{
       source,
       etag,
       last_attempt_at: at.toISOString(),
       last_ok_at: at.toISOString(),
       last_error: null,
-      calls_last_hour: callsLastHour,
       alerted_at: null,
       updated_at: at.toISOString(),
     }], 'source');
@@ -264,6 +259,19 @@ export class ResultsStore {
       last_attempt_at: at.toISOString(),
       // Bounded: an upstream HTML error page would otherwise land in full in this column.
       last_error: error.slice(0, 2000),
+      updated_at: at.toISOString(),
+    }], 'source');
+  }
+
+  /**
+   * The snapshot budget, spent across every snapshot scope, so it is kept on one row
+   * (`SNAPSHOT_BUDGET_SOURCE`) rather than on each scope's.
+   */
+  async recordSnapshotBudget(budget: SnapshotBudget, at: Date): Promise<void> {
+    await this.upsert('results_sync_state', [{
+      source: SNAPSHOT_BUDGET_SOURCE,
+      calls_last_hour: budget.calls,
+      calls_window_started_at: budget.windowStartedAt.toISOString(),
       updated_at: at.toISOString(),
     }], 'source');
   }
@@ -311,6 +319,9 @@ export const SYNC_SOURCES = {
   leagueSnapshot: (key: string, season: string) => `snapshot:league:${key}:${season}`,
   leagueTable: (key: string, season: string) => `league-table:${key}:${season}`,
 } as const;
+
+/** The row that carries the shared snapshot budget between ticks. */
+export const SNAPSHOT_BUDGET_SOURCE = SYNC_SOURCES.teamSnapshot;
 
 /** Maps a task to the `source` whose `last_ok_at` gates it. */
 export function taskSource(task: Task): string {

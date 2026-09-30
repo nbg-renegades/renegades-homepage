@@ -77,9 +77,9 @@ export interface ClientOptions {
  * Remembers when calls were made, so the cap and the back-off survive across endpoints
  * within one invocation.
  *
- * Deliberately in memory: an Edge Function instance handles many cron ticks, so this holds
- * for the common case, and `sync_state.calls_last_hour` in Postgres is the durable record
- * that survives a cold start. Neither alone is enough; together they keep us inside budget.
+ * Only within one: the function builds a fresh client per cron tick, so nothing here outlives
+ * the tick. Across ticks the budget lives in Postgres as a count and the start of the window
+ * it was spent in (`calls_last_hour`, `calls_window_started_at`), and `seed` brings it back.
  */
 export class CallLedger {
   readonly #timestamps = new Map<Endpoint, number[]>();
@@ -93,11 +93,16 @@ export class CallLedger {
     this.#timestamps.set(endpoint, stamps);
   }
 
-  /** Seeds the ledger from Postgres, so a cold start does not forget the last hour. */
-  seed(endpoint: Endpoint, count: number): void {
-    const now = this.now();
-    // Placed at the start of the window: pessimistic, and it never over-reports the budget.
-    this.#timestamps.set(endpoint, Array.from({ length: count }, () => now));
+  /**
+   * Seeds the ledger from Postgres, so a new tick does not forget the calls made before it.
+   *
+   * The calls are stamped at the start of their window, so they drop out an hour after it
+   * opened. Stamping them "now" instead meant they never aged: every tick re-seeded the same
+   * count as fresh, the count only ever grew, and once it reached the cap the snapshot sync
+   * stopped for good.
+   */
+  seed(endpoint: Endpoint, count: number, windowStartedAt: number): void {
+    this.#timestamps.set(endpoint, Array.from({ length: count }, () => windowStartedAt));
   }
 
   callsInLastHour(endpoint: Endpoint): number {
@@ -115,6 +120,32 @@ export class CallLedger {
   blockedForMs(): number {
     return Math.max(0, this.#blockedUntil - this.now());
   }
+}
+
+/** The snapshot budget as Postgres holds it between ticks. */
+export interface SnapshotBudget {
+  readonly calls: number;
+  readonly windowStartedAt: Date;
+}
+
+/**
+ * What is left of the recorded budget at `now`: the stored count while its window is open,
+ * or a fresh window once it has run an hour (or none was ever recorded).
+ *
+ * A fixed window, because one count and one timestamp cannot describe a rolling one. Its known
+ * cost: 30 calls at the end of one window and 30 at the start of the next are 60 within an
+ * hour. That is still upstream's limit, and the scheduler asks for about 14 an hour at most.
+ */
+export function carriedSnapshotBudget(
+  calls: number,
+  windowStartedAt: string | null,
+  now: Date,
+): SnapshotBudget {
+  const started = windowStartedAt === null ? null : new Date(windowStartedAt);
+  if (started === null || now.getTime() - started.getTime() >= 3_600_000) {
+    return { calls: 0, windowStartedAt: now };
+  }
+  return { calls, windowStartedAt: started };
 }
 
 export class LeagueSphereClient {

@@ -1,6 +1,12 @@
 import { assert, assertEquals, assertRejects, assertStringIncludes } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
-import { ResultsStore, SYNC_SOURCES, StoreError, taskSource } from './store.ts';
+import {
+  ResultsStore,
+  SNAPSHOT_BUDGET_SOURCE,
+  SYNC_SOURCES,
+  StoreError,
+  taskSource,
+} from './store.ts';
 import type { GamedayRow, GameEventRow } from './mappers.ts';
 import type { StandingsRow } from './standings.ts';
 
@@ -237,15 +243,28 @@ Deno.test('a long upstream error is truncated rather than stored whole', async (
 Deno.test('a success stamps last_ok_at, stores the ETag and clears the error and the alert latch', async () => {
   const { store, calls } = storeWith();
   const at = new Date('2026-09-27T16:00:00Z');
-  await store.recordSuccess(SYNC_SOURCES.teamSnapshot, at, '3066857c232b9f85c81f4f3fa5701d27', 4);
+  await store.recordSuccess(SYNC_SOURCES.teamSnapshot, at, '3066857c232b9f85c81f4f3fa5701d27');
 
   const row = (calls[0].body as Record<string, unknown>[])[0];
   assertEquals(row['last_ok_at'], at.toISOString());
   assertEquals(row['etag'], '3066857c232b9f85c81f4f3fa5701d27');
   assertEquals(row['last_error'], null);
-  assertEquals(row['calls_last_hour'], 4);
   // Clearing this re-arms the stale-data alert after a recovery.
   assertEquals(row['alerted_at'], null);
+  // The budget is written once per tick by recordSnapshotBudget, never per scope.
+  assert(!('calls_last_hour' in row));
+});
+
+Deno.test('the snapshot budget is stored with the window it was spent in', async () => {
+  const { store, calls } = storeWith();
+  const windowStartedAt = new Date('2026-09-30T09:15:00Z');
+  await store.recordSnapshotBudget({ calls: 7, windowStartedAt }, new Date('2026-09-30T09:40:00Z'));
+
+  const row = (calls[0].body as Record<string, unknown>[])[0];
+  assertEquals(row['source'], SNAPSHOT_BUDGET_SOURCE);
+  assertEquals(row['calls_last_hour'], 7);
+  assertEquals(row['calls_window_started_at'], '2026-09-30T09:15:00.000Z');
+  assert(!('last_ok_at' in row), 'recording the budget is not a success');
 });
 
 Deno.test('sync state loads into a map keyed by source', async () => {

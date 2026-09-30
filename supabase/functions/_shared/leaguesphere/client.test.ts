@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertStringIncludes } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
 import {
+  carriedSnapshotBudget,
   DEFAULT_RETRY_AFTER_MS,
   LeagueSphereClient,
   MAX_RETRY_AFTER_MS,
@@ -211,12 +212,47 @@ Deno.test('the budget is a rolling hour, and the liveticker does not share it', 
   assertEquals(calls.length, 3);
 });
 
-Deno.test('a cold start can seed the budget from what Postgres recorded', async () => {
-  const { client } = clientWith([json({ gamedays: [] })], { snapshotCapPerHour: 5 });
-  client.ledger.seed('snapshot', 5);
+Deno.test('a new tick can seed the budget from what Postgres recorded', async () => {
+  const { client, nowRef } = clientWith([json({ gamedays: [] })], { snapshotCapPerHour: 5 });
+  client.ledger.seed('snapshot', 5, nowRef() - 60_000);
 
   const result = await client.snapshot({ teamIds: [159] });
   assertEquals(result.kind, 'capped');
+});
+
+Deno.test('a seeded budget runs out an hour after its window opened', async () => {
+  // The regression: seeded calls were stamped "now", so a budget seeded at the cap never aged
+  // and the snapshot sync stayed capped from 28 September on.
+  const { client, calls, advance, nowRef } = clientWith([json({ gamedays: [] })], {
+    snapshotCapPerHour: 5,
+  });
+  const windowStartedAt = nowRef() - 59 * 60_000;
+  client.ledger.seed('snapshot', 5, windowStartedAt);
+  assertEquals((await client.snapshot({ teamIds: [159] })).kind, 'capped');
+
+  advance(60_000);
+  assertEquals((await client.snapshot({ teamIds: [159] })).kind, 'ok');
+  assertEquals(calls.length, 1);
+});
+
+Deno.test('the recorded budget carries over while its window is open', () => {
+  const now = new Date('2026-09-30T10:00:00Z');
+  const budget = carriedSnapshotBudget(12, '2026-09-30T09:15:00Z', now);
+  assertEquals(budget.calls, 12);
+  assertEquals(budget.windowStartedAt.toISOString(), '2026-09-30T09:15:00.000Z');
+});
+
+Deno.test('the recorded budget starts over once its window has run an hour', () => {
+  const now = new Date('2026-09-30T10:00:00Z');
+  const budget = carriedSnapshotBudget(30, '2026-09-30T09:00:00Z', now);
+  assertEquals(budget.calls, 0);
+  assertEquals(budget.windowStartedAt, now);
+});
+
+Deno.test('a budget recorded without a window is not trusted to still be open', () => {
+  // How every row looked before the window was recorded: 30 calls and no start, forever.
+  const now = new Date('2026-09-30T10:00:00Z');
+  assertEquals(carriedSnapshotBudget(30, null, now), { calls: 0, windowStartedAt: now });
 });
 
 // ── Failures ─────────────────────────────────────────────────────────────────

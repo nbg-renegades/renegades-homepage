@@ -16,7 +16,11 @@
  */
 
 import { getCorsHeaders } from '../_shared/cors.ts';
-import { LeagueSphereClient, unquoteEtag } from '../_shared/leaguesphere/client.ts';
+import {
+  carriedSnapshotBudget,
+  LeagueSphereClient,
+  unquoteEtag,
+} from '../_shared/leaguesphere/client.ts';
 import { LEAGUE_SEASONS, TEAM_IDS } from '../_shared/leaguesphere/config.ts';
 import {
   mapTeamSnapshot,
@@ -40,7 +44,11 @@ import {
   mapOfficialTable,
   summariseCheck,
 } from '../_shared/leaguesphere/standings.ts';
-import { ResultsStore, SYNC_SOURCES } from '../_shared/leaguesphere/store.ts';
+import {
+  ResultsStore,
+  SNAPSHOT_BUDGET_SOURCE,
+  SYNC_SOURCES,
+} from '../_shared/leaguesphere/store.ts';
 import { clubToday } from '../_shared/leaguesphere/time.ts';
 import { sendStaleDataAlert } from '../_shared/leaguesphere/alert.ts';
 
@@ -130,13 +138,16 @@ async function run(): Promise<RunReport> {
 
   const state = await store.loadSyncState();
 
-  // Seed the call ledger from what the last run recorded, so a cold start does not forget the
-  // budget it already spent.
-  const spent = Math.max(
-    state.get(SYNC_SOURCES.teamSnapshot)?.calls_last_hour ?? 0,
-    state.get(SYNC_SOURCES.draftSnapshot)?.calls_last_hour ?? 0,
+  // Seed the call ledger from what earlier ticks spent, so this one does not start from zero.
+  const budgetRow = state.get(SNAPSHOT_BUDGET_SOURCE);
+  const budget = carriedSnapshotBudget(
+    budgetRow?.calls_last_hour ?? 0,
+    budgetRow?.calls_window_started_at ?? null,
+    now,
   );
-  if (spent > 0) client.ledger.seed('snapshot', spent);
+  if (budget.calls > 0) {
+    client.ledger.seed('snapshot', budget.calls, budget.windowStartedAt.getTime());
+  }
 
   const input = await buildScheduleInput(store, state, now, today);
   const due = whatIsDue(input);
@@ -167,6 +178,12 @@ async function run(): Promise<RunReport> {
       console.error(`[sync] ${task} failed: ${message}`);
       outcomes[task] = `error: ${message}`;
     }
+  }
+
+  // Once per tick, whatever the tasks did: a call that failed or 429'd still spent budget.
+  const spent = client.ledger.callsInLastHour('snapshot');
+  if (spent !== budget.calls) {
+    await store.recordSnapshotBudget({ calls: spent, windowStartedAt: budget.windowStartedAt }, now);
   }
 
   await maybeAlert(store, state, now, input);
@@ -272,12 +289,7 @@ async function syncTeamSnapshot(
     if (result.kind === 'not-modified') {
       notes.push(`${scope.source}: 304`);
       // Still a success, and nothing to write: what we hold is already current.
-      await store.recordSuccess(
-        scope.source,
-        now,
-        state.get(scope.source)?.etag ?? null,
-        client.ledger.callsInLastHour('snapshot'),
-      );
+      await store.recordSuccess(scope.source, now, state.get(scope.source)?.etag ?? null);
       continue;
     }
 
@@ -346,12 +358,7 @@ async function syncTeamSnapshot(
   }
 
   for (const pending of pendingSuccess) {
-    await store.recordSuccess(
-      pending.source,
-      now,
-      pending.etag,
-      client.ledger.callsInLastHour('snapshot'),
-    );
+    await store.recordSuccess(pending.source, now, pending.etag);
   }
 
   for (const disagreement of mapped.disagreements) {
@@ -389,7 +396,7 @@ async function syncLiveticker(
   });
 
   if (result.kind === 'not-modified') {
-    await store.recordSuccess(source, now, state.get(source)?.etag ?? null, 0);
+    await store.recordSuccess(source, now, state.get(source)?.etag ?? null);
     return '304';
   }
   if (result.kind === 'capped') return result.reason;
@@ -424,7 +431,7 @@ async function syncLiveticker(
     throw cause;
   }
 
-  await store.recordSuccess(source, now, unquoteEtag(result.etag), 0);
+  await store.recordSuccess(source, now, unquoteEtag(result.etag));
 
   return `${rows.length} live game(s) of ${parsed.value.length} returned, ${ticks.length} tick(s)`;
 }
@@ -450,7 +457,7 @@ async function syncLeagueTables(
     );
 
     if (result.kind === 'not-modified') {
-      await store.recordSuccess(source, now, state.get(source)?.etag ?? null, 0);
+      await store.recordSuccess(source, now, state.get(source)?.etag ?? null);
       notes.push(`${config.key}: 304`);
       continue;
     }
@@ -482,7 +489,7 @@ async function syncLeagueTables(
     }
 
     await store.replaceStandings(config.key, config.season, rows);
-    await store.recordSuccess(source, now, unquoteEtag(result.etag), 0);
+    await store.recordSuccess(source, now, unquoteEtag(result.etag));
     notes.push(`${config.key}: ${rows.length} row(s)`);
   }
 
@@ -522,7 +529,7 @@ async function crossCheckStandings(
     });
 
     if (result.kind === 'not-modified') {
-      await store.recordSuccess(source, now, state.get(source)?.etag ?? null, client.ledger.callsInLastHour('snapshot'));
+      await store.recordSuccess(source, now, state.get(source)?.etag ?? null);
       notes.push(`${config.key}: 304`);
       continue;
     }
@@ -581,7 +588,7 @@ async function crossCheckStandings(
       continue;
     }
 
-    await store.recordSuccess(source, now, unquoteEtag(result.etag), client.ledger.callsInLastHour('snapshot'));
+    await store.recordSuccess(source, now, unquoteEtag(result.etag));
     notes.push(`${config.key}: agrees (${summary})`);
   }
 

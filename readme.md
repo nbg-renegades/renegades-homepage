@@ -465,9 +465,14 @@ photographs and will generate responsive variants nobody needs.
 it holds upstream error strings. Query it from the SQL editor or with the service role:
 
 ```sql
-select source, last_ok_at, last_error, calls_last_hour
+select source, last_ok_at, last_error, calls_last_hour, calls_window_started_at
 from results_sync_state order by source;
 ```
+
+The snapshot budget (30 calls an hour) is shared by every snapshot scope, so it lives on the
+`snapshot:teams` row only: the calls spent and when their one-hour window opened. A run whose
+outcome reads `snapshot budget spent` is waiting for that window to close. If one still does
+more than an hour after `calls_window_started_at`, the budget is not draining, which is a bug.
 
 `last_ok_at` null or old with a `last_error` set means the site is serving stale data and saying
 so. A `schema mismatch` there is the interesting case: LeagueSphere changed shape, and the
