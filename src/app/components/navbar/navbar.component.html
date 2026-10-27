@@ -66,6 +66,11 @@
           class="nav-link text-[0.85rem] text-[var(--ink-0)]/86 hover:text-[var(--ink-0)] xl:text-[0.92rem]"
         >{{ 'nav.sponsoring' | translate }}</a>
         <a
+          [routerLink]="'/shop' | localePath"
+          routerLinkActive="nav-link--active"
+          class="nav-link text-[0.85rem] text-[var(--ink-0)]/86 hover:text-[var(--ink-0)] xl:text-[0.92rem]"
+        >{{ 'nav.shop' | translate }}</a>
+        <a
           [routerLink]="'/contact' | localePath"
           routerLinkActive="nav-link--active"
           class="nav-link text-[0.85rem] text-[var(--ink-0)]/86 hover:text-[var(--ink-0)] xl:text-[0.92rem]"
@@ -130,6 +135,12 @@
             (click)="closeMenu()"
             class="block rounded-md px-3 py-2 text-base font-semibold text-[var(--ink-0)]/86 transition-colors duration-300 hover:text-[var(--ink-0)]"
           >{{ 'nav.sponsoring' | translate }}</a>
+          <a
+            [routerLink]="'/shop' | localePath"
+            routerLinkActive="!text-[var(--ink-0)] bg-[var(--surface-2)]"
+            (click)="closeMenu()"
+            class="block rounded-md px-3 py-2 text-base font-semibold text-[var(--ink-0)]/86 transition-colors duration-300 hover:text-[var(--ink-0)]"
+          >{{ 'nav.shop' | translate }}</a>
           <a 
             [routerLink]="'/contact' | localePath" 
             routerLinkActive="!text-[var(--ink-0)] bg-[var(--surface-2)]"

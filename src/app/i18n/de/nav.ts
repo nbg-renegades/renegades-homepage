@@ -4,6 +4,7 @@ export const nav = {
   'nav.club': 'Verein',
   'nav.training': 'Training',
   'nav.sponsoring': 'Sponsoring',
+  'nav.shop': 'Shop',
   'nav.results': 'Ergebnisse',
   'nav.contact': 'Kontakt'
 };

@@ -4,6 +4,9 @@
       <!-- Main Footer Content -->
       <div class="flex flex-col items-center justify-between space-y-5 md:flex-row md:space-y-0">
         <div class="flex flex-col items-center space-y-2 md:flex-row md:space-x-5 md:space-y-0">
+          <a [routerLink]="'/shop' | localePath" class="text-sm font-semibold tracking-wide text-primary/90 dark:text-white/90 transition-colors duration-300 hover:text-accent dark:hover:text-[var(--brand-amber)]">
+            {{ "footer.shop" | translate }}
+          </a>
           <a [routerLink]="'/faq' | localePath" class="text-sm font-semibold tracking-wide text-primary/90 dark:text-white/90 transition-colors duration-300 hover:text-accent dark:hover:text-[var(--brand-amber)]">
             {{ "footer.faq" | translate }}
           </a>

@@ -6,6 +6,7 @@ const pagePaths = [
   '',
   'team',
   'sponsoring',
+  'shop',
   'impressum',
   'datenschutz',
   'ergebnisse',

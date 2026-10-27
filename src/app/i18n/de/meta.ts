@@ -17,6 +17,9 @@ export const meta = {
   'meta.sponsoring.title': 'Sponsoring & Partner | Nürnberg Renegades',
   'meta.sponsoring.description': 'Unterstütze Nürnberg Renegades e.V. als Sponsor und fördere Flag Football in Nürnberg und der Metropolregion.',
 
+  'meta.shop.title': 'Teamshop | Nürnberg Renegades',
+  'meta.shop.description': 'Trikots und Teamkleidung der Nürnberg Renegades e.V.: Links zu unseren Teamshops bei owayo und HARWY.',
+
   'meta.contact.title': 'Kontakt | Nürnberg Renegades',
   'meta.contact.description': 'Fragen zum Flag Football, Training oder zur Mitgliedschaft? Kontaktiere Nürnberg Renegades e.V. über unser Formular.',
 

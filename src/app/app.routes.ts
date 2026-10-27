@@ -28,6 +28,10 @@ const pages: Routes = [
     loadComponent: () => import('./components/sponsoring/sponsoring.component').then(m => m.SponsoringComponent)
   },
   {
+    path: 'shop',
+    loadComponent: () => import('./components/shop/shop.component').then(m => m.ShopComponent)
+  },
+  {
     path: 'ergebnisse',
     children: [
       {

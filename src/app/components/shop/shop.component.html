@@ -1,0 +1,26 @@
+<main class="main-content bg-secondary dark:bg-dark-secondary text-primary dark:text-white">
+  <div class="container mx-auto px-4 mb-4">
+    <h1 class="text-4xl font-bold mb-6 text-center text-primary dark:text-white">{{ 'shop.title' | translate }}</h1>
+    <p class="mb-12 max-w-2xl mx-auto text-center text-primary/80 dark:text-white/80">{{ 'shop.intro' | translate }}</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      @for (shop of shops; track shop.key) {
+        <div class="flex flex-col bg-secondary-dark dark:bg-dark-surface rounded-lg p-6 shadow-lg">
+          <h2 class="text-2xl font-bold mb-1 text-primary dark:text-white">{{ ('shop.' + shop.key + '.name') | translate }}</h2>
+          <p class="mb-4 text-sm font-semibold text-accent dark:text-[var(--brand-amber)]">{{ ('shop.' + shop.key + '.tagline') | translate }}</p>
+          <p class="mb-6 text-primary/80 dark:text-white/80">{{ ('shop.' + shop.key + '.description') | translate }}</p>
+          <a
+            [href]="shop.url"
+            target="_blank"
+            rel="noopener"
+            class="mt-auto self-start bg-accent text-white px-6 py-3 rounded-lg font-bold hover:bg-accent-dark transition-colors duration-300"
+          >
+            {{ ('shop.' + shop.key + '.cta') | translate }} ↗
+          </a>
+        </div>
+      }
+    </div>
+
+    <p class="mt-12 max-w-2xl mx-auto text-center text-sm text-[var(--ink-muted)]">{{ 'shop.note' | translate }}</p>
+  </div>
+</main>

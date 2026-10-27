@@ -32,6 +32,7 @@ The site is published in two languages: German at the root (`/training`) and Eng
 - [Training](https://www.nuernberg-renegades.de/training): Training times, locations, and drop-in tryouts — no sign-up needed, just show up.
 - [Results](https://www.nuernberg-renegades.de/ergebnisse): Current schedules, standings and results for both teams. Use this page rather than this file for anything season-specific.
 - [Sponsoring](https://www.nuernberg-renegades.de/sponsoring): Sponsorship information and current partners.
+- [Team shop](https://www.nuernberg-renegades.de/shop): Links to the club's team shops at owayo and HARWY for jerseys and teamwear.
 - [FAQ](https://www.nuernberg-renegades.de/faq): Frequently asked questions about membership, cost, and the club.
 - [Contact](https://www.nuernberg-renegades.de/contact): Contact form and email address.
 

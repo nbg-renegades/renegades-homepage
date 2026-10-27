@@ -137,6 +137,15 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.nuernberg-renegades.de/sponsoring" />
   </url>
   <url>
+    <loc>https://www.nuernberg-renegades.de/shop</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.nuernberg-renegades.de/shop" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.nuernberg-renegades.de/en/shop" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.nuernberg-renegades.de/shop" />
+  </url>
+  <url>
     <loc>https://www.nuernberg-renegades.de/faq</loc>
     <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
@@ -297,6 +306,15 @@
     <xhtml:link rel="alternate" hreflang="de" href="https://www.nuernberg-renegades.de/sponsoring" />
     <xhtml:link rel="alternate" hreflang="en" href="https://www.nuernberg-renegades.de/en/sponsoring" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.nuernberg-renegades.de/sponsoring" />
+  </url>
+  <url>
+    <loc>https://www.nuernberg-renegades.de/en/shop</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.nuernberg-renegades.de/shop" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.nuernberg-renegades.de/en/shop" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.nuernberg-renegades.de/shop" />
   </url>
   <url>
     <loc>https://www.nuernberg-renegades.de/en/faq</loc>

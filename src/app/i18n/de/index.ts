@@ -7,6 +7,7 @@ import { team } from './team';
 import { club } from './club';
 import { membership } from './membership';
 import { sponsoring } from './sponsoring';
+import { shop } from './shop';
 import { contact } from './contact';
 import { footer } from './footer';
 import { legal } from './legal';
@@ -25,6 +26,7 @@ export const de = {
   ...club,
   ...membership,
   ...sponsoring,
+  ...shop,
   ...contact,
   ...footer,
   ...legal,

@@ -31,6 +31,7 @@ The app uses full Angular SSR (no build-time prerendering) configured in `src/ap
 | `/training` | Server |
 | `/ergebnisse`, `/ergebnisse/:team`, `/ergebnisse/:team/:tab` | Server — the results are fetched during rendering, so they are in the HTML |
 | `/sponsoring` | Server |
+| `/shop` | Server |
 | `/contact` | Server |
 | `/faq` | Server |
 | `/impressum` | Server |
@@ -110,6 +111,7 @@ Browser request
 │   │   │   │                      #   live-ticker            today's games, over Realtime
 │   │   │   │                      #   team-logo              logo, or initials
 │   │   │   │                      #   results.config/.format
+│   │   │   ├── shop/              # Links out to the owayo and HARWY team shops
 │   │   │   ├── sponsoring/
 │   │   │   ├── team/
 │   │   │   └── training/          # Training info + tryout form

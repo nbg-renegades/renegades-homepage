@@ -1,5 +1,6 @@
 export const footer = {
   'footer.faq': 'FAQ',
+  'footer.shop': 'Team Shop',
   'footer.impressum': 'Legal Notice',
   'footer.privacy': 'Privacy Policy',
   'footer.rights': 'All rights reserved.',

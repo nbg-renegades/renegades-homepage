@@ -17,6 +17,9 @@ export const meta = {
   'meta.sponsoring.title': 'Sponsoring & Partners | Nürnberg Renegades',
   'meta.sponsoring.description': 'Support Nürnberg Renegades e.V. as a sponsor and help grow competitive flag football in Nuremberg and beyond.',
 
+  'meta.shop.title': 'Team Shop | Nürnberg Renegades',
+  'meta.shop.description': 'Jerseys and teamwear of Nürnberg Renegades e.V.: links to our team shops at owayo and HARWY.',
+
   'meta.contact.title': 'Contact | Nürnberg Renegades',
   'meta.contact.description': 'Questions about flag football, training or membership? Get in touch with Nürnberg Renegades e.V. via our contact form.',
 
