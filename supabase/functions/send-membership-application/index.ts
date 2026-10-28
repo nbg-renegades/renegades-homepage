@@ -10,16 +10,6 @@ import {
   PDF_FORM_URL,
 } from "./pdf.ts";
 
-/**
- * What the site sent before the youth membership existed: two checkboxes instead of one
- * type. Still accepted so a page loaded before the release can submit; drop it once that
- * release has been out for a while.
- */
-interface LegacyMembershipFlags {
-  membership_active?: boolean;
-  membership_support?: boolean;
-}
-
 const TYPE_LABELS: Record<MembershipType, string> = {
   adult: "Erwachsene (ab 16)",
   youth: "Jugend (unter 16)",
@@ -27,7 +17,7 @@ const TYPE_LABELS: Record<MembershipType, string> = {
 };
 
 interface EmailData {
-  application: MembershipApplication & LegacyMembershipFlags;
+  application: MembershipApplication;
 }
 
 serve(async (req) => {
@@ -40,7 +30,6 @@ serve(async (req) => {
     }
 
     const { application } = await req.json() as EmailData;
-    application.membership_type ??= application.membership_support ? "support" : "adult";
     if (!MEMBERSHIP_TYPES.includes(application.membership_type)) {
       return new Response(
         JSON.stringify({ error: "Invalid membership type" }),
