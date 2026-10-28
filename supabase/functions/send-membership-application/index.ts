@@ -117,7 +117,6 @@ serve(async (req) => {
             <p><strong>Name:</strong> ${e.name} ${e.firstname}</p>
             <p><strong>Birth Date:</strong> ${e.birthday}</p>
             <p><strong>Birth Place:</strong> ${e.birthplace}</p>
-            <p><strong>Profession:</strong> ${e.profession}</p>
             <p><strong>Nationality:</strong> ${e.nationality}</p>
             <p><strong>Address:</strong> ${e.street}, ${e.plz_town}</p>
             <p><strong>Contact:</strong><br>

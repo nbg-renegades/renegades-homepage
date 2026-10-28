@@ -15,9 +15,12 @@
  * changes, re-measure them (pdfjs `getTextContent()` gives every label's baseline), rebuild, and
  * fill a test copy to check every value lands on its line. Field names are what
  * `send-membership-application/pdf.ts` fills by, and its test fails if one goes missing.
+ *
+ * It also corrects a few things on the Word form itself (see CORRECTIONS). Once the Word file has
+ * them, drop the corrections along with the new export.
  */
 
-import { PDFDocument, PDFPage, rgb, TextAlignment } from 'npm:pdf-lib@1.17.1';
+import { PDFDocument, PDFPage, rgb, StandardFonts, TextAlignment } from 'npm:pdf-lib@1.17.1';
 
 const SOURCE = new URL('./Mitgliedsantrag_26-10.source.pdf', import.meta.url);
 const TARGET = new URL('../../src/assets/forms/Mitgliedsantrag_26-10.pdf', import.meta.url);
@@ -93,7 +96,6 @@ const FIELDS: Field[] = [
   line('firstname', RIGHT.x, RIGHT.width, ROWS.name),
   line('birthday', LEFT.x, LEFT.width, ROWS.birth),
   line('birthplace', RIGHT.x, RIGHT.width, ROWS.birth),
-  line('profession', LEFT.x, LEFT.width, ROWS.job),
   line('nationality', RIGHT.x, RIGHT.width, ROWS.job),
   line('street', LEFT.x, LEFT.width, ROWS.street),
   line('plz_town', RIGHT.x, RIGHT.width, ROWS.street),
@@ -120,6 +122,32 @@ const FIELDS: Field[] = [
 const pdf = await PDFDocument.load(await Deno.readFile(SOURCE));
 const page: PDFPage = pdf.getPage(0);
 const form = pdf.getForm();
+
+// Painted over the export rather than edited in it: pdf-lib cannot rewrite the page's text,
+// so the replaced words are still in the file, just covered.
+const CORRECTIONS = {
+  covers: [
+    { x: 40, y: 785, width: 520, height: 32 }, // heading "DFFL 5 er Flag Football Nürnberg Renegades"
+    { x: 50, y: 527, width: 230, height: 17 }, // "Beruf. ________": the club doesn't ask for it
+    { x: 75, y: 437, width: 455, height: 16 }, // "…die Aufnahme in den DFFL Flag Football Nürnberg…"
+  ],
+  /** Same position and size as what they replace; `center` keeps a centred line centred. */
+  texts: [
+    { text: 'Nürnberg Renegades e.V.', x: 54, baseline: 794.2, size: 21.5 },
+    {
+      text: 'beantragt hiermit die Aufnahme in den Nürnberg Renegades e.V.:',
+      center: (81.3 + 522.6) / 2,
+      baseline: 441.6,
+      size: 11,
+    },
+  ],
+};
+const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+for (const cover of CORRECTIONS.covers) page.drawRectangle({ ...cover, color: rgb(1, 1, 1) });
+for (const t of CORRECTIONS.texts) {
+  const x = 'center' in t ? t.center - bold.widthOfTextAtSize(t.text, t.size) / 2 : t.x;
+  page.drawText(t.text, { x, y: t.baseline, size: t.size, font: bold, color: rgb(0, 0, 0) });
+}
 
 for (const f of FIELDS) {
   const field = form.createTextField(f.name);

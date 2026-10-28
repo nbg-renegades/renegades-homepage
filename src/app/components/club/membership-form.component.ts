@@ -68,7 +68,6 @@ export class MembershipFormComponent {
       firstname: ["", Validators.required],
       birthday: ["", Validators.required],
       birthplace: ["", Validators.required],
-      profession: [""],
       nationality: [""],
       street: ["", Validators.required],
       plz_town: ["", Validators.required],

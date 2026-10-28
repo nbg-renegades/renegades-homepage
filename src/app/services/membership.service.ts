@@ -20,7 +20,6 @@ export interface MembershipApplication {
   firstname: string;
   birthday: string;
   birthplace: string;
-  profession: string;
   nationality: string;
   street: string;
   plz_town: string;

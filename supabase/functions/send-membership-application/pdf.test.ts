@@ -14,7 +14,6 @@ const application: MembershipApplication = {
   firstname: 'Jörg',
   birthday: '2014-03-09',
   birthplace: 'Fürth',
-  profession: '',
   nationality: 'deutsch',
   street: 'Große Straße 12',
   plz_town: '90402 Nürnberg',

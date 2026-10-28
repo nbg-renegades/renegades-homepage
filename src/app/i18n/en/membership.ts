@@ -11,7 +11,6 @@ export const membership = {
   'club.join.form.firstname': 'First Name',
   'club.join.form.birthday': 'Date of Birth',
   'club.join.form.birthplace': 'Place of Birth',
-  'club.join.form.profession': 'Profession',
   'club.join.form.nationality': 'Nationality',
   'club.join.form.street': 'Street',
   'club.join.form.plz_town': 'Postal Code, City',

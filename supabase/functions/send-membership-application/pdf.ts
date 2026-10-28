@@ -29,7 +29,6 @@ export interface MembershipApplication {
   firstname: string;
   birthday: string;
   birthplace: string;
-  profession: string;
   nationality: string;
   street: string;
   plz_town: string;
@@ -89,7 +88,6 @@ export async function fillMembershipPdfForm(
   const [year, month, day] = application.birthday.split('-');
   set('birthday', `${day}.${month}.${year}`);
   set('birthplace', application.birthplace);
-  set('profession', application.profession);
   set('nationality', application.nationality);
   set('street', application.street);
   set('plz_town', application.plz_town);

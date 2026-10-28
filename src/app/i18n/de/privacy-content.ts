@@ -274,8 +274,8 @@ export const privacyContent: PrivacyContent = {
           text:
             'Für die Aufnahme in den Verein benötigen wir die gewünschte Mitgliedschaftsart, Vor- und ' +
             'Nachname, Geburtsdatum, Geburtsort, Anschrift, E-Mail-Adresse und den gewünschten ' +
-            'Eintrittstermin. Freiwillig sind Beruf, ' +
-            'Staatsangehörigkeit sowie Telefon-, Mobil- und Faxnummer.'
+            'Eintrittstermin. Freiwillig sind Staatsangehörigkeit sowie Telefon-, Mobil- und ' +
+            'Faxnummer.'
         },
         {
           type: 'p',

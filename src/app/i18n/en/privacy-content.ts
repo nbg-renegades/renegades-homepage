@@ -266,8 +266,7 @@ export const privacyContent: PrivacyContent = {
           text:
             'To admit you to the association we need the type of membership, your first and last ' +
             'name, date of birth, place of birth, address, email address and preferred joining ' +
-            'date. Occupation, nationality ' +
-            'and phone, mobile and fax numbers are optional.'
+            'date. Nationality and phone, mobile and fax numbers are optional.'
         },
         {
           type: 'p',
