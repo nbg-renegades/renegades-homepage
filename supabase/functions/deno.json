@@ -17,8 +17,8 @@
     "singleQuote": true
   },
   "tasks": {
-    "test": "deno test --allow-read _shared/leaguesphere/",
-    "check": "deno check _shared/leaguesphere/*.ts sync-leaguesphere/index.ts"
+    "test": "deno test --allow-read _shared/leaguesphere/ send-membership-application/",
+    "check": "deno check _shared/leaguesphere/*.ts sync-leaguesphere/index.ts send-membership-application/*.ts"
   },
   "exclude": ["node_modules"]
 }

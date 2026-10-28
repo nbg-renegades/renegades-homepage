@@ -1,9 +1,21 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 
+export type MembershipType = 'adult' | 'youth' | 'support';
+
+/**
+ * Monthly fees in euros, as printed on the Mitgliedsantrag. The membership function has its
+ * own copy for the notification mail; change both when the Vorstand changes the form.
+ */
+export const MEMBERSHIP_FEES: Record<MembershipType, number> = {
+  adult: 18,
+  youth: 15,
+  support: 5,
+};
+export const ADMISSION_FEE = 20;
+
 export interface MembershipApplication {
-  membership_active: boolean;
-  membership_support: boolean;
+  membership_type: MembershipType;
   name: string;
   firstname: string;
   birthday: string;

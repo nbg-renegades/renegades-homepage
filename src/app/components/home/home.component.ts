@@ -5,6 +5,7 @@ import { LocalePathPipe } from '../../pipes/locale-path.pipe';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { MetaService } from '../../services/meta.service';
+import { ADMISSION_FEE, MEMBERSHIP_FEES, MembershipType } from '../../services/membership.service';
 
 interface Feature {
   titleKey: string;
@@ -45,6 +46,12 @@ export class HomeComponent implements OnInit {
       descriptionKey: 'home.features.competition.description'
     }
   ]);
+
+  readonly memberships = (Object.keys(MEMBERSHIP_FEES) as MembershipType[]).map((type) => ({
+    type,
+    fee: MEMBERSHIP_FEES[type],
+  }));
+  readonly admissionFee = String(ADMISSION_FEE);
 
   ngOnInit(): void {
     this.meta.updateMeta({

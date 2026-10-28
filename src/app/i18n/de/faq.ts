@@ -6,7 +6,7 @@ export const faq = {
   'faq.q2.question': 'Brauche ich Erfahrung, um mitzumachen?',
   'faq.q2.answer': 'Nein. Wir heißen Anfänger:innen genauso willkommen wie erfahrene Spieler:innen. Komm einfach zu einem Probetraining vorbei und finde heraus, ob Flag Football zu dir passt.',
   'faq.q3.question': 'Was kostet die Mitgliedschaft?',
-  'faq.q3.answer': 'Die aktive Spielmitgliedschaft kostet 18 € pro Monat. Andere Mitgliedschaftsarten, zum Beispiel eine fördernde Mitgliedschaft, können abweichende Beiträge haben. Details erfährst du über unser Kontaktformular.',
+  'faq.q3.answer': 'Die Mitgliedschaft im Erwachsenen-Team (ab 16 Jahren) kostet 18 € pro Monat, im Jugend-Team (unter 16 Jahren) 15 € pro Monat. Eine Fördermitgliedschaft gibt es ab 5 € pro Monat. Dazu kommt einmalig eine Aufnahmegebühr von 20 €. Fragen beantworten wir gern über unser Kontaktformular.',
   'faq.q4.question': 'Wie kann ich Mitglied werden oder zum Probetraining kommen?',
   'faq.q4.answer': 'Du musst uns nicht vorher kontaktieren – komm einfach in Sportkleidung und Fußballschuhen zu einem unserer Trainingstermine vorbei. Unser Kontaktformular oder das Probetraining-Formular auf der Trainingsseite auszufüllen ist optional, falls du uns vorab Bescheid geben möchtest. Den Mitgliedsantrag findest du auf unserer Vereinsseite.',
   'faq.q5.question': 'Welche Ausrüstung brauche ich zu Beginn?',

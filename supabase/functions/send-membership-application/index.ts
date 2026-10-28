@@ -1,49 +1,33 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { verifyRecaptcha } from "../_shared/recaptcha.ts";
-import { PDFDocument } from "https://cdn.skypack.dev/pdf-lib"; // Deno compatible!
-
-// If you need to support Unicode (non-latin, e.g., German umlauts), see notes further below for font embedding
+import {
+  fillMembershipPdfForm,
+  MEMBERSHIP_FEES,
+  MEMBERSHIP_TYPES,
+  type MembershipApplication,
+  type MembershipType,
+  PDF_FORM_URL,
+} from "./pdf.ts";
 
 /**
- * The blank form lives in the site's own assets (src/assets/forms), not in Supabase
- * Storage. It used to sit in a Storage bucket, which meant the only copy of it was
- * inside one Supabase project — when that project was paused the template became
- * unreachable and there was nothing in git to restore it from. Served from Netlify's
- * CDN it is versioned with the code and survives any future Supabase change.
- *
- * pdf-lib fills this by field name, so replacing it means keeping the field names.
+ * What the site sent before the youth membership existed: two checkboxes instead of one
+ * type. Still accepted so a page loaded before the release can submit; drop it once that
+ * release has been out for a while.
  */
-const PDF_FORM_URL =
-  "https://www.nuernberg-renegades.de/assets/forms/Mitgliedsantrag_25-08.pdf";
-
-export interface MembershipApplication {
-  membership_active: boolean;
-  membership_support: boolean;
-  name: string;
-  firstname: string;
-  birthday: string;
-  birthplace: string;
-  profession: string;
-  nationality: string;
-  street: string;
-  plz_town: string;
-  tel: string;
-  fax: string;
-  mobile: string;
-  email: string;
-  joindate_month: string;
-  joindate_year: string;
-  sepa_account_holder_name: string;
-  sepa_account_holder_firstname: string;
-  sepa_iban: string;
-  sepa_bic: string;
-  sepa_bank: string;
-  recaptchaToken: string;
+interface LegacyMembershipFlags {
+  membership_active?: boolean;
+  membership_support?: boolean;
 }
 
+const TYPE_LABELS: Record<MembershipType, string> = {
+  adult: "Erwachsene (ab 16)",
+  youth: "Jugend (unter 16)",
+  support: "Fördermitglied",
+};
+
 interface EmailData {
-  application: MembershipApplication;
+  application: MembershipApplication & LegacyMembershipFlags;
 }
 
 serve(async (req) => {
@@ -56,6 +40,16 @@ serve(async (req) => {
     }
 
     const { application } = await req.json() as EmailData;
+    application.membership_type ??= application.membership_support ? "support" : "adult";
+    if (!MEMBERSHIP_TYPES.includes(application.membership_type)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid membership type" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
 
     if (!application.recaptchaToken) {
       return new Response(
@@ -110,6 +104,11 @@ serve(async (req) => {
     }
     const base64Pdf = btoa(chunks.join(''));
 
+    // Everything typed into the form goes into the mail's HTML, so it is escaped first.
+    const e = Object.fromEntries(
+      Object.entries(application).map(([key, value]) => [key, escapeHtml(String(value ?? ""))]),
+    ) as Record<keyof MembershipApplication, string>;
+
     // === Send the email with the filled PDF as attachment ===
     const emailPromises = notificationEmails.map(async (to) => {
       const res = await fetch("https://api.resend.com/emails", {
@@ -125,24 +124,24 @@ serve(async (req) => {
             `New Membership Application - ${application.name} ${application.firstname}`,
           html: `
             <h2>New Membership Application</h2>
-            <p><strong>Membership Type:</strong> ${application.membership_active ? 'Active' : ''} ${application.membership_support ? 'Supporting' : ''}</p>
-            <p><strong>Name:</strong> ${application.name} ${application.firstname}</p>
-            <p><strong>Birth Date:</strong> ${application.birthday}</p>
-            <p><strong>Birth Place:</strong> ${application.birthplace}</p>
-            <p><strong>Profession:</strong> ${application.profession}</p>
-            <p><strong>Nationality:</strong> ${application.nationality}</p>
-            <p><strong>Address:</strong> ${application.street}, ${application.plz_town}</p>
+            <p><strong>Membership Type:</strong> ${TYPE_LABELS[application.membership_type]} (${MEMBERSHIP_FEES[application.membership_type]} € / Monat)</p>
+            <p><strong>Name:</strong> ${e.name} ${e.firstname}</p>
+            <p><strong>Birth Date:</strong> ${e.birthday}</p>
+            <p><strong>Birth Place:</strong> ${e.birthplace}</p>
+            <p><strong>Profession:</strong> ${e.profession}</p>
+            <p><strong>Nationality:</strong> ${e.nationality}</p>
+            <p><strong>Address:</strong> ${e.street}, ${e.plz_town}</p>
             <p><strong>Contact:</strong><br>
-               Tel: ${application.tel}<br>
-               Fax: ${application.fax}<br>
-               Mobile: ${application.mobile}<br>
-               Email: ${application.email}</p>
-            <p><strong>Join Date:</strong> ${application.joindate_month}/${application.joindate_year}</p>
+               Tel: ${e.tel}<br>
+               Fax: ${e.fax}<br>
+               Mobile: ${e.mobile}<br>
+               Email: ${e.email}</p>
+            <p><strong>Join Date:</strong> ${e.joindate_month}/${e.joindate_year}</p>
             <p><strong>SEPA Information:</strong><br>
-               Account Holder: ${application.sepa_account_holder_name} ${application.sepa_account_holder_firstname}<br>
-               IBAN: ${application.sepa_iban}<br>
-               BIC: ${application.sepa_bic}<br>
-               Bank: ${application.sepa_bank}</p>
+               Account Holder: ${e.sepa_account_holder_firstname} ${e.sepa_account_holder_name}<br>
+               IBAN: ${e.sepa_iban}<br>
+               BIC: ${e.sepa_bic}<br>
+               Bank: ${e.sepa_bank}</p>
             <hr>
             <p>PDF is attached.</p>
           `,
@@ -183,70 +182,11 @@ serve(async (req) => {
   }
 });
 
-/**
- * Fills the pre-generated PDF form fields using pdf-lib
- */
-async function fillMembershipPdfForm(
-  formPdfBytes: Uint8Array,
-  application: MembershipApplication,
-): Promise<Uint8Array> {
-  const pdfDoc = await PDFDocument.load(formPdfBytes);
-
-  // Access the PDF form
-  const form = pdfDoc.getForm();
-
-  // Fill fields by their exact name as defined in the PDF editor!
-  if (application.membership_active) {
-    form.getTextField("membership_active").setText('X');
-  } 
-  if (application.membership_support) {
-    // setText() with no argument wrote nothing here, so a supporting membership came
-    // through with neither box marked and the type had to be guessed from the fee.
-    form.getTextField("membership_support").setText('X');
-  } 
-  form.getTextField("name").setText(application.name);
-  form.getTextField("firstname").setText(application.firstname);
-  // Convert birthday from ISO (YYYY-MM-DD) to German format (DD.MM.YYYY)
-  const [year, month, day] = application.birthday.split('-');
-  form.getTextField("birthday").setText(`${day}.${month}.${year}`);
-  form.getTextField("birthplace").setText(application.birthplace);
-  form.getTextField("profession").setText(application.profession);
-  form.getTextField("nationality").setText(application.nationality);
-  form.getTextField("street").setText(application.street);
-  form.getTextField("plz_town").setText(application.plz_town);
-  form.getTextField("tel").setText(application.tel);
-  form.getTextField("fax").setText(application.fax);
-  form.getTextField("mobile").setText(application.mobile);
-  form.getTextField("email").setText(application.email);
-  // Convert month number to German month name
-  const germanMonths: { [key: string]: string } = {
-    "01": "Januar",
-    "02": "Februar",
-    "03": "März",
-    "04": "April",
-    "05": "Mai",
-    "06": "Juni",
-    "07": "Juli",
-    "08": "August",
-    "09": "September",
-    "10": "Oktober",
-    "11": "November",
-    "12": "Dezember"
-  };
-  form.getTextField("joindate_month").setText(germanMonths[application.joindate_month] || "");
-  
-  // Take only last 2 digits of the year
-  const yearLastTwo = application.joindate_year.toString().slice(-2);
-  form.getTextField("joindate_year").setText(yearLastTwo);
-  
-  form.getTextField("sepa_account_holder_name").setText(application.sepa_account_holder_name);
-  form.getTextField("sepa_account_holder_firstname").setText(application.sepa_account_holder_firstname);
-  form.getTextField("sepa_iban").setText(application.sepa_iban);
-  form.getTextField("sepa_bic").setText(application.sepa_bic);
-  form.getTextField("sepa_bank").setText(application.sepa_bank);
-
-  // Optionally, flatten to make fields un-editable:
-  form.flatten();
-
-  return await pdfDoc.save();
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }

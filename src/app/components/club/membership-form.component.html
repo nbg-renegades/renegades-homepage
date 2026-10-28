@@ -1,13 +1,21 @@
 <form [formGroup]="membershipForm" (ngSubmit)="onSubmit()" (focusin)="recaptchaService.preload()" class="bg-secondary-dark dark:bg-dark-surface rounded-lg p-8">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div>
-      <label class="block mb-2 font-medium text-primary dark:text-white">{{ 'club.join.form.membership_active' | translate }} *</label>
-      <input type="checkbox" formControlName="membership_active" class="mr-2"> <span class="text-primary dark:text-white">Ja</span>
-    </div>
-    <div>
-      <label class="block mb-2 font-medium text-primary dark:text-white">{{ 'club.join.form.membership_support' | translate }}</label>
-      <input type="checkbox" formControlName="membership_support" class="mr-2"> <span class="text-primary dark:text-white">Ja</span>
-    </div>
+    <fieldset class="md:col-span-2">
+      <legend class="block mb-2 font-medium text-primary dark:text-white">{{ 'club.join.form.membership_type' | translate }} *</legend>
+      <div class="space-y-2">
+        @for (type of membershipTypes; track type.value) {
+          <label class="flex items-center gap-3 p-3 rounded-lg bg-secondary dark:bg-dark-secondary text-primary dark:text-white cursor-pointer has-[:checked]:ring-2 has-[:checked]:ring-accent">
+            <input type="radio" formControlName="membership_type" [value]="type.value" class="accent-accent">
+            <span class="flex-1">{{ 'club.join.form.membership_' + type.value | translate }}</span>
+            <span class="font-semibold whitespace-nowrap">{{ type.fee }} € {{ 'club.join.form.per_month' | translate }}</span>
+          </label>
+        }
+      </div>
+      <p class="mt-2 text-sm text-primary/70 dark:text-white/70">{{ 'club.join.form.admission_fee' | translate: { fee: admissionFee } }}</p>
+      @if (isYouth()) {
+        <p class="mt-4 p-4 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100">{{ 'club.join.form.youth_hint' | translate }}</p>
+      }
+    </fieldset>
     <div>
       <label class="block mb-2 font-medium text-primary dark:text-white">{{ 'club.join.form.name' | translate }} *</label>
       <input type="text" formControlName="name" class="w-full p-3 rounded-lg bg-secondary dark:bg-dark-secondary text-primary dark:text-white border-0 focus:ring-2 focus:ring-accent">
@@ -19,6 +27,9 @@
     <div>
       <label class="block mb-2 font-medium text-primary dark:text-white">{{ 'club.join.form.birthday' | translate }} *</label>
       <input type="date" formControlName="birthday" class="w-full p-3 rounded-lg bg-secondary dark:bg-dark-secondary text-primary dark:text-white border-0 focus:ring-2 focus:ring-accent">
+      @if (ageMismatch()) {
+        <p class="mt-2 text-sm text-amber-700 dark:text-amber-300">{{ 'club.join.form.age_mismatch' | translate }}</p>
+      }
     </div>
     <div>
       <label class="block mb-2 font-medium text-primary dark:text-white">{{ 'club.join.form.birthplace' | translate }} *</label>

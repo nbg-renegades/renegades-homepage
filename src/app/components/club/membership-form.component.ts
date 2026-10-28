@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, signal } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import {
   FormBuilder,
   FormGroup,
@@ -7,7 +8,12 @@ import {
 } from "@angular/forms";
 
 import { TranslatePipe } from "../../pipes/translate.pipe";
-import { MembershipService } from "../../services/membership.service";
+import {
+  ADMISSION_FEE,
+  MEMBERSHIP_FEES,
+  MembershipService,
+  MembershipType,
+} from "../../services/membership.service";
 import { RecaptchaService } from "../../services/recaptcha.service";
 
 @Component({
@@ -25,14 +31,39 @@ export class MembershipFormComponent {
   currentYear = new Date().getFullYear();
   nextYear = this.currentYear + 1;
 
+  readonly membershipTypes = (Object.keys(MEMBERSHIP_FEES) as MembershipType[]).map((value) => ({
+    value,
+    fee: MEMBERSHIP_FEES[value],
+  }));
+  readonly admissionFee = String(ADMISSION_FEE);
+
+  readonly #value;
+  readonly isYouth = computed(() => this.#value().membership_type === "youth");
+  /**
+   * The age groups are "ab 16" and "unter 16", counted on the joining date. A mismatch is
+   * only pointed out, not blocked: the club decides, and someone turning 16 the month after
+   * joining may well be meant for the youth team.
+   */
+  readonly ageMismatch = computed(() => {
+    const { membership_type, birthday, joindate_month, joindate_year } = this.#value();
+    if (!birthday || (membership_type !== "adult" && membership_type !== "youth")) return false;
+    const [year, month, day] = birthday.split("-").map(Number);
+    const join = joindate_month && joindate_year
+      ? new Date(Number(joindate_year), Number(joindate_month) - 1, 1)
+      : new Date();
+    const birthdayReached =
+      join.getMonth() + 1 > month || (join.getMonth() + 1 === month && join.getDate() >= day);
+    const age = join.getFullYear() - year - (birthdayReached ? 0 : 1);
+    return membership_type === "youth" ? age >= 16 : age < 16;
+  });
+
   constructor(
     private fb: FormBuilder, 
     private membershipService: MembershipService,
     protected recaptchaService: RecaptchaService
   ) {
     this.membershipForm = this.fb.group({
-      membership_active: [false],
-      membership_support: [false],
+      membership_type: ["", Validators.required],
       name: ["", Validators.required],
       firstname: ["", Validators.required],
       birthday: ["", Validators.required],
@@ -52,6 +83,9 @@ export class MembershipFormComponent {
       sepa_iban: [""],
       sepa_bic: [""],
       sepa_bank: [""],
+    });
+    this.#value = toSignal(this.membershipForm.valueChanges, {
+      initialValue: this.membershipForm.value,
     });
   }
 

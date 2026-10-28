@@ -6,7 +6,7 @@ export const faq = {
   'faq.q2.question': 'Do I need experience to join?',
   'faq.q2.answer': 'No. We welcome beginners just as much as experienced players. Come to a trial training session and find out if flag football is for you.',
   'faq.q3.question': 'How much does membership cost?',
-  'faq.q3.answer': 'Active playing membership costs 18 € per month. Other membership types, such as a supporting membership, may have different rates. Reach out via our contact form for details.',
+  'faq.q3.answer': 'Membership of the adult team (16 and over) costs 18 € per month, of the youth team (under 16) 15 € per month. A supporting membership starts at 5 € per month. There is also a one-off admission fee of 20 €. Any questions? Reach out via our contact form.',
   'faq.q4.question': 'How can I join or attend a trial training?',
   'faq.q4.answer': 'No need to contact us first — just show up to one of our training sessions in sportswear and cleats. Filling out our contact form or the try-out form on our training page is optional if you\'d like us to know you\'re coming. You can find the membership application on our club page.',
   'faq.q5.question': 'What equipment do I need to get started?',

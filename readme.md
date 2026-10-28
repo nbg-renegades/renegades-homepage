@@ -145,6 +145,7 @@ Browser request
 │   └── global_styles.css
 ├── scripts/
 │   ├── optimize-images.js
+│   ├── membership-form/           # Adds the form fields to the Mitgliedsantrag PDF
 │   └── results-parity/            # Fixture upstream, gameday replay, parity checks
 ├── supabase/
 │   ├── config.toml                # Project ref + per-function settings (committed)
@@ -368,6 +369,25 @@ Keep it that way — a policy loosened in the performance repo is a policy this 
    bundle) and set `RECAPTCHA_SECRET_KEY` as a Supabase Edge Function secret. There is no
    `VITE_RECAPTCHA_SITE_KEY` — that variable was never wired up, see the note in
    `environment.ts`.
+
+### Membership application PDF
+
+The membership form sends the club a filled copy of the paper Mitgliedsantrag. The blank
+template is `src/assets/forms/Mitgliedsantrag_26-10.pdf`. The function fetches it from the live
+site, so the site has to be deployed before a function that points at a new template.
+
+The Vorstand maintains the form in Word, and a Word export has no form fields. They are added by
+a script, from the export in `scripts/membership-form/`:
+
+```bash
+deno run --config supabase/functions/deno.json --allow-read --allow-write \
+  scripts/membership-form/build.ts
+```
+
+When the form changes, replace the source PDF and re-measure the positions at the top of
+`build.ts` (its header says how), then fill a test copy and look at it. The filler in
+`send-membership-application/pdf.ts` addresses fields by name, and
+`cd supabase/functions && deno task test` fails if one is missing from the template.
 
 ## Results
 

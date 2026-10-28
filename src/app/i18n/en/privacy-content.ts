@@ -4,7 +4,7 @@ const LINK = 'class="text-accent dark:text-[var(--brand-amber)] underline hover:
 
 export const privacyContent: PrivacyContent = {
   title: 'Privacy Policy',
-  updated: 'Last updated: 27 September 2026',
+  updated: 'Last updated: 28 October 2026',
   tocHeading: 'Contents',
   cookieSettingsIntro:
     'You can change or withdraw your consent here at any time. Changes take effect immediately and apply to future page views.',
@@ -264,8 +264,9 @@ export const privacyContent: PrivacyContent = {
         {
           type: 'p',
           text:
-            'To admit you to the association we need your first and last name, date of birth, place ' +
-            'of birth, address, email address and preferred joining date. Occupation, nationality ' +
+            'To admit you to the association we need the type of membership, your first and last ' +
+            'name, date of birth, place of birth, address, email address and preferred joining ' +
+            'date. Occupation, nationality ' +
             'and phone, mobile and fax numbers are optional.'
         },
         {
@@ -275,6 +276,14 @@ export const privacyContent: PrivacyContent = {
             '<strong>account holder, IBAN, BIC and bank name</strong>. These details are optional; ' +
             'membership is possible without them, but the fee must then be paid another way. We use ' +
             'payment details solely to collect the membership fee.'
+        },
+        {
+          type: 'p',
+          text:
+            'For children and teenagers under 16, a parent applies and signs as their legal ' +
+            'guardian. We then process the details about the child listed above, together with the ' +
+            'email address, phone number and account details the parent gives for themselves — ' +
+            'solely for the child\'s membership.'
         },
         {
           type: 'p',

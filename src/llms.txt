@@ -14,7 +14,7 @@ The site is published in two languages: German at the root (`/training`) and Eng
 - Teams: 1st team in the DFFL1 (highest German division); 2nd team in the Bayernliga (Bavarian regional league)
 - Registered address: Bartholomäusstr. 26c, 90489 Nürnberg, Germany
 - Contact: info@nuernberg-renegades.de
-- Membership fee: 18 EUR per month for an active playing membership; other membership types may differ
+- Membership fees per month: 18 EUR adult team (16 and over), 15 EUR youth team (under 16), 5 EUR supporting membership; plus a one-off admission fee of 20 EUR
 - Languages served: German (default), English
 
 ## Training

@@ -4,7 +4,7 @@ const LINK = 'class="text-accent dark:text-[var(--brand-amber)] underline hover:
 
 export const privacyContent: PrivacyContent = {
   title: 'Datenschutzerklärung',
-  updated: 'Stand: 27. September 2026',
+  updated: 'Stand: 28. Oktober 2026',
   tocHeading: 'Inhaltsübersicht',
   cookieSettingsIntro:
     'Hier können Sie Ihre Einwilligung jederzeit anpassen oder widerrufen. Die Änderung wirkt sofort und gilt für künftige Seitenaufrufe.',
@@ -272,8 +272,9 @@ export const privacyContent: PrivacyContent = {
         {
           type: 'p',
           text:
-            'Für die Aufnahme in den Verein benötigen wir Vor- und Nachname, Geburtsdatum, Geburtsort, ' +
-            'Anschrift, E-Mail-Adresse und den gewünschten Eintrittstermin. Freiwillig sind Beruf, ' +
+            'Für die Aufnahme in den Verein benötigen wir die gewünschte Mitgliedschaftsart, Vor- und ' +
+            'Nachname, Geburtsdatum, Geburtsort, Anschrift, E-Mail-Adresse und den gewünschten ' +
+            'Eintrittstermin. Freiwillig sind Beruf, ' +
             'Staatsangehörigkeit sowie Telefon-, Mobil- und Faxnummer.'
         },
         {
@@ -283,6 +284,14 @@ export const privacyContent: PrivacyContent = {
             '<strong>Kontoinhaber, IBAN, BIC und Bankname</strong>. Diese Angaben sind freiwillig; ' +
             'ohne sie ist eine Mitgliedschaft möglich, der Beitrag muss dann aber anders beglichen ' +
             'werden. Die Zahlungsdaten verwenden wir ausschließlich zum Einzug des Mitgliedsbeitrags.'
+        },
+        {
+          type: 'p',
+          text:
+            'Für Kinder und Jugendliche unter 16 Jahren stellt ein Elternteil als gesetzlicher ' +
+            'Vertreter den Antrag und unterschreibt ihn. Wir verarbeiten dann die oben genannten ' +
+            'Angaben zum Kind sowie die E-Mail-Adresse, Telefonnummer und Kontodaten, die das ' +
+            'Elternteil für sich angibt – ausschließlich für die Mitgliedschaft des Kindes.'
         },
         {
           type: 'p',

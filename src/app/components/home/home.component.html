@@ -155,6 +155,35 @@
 
   <div class="section-separator"></div>
 
+  <section class="relative py-20 md:py-24">
+    <div class="container mx-auto max-w-6xl px-6">
+      <div class="mb-10 flex items-end justify-between gap-6">
+        <h2 class="display-heading text-3xl font-bold tracking-tight md:text-4xl">{{ 'home.fees.heading' | translate }}</h2>
+        <div class="hidden h-px flex-1 bg-[var(--brand-line)]/60 md:block"></div>
+      </div>
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
+        @for (membership of memberships; track membership.type) {
+          <article class="athletic-card rounded-3xl p-7">
+            <h3 class="display-heading text-xl font-bold tracking-tight text-[var(--ink-0)]">{{ 'home.fees.' + membership.type + '.title' | translate }}</h3>
+            <p class="mt-4">
+              <span class="display-heading text-4xl font-extrabold tracking-tight text-[var(--ink-0)]">{{ membership.fee }} €</span>
+              <span class="ml-1 text-[var(--ink-muted)]">{{ 'home.fees.per_month' | translate }}</span>
+            </p>
+            <p class="mt-4 leading-relaxed text-[var(--ink-muted)]">{{ 'home.fees.' + membership.type + '.description' | translate }}</p>
+          </article>
+        }
+      </div>
+      <p class="mt-6 text-[var(--ink-muted)]">{{ 'home.fees.admission' | translate: { fee: admissionFee } }}</p>
+      <div class="mt-8">
+        <a [routerLink]="'/club' | localePath" class="btn-base btn-primary btn-size-md" aria-label="Apply for membership">
+          {{ 'home.fees.cta' | translate }}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-separator"></div>
+
   <section class="relative isolate overflow-hidden py-20 md:py-24">
     <div class="about-bg absolute inset-0 bg-cover bg-center"></div>
     <div class="about-overlay absolute inset-0"></div>
