@@ -13,6 +13,7 @@ function clone<T>(value: T): T {
 Deno.test('every recorded snapshot parses', async () => {
   const fixtures = [
     'snapshot.teams-159-287.json',
+    'snapshot.teams-159-287-with-time.json',
     'snapshot.league-ffbl-2026.json',
     'snapshot.league-dffl-2026.json',
     'snapshot.status-draft-empty.json',
@@ -203,6 +204,68 @@ Deno.test('a possession marker keeps its name and carries no players', async () 
   assert(marker !== undefined);
   assertEquals(marker.name, 'Interception');
   assertEquals(Object.keys(marker.players), []);
+});
+
+// ── Log fields added in LeagueSphere 4.42 ────────────────────────────────────
+
+const WITH_TIME = 'snapshot.teams-159-287-with-time.json';
+
+Deno.test('time and a marker player are kept, but not as players', async () => {
+  const parsed = parseSnapshot(await loadFixture(WITH_TIME));
+  assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
+  const games = parsed.value.gamedays.find((g) => g.id === 645)?.games ?? [];
+
+  // `players` holds jersey numbers only. Were `time` a key there, it would be scored and
+  // rendered as an event.
+  const touchdown = games.find((g) => g.id === 7374)?.log?.home.firsthalf.entries
+    .find((e) => e.sequence === 8);
+  assert(touchdown !== undefined);
+  assertEquals(touchdown.time, '2026-05-09T09:51:53.399540+00:00');
+  assertEquals(Object.keys(touchdown.players).sort(), ['pat1', 'td']);
+
+  const interception = games.find((g) => g.id === 7373)?.log?.away.firsthalf.entries
+    .find((e) => e.sequence === 5);
+  assert(interception !== undefined);
+  assertEquals(interception.player, 96);
+  assertEquals(Object.keys(interception.players), []);
+
+  // A turnover credits nobody: null survives as null.
+  const turnover = games.find((g) => g.id === 7372)?.log?.home.firsthalf.entries
+    .find((e) => e.sequence === 5);
+  assert(turnover !== undefined);
+  assert('player' in turnover);
+  assertEquals(turnover.player, null);
+});
+
+Deno.test('an unknown log entry key that is not a jersey number is ignored', async () => {
+  const good = await loadFixture(WITH_TIME) as Record<string, unknown>;
+  const extended = clone(good);
+  const entry = firstLogEntry(extended) as Record<string, unknown>;
+  entry['note'] = 'Nachgetragen';
+  entry['position'] = { x: 3, y: 12 };
+
+  // Upstream promises additive changes only; a new descriptive field must not cost us the
+  // whole snapshot the way `time` did in 4.42.
+  const result = parseSnapshot(extended);
+  assert(result.ok, result.ok ? '' : result.errors.join('; '));
+});
+
+Deno.test('a retyped time or marker player is still rejected', async () => {
+  const good = await loadFixture(WITH_TIME) as Record<string, unknown>;
+
+  const cases: readonly [string, (e: Record<string, unknown>) => void, string][] = [
+    ['time became a number', (e) => { e['time'] = 1715245000; }, '.time'],
+    ['player became a name', (e) => { e['player'] = 'Meier'; }, '.player'],
+    ['a pat1 number became a name', (e) => { e['pat1'] = 'Meier'; }, '.pat1'],
+  ];
+
+  for (const [label, corrupt, expectedPath] of cases) {
+    const broken = clone(good);
+    corrupt(firstLogEntry(broken) as Record<string, unknown>);
+    const result = parseSnapshot(broken);
+    assert(!result.ok, `${label}: should have been rejected`);
+    assertStringIncludes(result.errors.join('\n'), expectedPath, label);
+  }
 });
 
 Deno.test('a snapshot without include=games yields gamedays with no games', () => {

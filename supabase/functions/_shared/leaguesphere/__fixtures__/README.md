@@ -13,6 +13,7 @@ traffic is **120/min per IP**.
 | File | Request | Why it is here |
 | --- | --- | --- |
 | `snapshot.teams-159-287.json` | `/api/snapshot/?team=159&team=287&include=games,logs`, trimmed to gamedays 645, 844, 852, 893 | The main read path. Covers finished games, an unplayed (`Geplant`) game, an abandoned `2. Halbzeit` game, failed extra points, a deleted log entry, a real address, a city-only address and the `Adresse folgt in der Einladung` placeholder. |
+| `snapshot.teams-159-287-with-time.json` | Same request with `year=2026`, recorded **2026-10-28**, trimmed to the same four gamedays | LeagueSphere 4.42 added `time` (ISO instant) to every log entry and `player` (number or null) to every possession marker. Otherwise its logs equal the recording above, which pins that the new fields change no stored row. |
 | `snapshot.league-ffbl-2026.json` | `/api/snapshot/?league=18&season=6&include=games` | League-scoped fetch for FF BL 2026. Standings parity oracle: reproduces `league-table.ff-bl-2026.json` exactly. |
 | `snapshot.league-dffl-2026.json` | `/api/snapshot/?league=7&season=6&include=games` | Same for DKB DFFL 2026. W/L/D/PF/PA reproduce exactly; `win_points`/`win_quotient` do not — see the Phase 0 notes. |
 | `snapshot.status-draft-empty.json` | `…&status=DRAFT` | The real second call of the two-call draft strategy. Currently returns zero gamedays for our teams; proves the empty-but-valid response shape. |

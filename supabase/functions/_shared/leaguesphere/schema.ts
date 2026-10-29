@@ -146,6 +146,10 @@ export interface UpstreamLogEntry {
   readonly cop?: boolean;
   readonly name?: string;
   readonly isDeleted?: boolean;
+  /** When the play was entered, an ISO instant (since LeagueSphere 4.42). */
+  readonly time?: string;
+  /** A possession marker's player, e.g. the interceptor; null when none was entered. */
+  readonly player?: number | null;
   /** `td`, `pat1`, `pat2`, `OT` and free-form event names such as `Safety (+2)`. */
   readonly players: Readonly<Record<string, number | null>>;
 }
@@ -243,6 +247,19 @@ export interface UpstreamLeagueTable {
 
 // ── Parsers ──────────────────────────────────────────────────────────────────
 
+/** Log entry keys that describe the entry itself rather than an event with a jersey number. */
+const ENTRY_FIELDS: ReadonlySet<string> = new Set([
+  'sequence',
+  'cop',
+  'name',
+  'isDeleted',
+  'time',
+  'player',
+]);
+
+/** Events whose value we read as a jersey number, so a retyped value is a breakage. */
+const SCORING_EVENTS: ReadonlySet<string> = new Set(['td', 'pat1', 'pat2', 'OT', 'Safety (+2)']);
+
 function parseLogEntry(v: Validation, path: string, raw: unknown): UpstreamLogEntry | null {
   const obj = record(v, path, raw);
   if (obj === null) return null;
@@ -252,12 +269,15 @@ function parseLogEntry(v: Validation, path: string, raw: unknown): UpstreamLogEn
 
   const players: Record<string, number | null> = {};
   for (const [key, value] of Object.entries(obj)) {
-    if (key === 'sequence' || key === 'cop' || key === 'name' || key === 'isDeleted') continue;
+    if (ENTRY_FIELDS.has(key)) continue;
     if (value === null) {
       // A failed attempt: the event happened, nobody is credited, it scores nothing.
       players[key] = null;
       continue;
     }
+    // Any other key is an event carrying a jersey number. A known event must stay a number;
+    // an unknown key holding something else is a field upstream added, not an event.
+    if (!SCORING_EVENTS.has(key) && typeof value !== 'number') continue;
     const player = int(v, `${path}.${key}`, value);
     if (player === null) return null;
     players[key] = player;
@@ -270,6 +290,12 @@ function parseLogEntry(v: Validation, path: string, raw: unknown): UpstreamLogEn
     isDeleted: obj['isDeleted'] === undefined
       ? undefined
       : (bool(v, `${path}.isDeleted`, obj['isDeleted']) ?? undefined),
+    time: obj['time'] === undefined
+      ? undefined
+      : (str(v, `${path}.time`, obj['time']) ?? undefined),
+    player: obj['player'] === undefined
+      ? undefined
+      : nullableInt(v, `${path}.player`, obj['player']),
     players,
   };
 }
