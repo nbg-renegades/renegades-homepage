@@ -5,6 +5,7 @@ export interface Sponsor {
   id: string;
   name: string;
   logo_url?: string;
+  logo_url_dark?: string;
   description?: string;
   website?: string;
   active: boolean;
