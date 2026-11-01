@@ -82,7 +82,14 @@ Deno.serve({ port }, (req) => {
   }
 
   if (url.pathname === '/api/liveticker/') return json([currentLiveGame()]);
-  if (url.pathname === '/api/snapshot/') return json(currentSnapshot());
+  if (url.pathname === '/api/snapshot/') {
+    // Empty on purpose: an empty standings payload keeps the stored tables, so a replay cannot
+    // wipe the standings it is not testing.
+    if (url.searchParams.get('include')?.split(',').includes('standings')) {
+      return json({ generated_at: new Date().toISOString(), gamedays: [], standings: [] });
+    }
+    return json(currentSnapshot());
+  }
   if (url.pathname.startsWith('/api/league-table/')) return json(emptyTable(url.pathname));
 
   return new Response('not found', { status: 404 });

@@ -262,28 +262,6 @@ export class ResultsStore {
   }
 
   /**
-   * Replaces a league season's table.
-   *
-   * Also a delete-then-insert: a team can leave a league between syncs, and an upsert would
-   * keep it in the table at its last known rank for the rest of the season.
-   */
-  async replaceStandings(
-    leagueKey: string,
-    season: string,
-    rows: readonly StandingsRow[],
-  ): Promise<void> {
-    await this.deleteWhere(
-      'results_standings',
-      `league_key=eq.${encodeURIComponent(leagueKey)}&season=eq.${encodeURIComponent(season)}`,
-    );
-    await this.upsert(
-      'results_standings',
-      withTimestamp(rows.map(toStandingsColumns)),
-      'league_key,season,team_id',
-    );
-  }
-
-  /**
    * Writes a league season's table without ever leaving it empty for a reader.
    *
    * A team can leave a league between syncs, so teams missing from the new set are removed,
@@ -514,9 +492,7 @@ export function taskSource(task: Task): string {
       return SYNC_SOURCES.teamSnapshot;
     case 'liveticker':
       return SYNC_SOURCES.liveticker;
-    case 'league-table':
-      return 'league-table';
-    case 'league-snapshot':
-      return 'snapshot:league';
+    case 'standings':
+      return SYNC_SOURCES.standingsSnapshot;
   }
 }

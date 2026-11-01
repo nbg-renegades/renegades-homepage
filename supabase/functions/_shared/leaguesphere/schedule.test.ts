@@ -34,8 +34,7 @@ function ago(ms: number): Date {
 function allFresh(): Record<Task, Date> {
   return {
     'team-snapshot': NOW,
-    'league-snapshot': NOW,
-    'league-table': NOW,
+    standings: NOW,
     liveticker: NOW,
   };
 }
@@ -50,7 +49,7 @@ Deno.test('a tick with everything fresh does no upstream work', () => {
 
 Deno.test('a first run fetches everything', () => {
   const due = whatIsDue(input());
-  assertEquals(new Set(due.tasks), new Set(['team-snapshot', 'league-table', 'league-snapshot']));
+  assertEquals(new Set(due.tasks), new Set(['team-snapshot', 'standings']));
 });
 
 // ── No gameday today ─────────────────────────────────────────────────────────
@@ -180,10 +179,9 @@ Deno.test('a finished gameday pulls the standings in without waiting an hour', (
   const due = whatIsDue(input({
     todaysKickoffs: ['09:00:00'],
     gamedayFinished: true,
-    lastOkAt: { ...allFresh(), 'league-table': ago(GAMEDAY_INTERVAL_MS) },
+    lastOkAt: { ...allFresh(), standings: ago(GAMEDAY_INTERVAL_MS) },
   }));
-  assert(due.tasks.includes('league-table'));
-  assert(due.tasks.includes('league-snapshot'), 'the cross-check needs the league-scoped snapshot');
+  assert(due.tasks.includes('standings'));
   assertEquals(due.reason, 'gameday finished, standings settled');
 });
 
@@ -196,29 +194,13 @@ Deno.test('a finished gameday drops back to the hourly snapshot cadence', () => 
   assert(!due.tasks.includes('team-snapshot'), 'there is nothing left to change today');
 });
 
-Deno.test('standings and the league snapshot always travel together', () => {
-  for (const finished of [true, false]) {
-    const due = whatIsDue(input({
-      todaysKickoffs: ['09:00:00'],
-      gamedayFinished: finished,
-      lastOkAt: {},
-    }));
-    assertEquals(
-      due.tasks.includes('league-table'),
-      due.tasks.includes('league-snapshot'),
-      'a table without its snapshot cannot be cross-checked',
-    );
-  }
-});
-
 // ── Budget ───────────────────────────────────────────────────────────────────
 
 Deno.test('a full gameday stays inside the snapshot budget', () => {
   // Walk a 12-hour gameday minute by minute and count the snapshot scopes requested.
-  // Two scopes per team-snapshot task (all statuses, then drafts) and one per league season.
-  const LEAGUE_SEASONS = 2;
+  // Two scopes per team-snapshot task (all statuses, then drafts); standings are one request.
   let teamSnapshots = 0;
-  let leagueSnapshots = 0;
+  let standingsRequests = 0;
   const lastOkAt: Record<string, Date> = {};
 
   for (let minute = 0; minute < 12 * 60; minute += 1) {
@@ -237,16 +219,21 @@ Deno.test('a full gameday stays inside the snapshot budget', () => {
     for (const task of due.tasks) {
       lastOkAt[task] = now;
       if (task === 'team-snapshot') teamSnapshots += 1;
-      if (task === 'league-snapshot') leagueSnapshots += 1;
+      if (task === 'standings') standingsRequests += 1;
     }
   }
 
-  const calls = teamSnapshots * 2 + leagueSnapshots * LEAGUE_SEASONS;
+  const calls = teamSnapshots * 2;
   const hours = 12;
   const perHour = calls / hours;
   assert(
     perHour <= 30,
     `averaged ${perHour.toFixed(1)} snapshot calls/hour over a gameday, cap is 30`,
+  );
+  // Standings spend their own budget of 20 an hour (D-15).
+  assert(
+    standingsRequests / hours <= 20,
+    `averaged ${(standingsRequests / hours).toFixed(1)} standings requests/hour, cap is 20`,
   );
   // And it must actually be doing work, not passing by doing nothing.
   assert(teamSnapshots > 10, `expected regular refreshes, got ${teamSnapshots}`);

@@ -35,6 +35,10 @@ Deno.serve({ port }, async (req) => {
 
   if (url.pathname === '/api/snapshot/') {
     const league = url.searchParams.get('league');
+    // The standings request: both tables of our teams' leagues in one answer.
+    if (url.searchParams.get('include')?.split(',').includes('standings')) {
+      return json(await fixture('snapshot.standings-teams-159-287-2026.json'));
+    }
     // League-scoped calls are the standings cross-check; team-scoped is the schedule.
     if (league === '18') return json(await fixture('snapshot.league-ffbl-2026.json'));
     if (league === '7') return json(await fixture('snapshot.league-dffl-2026.json'));

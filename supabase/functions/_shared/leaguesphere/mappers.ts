@@ -356,7 +356,7 @@ export interface MappedSnapshot {
  * Only games involving our teams are kept. A gameday of 12 games typically has 3 or 4 of
  * ours, and storing the rest would multiply the data for rows nothing ever reads — hard
  * constraint 6 asks for the stored data to stay small. League tables are unaffected: they
- * come from `/api/league-table/`, not from these rows.
+ * come from the snapshot's `standings`, not from these rows.
  */
 export function mapTeamSnapshot(
   gamedays: readonly UpstreamGameday[],

@@ -237,42 +237,6 @@ Deno.test('an empty diff makes no request', async () => {
   assertEquals(calls.length, 0);
 });
 
-Deno.test('standings are replaced per league season, not globally', async () => {
-  const { store, calls } = storeWith();
-  const rows: StandingsRow[] = [{
-    leagueKey: 'ff-bl',
-    season: '2026',
-    teamId: 287,
-    rank: 3,
-    group: 'FF BL',
-    sp: 23,
-    s: 18,
-    u: 0,
-    n: 5,
-    ep: 855,
-    gp: 322,
-    pd: 533,
-    sq: 0.783,
-    promotionRestricted: false,
-    mode: 'official',
-  }];
-
-  await store.replaceStandings('ff-bl', '2026', rows);
-
-  assertEquals(calls[0].method, 'DELETE');
-  // Scoped: deleting the whole table would take the other league's standings with it.
-  assertStringIncludes(calls[0].path, 'league_key=eq.ff-bl');
-  assertStringIncludes(calls[0].path, 'season=eq.2026');
-
-  // camelCase domain rows become snake_case columns.
-  const written = (calls[1].body as Record<string, unknown>[])[0];
-  assertEquals(written['league_key'], 'ff-bl');
-  assertEquals(written['team_id'], 287);
-  assertEquals(written['group_name'], 'FF BL');
-  assertEquals(written['promotion_restricted'], false);
-  assert(!('leagueKey' in written), 'camelCase keys must not reach PostgREST');
-});
-
 Deno.test('standings are written before the teams that left are removed', async () => {
   const { store, calls } = storeWith();
   const row = (teamId: number): StandingsRow => ({
@@ -521,9 +485,10 @@ Deno.test('the league-scoped sources are distinct per league season', () => {
 });
 
 Deno.test('every task maps to a source', () => {
-  for (const task of ['team-snapshot', 'liveticker', 'league-table', 'league-snapshot'] as const) {
+  for (const task of ['team-snapshot', 'standings', 'liveticker'] as const) {
     assert(taskSource(task).length > 0);
   }
+  assertEquals(taskSource('standings'), 'snapshot:standings');
 });
 
 // ── Failures ─────────────────────────────────────────────────────────────────
