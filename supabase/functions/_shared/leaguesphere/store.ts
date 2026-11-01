@@ -45,6 +45,9 @@ export interface StoreOptions {
   readonly log?: (message: string) => void;
 }
 
+/** Rows per page of `selectAll`, below the 1000-row cap so a lower configured cap still works. */
+const PAGE_SIZE = 500;
+
 export class StoreError extends Error {
   constructor(message: string, readonly status: number | null) {
     super(message);
@@ -125,6 +128,29 @@ export class ResultsStore {
   async select<T>(table: string, query: string): Promise<readonly T[]> {
     const result = await this.#request(`/${table}?${query}`, { method: 'GET' });
     return Array.isArray(result) ? result as T[] : [];
+  }
+
+  /**
+   * Every row a query matches, read in pages.
+   *
+   * PostgREST caps a response at its `max-rows` (1000 on hosted Supabase) and answers 200 with
+   * the first rows, so a plain `select` over a big table is silently short. `query` must carry
+   * an `order=` so the pages do not overlap. Stops on an empty page rather than a short one: a
+   * server capped below `pageSize` would otherwise look finished after its first page. A page
+   * that is not an array is an error here, unlike in `select`, because a diff or prune built on
+   * a read that quietly returned nothing would write or delete the wrong rows.
+   */
+  async selectAll<T>(table: string, query: string, pageSize = PAGE_SIZE): Promise<readonly T[]> {
+    const rows: T[] = [];
+    for (;;) {
+      const path = `/${table}?${query}&limit=${pageSize}&offset=${rows.length}`;
+      const page = await this.#request(path, { method: 'GET' });
+      if (!Array.isArray(page)) {
+        throw new StoreError(`GET ${path} → expected an array of rows`, null);
+      }
+      if (page.length === 0) return rows;
+      rows.push(...page as T[]);
+    }
   }
 
   async deleteWhere(table: string, filter: string): Promise<void> {
