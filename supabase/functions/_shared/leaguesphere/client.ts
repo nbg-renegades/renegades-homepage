@@ -5,24 +5,39 @@
  *
  *  - **Conditional requests.** Every call sends `If-None-Match`. A 304 costs upstream almost
  *    nothing and costs us no parsing, and on a quiet day nearly every call is a 304.
- *  - **Throttles are hard limits, not hints.** `/api/snapshot/` allows 60 requests/hour per IP
- *    and all anonymous traffic 120/min. A 429 is obeyed for as long as `Retry-After` says.
- *  - **A local cap below the upstream one.** Being throttled means serving stale results, so
- *    the client refuses to exceed its own budget (30 snapshot calls/hour) before upstream has
- *    to refuse us. Supabase Edge Functions share an egress IP with every other project in the
- *    region, so the budget we actually get may be smaller than the documented one.
+ *  - **Throttles are hard limits, not hints.** Upstream has three: a narrow `/api/snapshot/`
+ *    scope may rebuild 600 times an hour, a dump or any `include=standings` request is charged
+ *    against 60 an hour, and all anonymous traffic gets 120 a minute. A 429 is obeyed for as
+ *    long as `Retry-After` says, by the bucket that received it and across cron ticks.
+ *  - **Local caps below the upstream ones.** Being throttled means serving stale results, so
+ *    the client refuses to exceed its own budgets (300 narrow and 20 standings snapshot
+ *    calls/hour) before upstream has to refuse us. Supabase Edge Functions share an egress IP
+ *    with every other project in the region, so the budget we actually get may be smaller than
+ *    the documented one.
  *  - **A timeout.** A hung fetch would otherwise hold the invocation open until the platform
  *    kills it, and the next cron tick would pile onto it.
  *
  * `fetchImpl` and `now` are injected so the tests can drive every branch without a network.
  */
 
-/** Upstream's own limits, for reference. We stay under them deliberately. */
+/**
+ * Upstream's own limits, for reference. We stay under them deliberately.
+ *
+ * Upstream charges dumps and any `include=standings` request against this one
+ * (`is_large_scope`, `gamedays/api/snapshot.py`).
+ */
 export const UPSTREAM_SNAPSHOT_LIMIT_PER_HOUR = 60;
+/**
+ * Narrow scopes only. Counted per rebuild: a 304 costs no rebuild, and a narrow scope is
+ * rebuilt at most every 30 s.
+ */
+export const UPSTREAM_SNAPSHOT_REBUILD_LIMIT_PER_HOUR = 600;
 export const UPSTREAM_ANON_LIMIT_PER_MINUTE = 120;
 
-/** Our self-imposed budget. Half of upstream's, because the IP is shared. */
-export const SNAPSHOT_CALL_CAP_PER_HOUR = 30;
+/** Our narrow-scope budget. Half of upstream's, because the egress IP is shared. */
+export const NARROW_SNAPSHOT_CAP_PER_HOUR = 300;
+/** Our standings budget. A third of upstream's 60, which dumps share. */
+export const STANDINGS_SNAPSHOT_CAP_PER_HOUR = 20;
 
 export const DEFAULT_TIMEOUT_MS = 20_000;
 
@@ -63,27 +78,38 @@ export type FetchResult<T> =
   /** Anything else: a 4xx/5xx, a timeout, a transport failure or unparseable JSON. */
   | { readonly kind: 'error'; readonly message: string; readonly status: number | null; readonly durationMs: number };
 
-export type Endpoint = 'snapshot' | 'liveticker' | 'league-table';
+/** The parts of a snapshot a caller can ask for through `include`. */
+export type SnapshotInclude = 'games' | 'logs' | 'teams' | 'standings' | 'live';
+
+/** The two budgets snapshot calls are spent against. */
+export type SnapshotBucket = 'snapshot' | 'snapshot-standings';
+
+export type Endpoint = SnapshotBucket | 'liveticker' | 'league-table';
+
+/** `include` is always sent in this order, so the same request always looks the same. */
+const INCLUDE_ORDER: readonly SnapshotInclude[] = ['games', 'logs', 'teams', 'standings', 'live'];
 
 export interface ClientOptions {
   readonly fetchImpl?: typeof fetch;
   readonly now?: () => number;
   readonly timeoutMs?: number;
-  readonly snapshotCapPerHour?: number;
+  readonly narrowCapPerHour?: number;
+  readonly standingsCapPerHour?: number;
   readonly log?: (message: string) => void;
 }
 
 /**
- * Remembers when calls were made, so the cap and the back-off survive across endpoints
- * within one invocation.
+ * Remembers when calls were made, so the caps and the back-offs hold across endpoints within
+ * one invocation. A 429 blocks only the bucket that received it.
  *
  * Only within one: the function builds a fresh client per cron tick, so nothing here outlives
  * the tick. Across ticks the budget lives in Postgres as a count and the start of the window
  * it was spent in (`calls_last_hour`, `calls_window_started_at`), and `seed` brings it back.
+ * A back-off comes back through `results_sync_state.last_error` and `blockUntil`.
  */
 export class CallLedger {
   readonly #timestamps = new Map<Endpoint, number[]>();
-  #blockedUntil = 0;
+  readonly #blockedUntil = new Map<Endpoint, number>();
 
   constructor(private readonly now: () => number) {}
 
@@ -112,13 +138,13 @@ export class CallLedger {
     return stamps.length;
   }
 
-  blockUntil(timestamp: number): void {
-    this.#blockedUntil = Math.max(this.#blockedUntil, timestamp);
+  blockUntil(endpoint: Endpoint, timestamp: number): void {
+    this.#blockedUntil.set(endpoint, Math.max(this.#blockedUntil.get(endpoint) ?? 0, timestamp));
   }
 
-  /** Milliseconds left on a 429 back-off, or 0 when free to call. */
-  blockedForMs(): number {
-    return Math.max(0, this.#blockedUntil - this.now());
+  /** Milliseconds left on a 429 back-off of `endpoint`, or 0 when free to call. */
+  blockedForMs(endpoint: Endpoint): number {
+    return Math.max(0, (this.#blockedUntil.get(endpoint) ?? 0) - this.now());
   }
 }
 
@@ -133,8 +159,10 @@ export interface SnapshotBudget {
  * or a fresh window once it has run an hour (or none was ever recorded).
  *
  * A fixed window, because one count and one timestamp cannot describe a rolling one. Its known
- * cost: 30 calls at the end of one window and 30 at the start of the next are 60 within an
- * hour. That is still upstream's limit, and the scheduler asks for about 14 an hour at most.
+ * cost: 300 narrow calls at the end of one window and 300 at the start of the next are 600
+ * within an hour, which is upstream's own narrow limit (and 20 + 20 standings calls stay
+ * under its 60). The scheduler spends about 14 narrow calls an hour today, plus 60 once the
+ * live path moves to the snapshot (LIVE-01).
  */
 export function carriedSnapshotBudget(
   calls: number,
@@ -152,7 +180,8 @@ export class LeagueSphereClient {
   readonly #fetch: typeof fetch;
   readonly #now: () => number;
   readonly #timeoutMs: number;
-  readonly #snapshotCap: number;
+  readonly #narrowCap: number;
+  readonly #standingsCap: number;
   readonly #log: (message: string) => void;
   readonly ledger: CallLedger;
 
@@ -160,13 +189,18 @@ export class LeagueSphereClient {
     this.#fetch = options.fetchImpl ?? fetch;
     this.#now = options.now ?? (() => Date.now());
     this.#timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-    this.#snapshotCap = options.snapshotCapPerHour ?? SNAPSHOT_CALL_CAP_PER_HOUR;
+    this.#narrowCap = options.narrowCapPerHour ?? NARROW_SNAPSHOT_CAP_PER_HOUR;
+    this.#standingsCap = options.standingsCapPerHour ?? STANDINGS_SNAPSHOT_CAP_PER_HOUR;
     this.#log = options.log ?? ((message) => console.log(message));
     this.ledger = new CallLedger(this.#now);
   }
 
   /**
    * The snapshot, for one scope.
+   *
+   * `include` names the parts wanted (`live` implies games upstream). A request that includes
+   * `standings` is charged against upstream's strict budget, so it spends the standings
+   * bucket; every other request spends the narrow one.
    *
    * `status` is repeatable and **must be omitted entirely** to get everything except drafts,
    * which is the only way to receive gamedays whose status is `""` —
@@ -179,22 +213,27 @@ export class LeagueSphereClient {
     readonly teamIds?: readonly number[];
     readonly leaguePk?: number;
     readonly seasonPk?: number;
+    readonly year?: number;
     readonly dateFrom?: string;
     readonly dateTo?: string;
     readonly statuses?: readonly string[];
-    readonly includeLogs?: boolean;
+    readonly include: readonly SnapshotInclude[];
     readonly etag?: string | null;
   }): Promise<FetchResult<unknown>> {
     const query = new URLSearchParams();
     for (const teamId of params.teamIds ?? []) query.append('team', String(teamId));
     if (params.leaguePk !== undefined) query.set('league', String(params.leaguePk));
     if (params.seasonPk !== undefined) query.set('season', String(params.seasonPk));
+    if (params.year !== undefined) query.set('year', String(params.year));
     if (params.dateFrom !== undefined) query.set('date_from', params.dateFrom);
     if (params.dateTo !== undefined) query.set('date_to', params.dateTo);
     for (const status of params.statuses ?? []) query.append('status', status);
-    query.set('include', params.includeLogs === true ? 'games,logs' : 'games');
+    query.set('include', INCLUDE_ORDER.filter((part) => params.include.includes(part)).join(','));
 
-    return this.#request('snapshot', `/api/snapshot/?${query}`, params.etag ?? null);
+    const bucket: SnapshotBucket = params.include.includes('standings')
+      ? 'snapshot-standings'
+      : 'snapshot';
+    return this.#request(bucket, `/api/snapshot/?${query}`, params.etag ?? null);
   }
 
   /**
@@ -238,17 +277,22 @@ export class LeagueSphereClient {
     path: string,
     etag: string | null,
   ): Promise<FetchResult<unknown>> {
-    const blockedMs = this.ledger.blockedForMs();
+    const blockedMs = this.ledger.blockedForMs(endpoint);
     if (blockedMs > 0) {
       const reason = `backing off for another ${Math.ceil(blockedMs / 1000)}s after a 429`;
       this.#log(`[leaguesphere] ${endpoint} skipped: ${reason}`);
       return { kind: 'capped', reason };
     }
 
-    if (endpoint === 'snapshot') {
-      const used = this.ledger.callsInLastHour('snapshot');
-      if (used >= this.#snapshotCap) {
-        const reason = `snapshot budget spent: ${used}/${this.#snapshotCap} in the last hour`;
+    const cap = endpoint === 'snapshot'
+      ? this.#narrowCap
+      : endpoint === 'snapshot-standings'
+      ? this.#standingsCap
+      : null;
+    if (cap !== null) {
+      const used = this.ledger.callsInLastHour(endpoint);
+      if (used >= cap) {
+        const reason = `${endpoint} budget spent: ${used}/${cap} in the last hour`;
         this.#log(`[leaguesphere] ${endpoint} skipped: ${reason}`);
         return { kind: 'capped', reason };
       }
@@ -290,7 +334,7 @@ export class LeagueSphereClient {
 
     if (response.status === 429) {
       const retryAfterMs = parseRetryAfter(response.headers.get('retry-after'), this.#now());
-      this.ledger.blockUntil(this.#now() + retryAfterMs);
+      this.ledger.blockUntil(endpoint, this.#now() + retryAfterMs);
       return { kind: 'throttled', retryAfterMs, durationMs };
     }
 
@@ -353,6 +397,35 @@ export function parseRetryAfter(header: string | null, now: number): number {
   }
 
   return DEFAULT_RETRY_AFTER_MS;
+}
+
+/**
+ * How a 429 is written to `results_sync_state.last_error`, so the next cron tick can read it
+ * back with `persistedBackoffUntil`.
+ *
+ * The block is an absolute instant, not a duration from `last_attempt_at`: `recordAttempt`
+ * restamps that column at the start of every tick, so anchoring on it would re-arm the block
+ * each minute and it would never expire.
+ */
+export function throttledError(retryAfterMs: number, now: number): string {
+  return `429 retry-after-ms=${retryAfterMs} until=${new Date(now + retryAfterMs).toISOString()}`;
+}
+
+const THROTTLED_ERROR = /^429 retry-after-ms=(\d+) until=(\S+)$/;
+
+/**
+ * The instant a stored 429 still blocks until, or null when `lastError` is not one (or it has
+ * passed). Strict on purpose, and clamped to the existing one-hour ceiling, so a corrupted row
+ * can never stop the sync for longer than a real `Retry-After` could.
+ */
+export function persistedBackoffUntil(lastError: string | null, now: number): number | null {
+  if (lastError === null) return null;
+  const match = THROTTLED_ERROR.exec(lastError);
+  if (match === null) return null;
+
+  const until = Date.parse(match[2]);
+  if (Number.isNaN(until) || until <= now) return null;
+  return Math.min(until, now + MAX_RETRY_AFTER_MS);
 }
 
 function clampRetryAfter(ms: number): number {
