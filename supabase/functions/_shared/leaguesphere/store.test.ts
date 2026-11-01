@@ -12,6 +12,7 @@ import {
 } from './store.ts';
 import type { SyncStateRow } from './store.ts';
 import type { GamedayRow, GameEventRow } from './mappers.ts';
+import type { EventKey } from './reconcile.ts';
 import type { StandingsRow } from './standings.ts';
 
 interface Recorded {
@@ -115,12 +116,27 @@ Deno.test('a large batch is chunked rather than sent as one vast body', async ()
   assertEquals((calls[2].body as unknown[]).length, 200);
 });
 
-// ── Paged reads ──────────────────────────────────────────────────────────────
+// ── Paged reads and play-by-play diff writes ─────────────────────────────────
 
 function jsonPage(rows: number): Response {
   return new Response(JSON.stringify(Array.from({ length: rows }, (_, i) => ({ id: i }))), {
     status: 200,
   });
+}
+
+function eventRow(gameId: number, seq: number, half: 1 | 2 = 1, side: 'home' | 'away' = 'home') {
+  return {
+    game_id: gameId,
+    seq,
+    half,
+    side,
+    text: 'Touchdown: #3',
+    points: 6,
+    score_home: 6,
+    score_away: 0,
+    is_deleted: false,
+    is_marker: false,
+  } satisfies GameEventRow;
 }
 
 Deno.test('selectAll pages until an empty page', async () => {
@@ -154,33 +170,71 @@ Deno.test('selectAll fails loudly on a non-array page', async () => {
   await assertRejects(() => store.selectAll('results_games', 'select=id&order=id'), StoreError);
 });
 
-// ── Replace semantics ────────────────────────────────────────────────────────
+Deno.test('play-by-play is loaded in chunks of 100 game ids, ordered by key', async () => {
+  const { store, calls } = storeWith([jsonPage(0), jsonPage(0)]);
+  const ids = Array.from({ length: 150 }, (_, i) => 1000 + i);
 
-/**
- * Play-by-play is replaced, not merged. Upstream corrects a mis-entered play by deleting the
- * entry, and an upsert would leave that row in our table for the rest of the season.
- */
-Deno.test('game events are deleted before being written, scoped to one game', async () => {
+  await store.loadGameEvents(ids);
+
+  assertEquals(calls.length, 2);
+  const lists = calls.map((call) => /game_id=in\.\(([^)]*)\)/.exec(call.path)?.[1].split(','));
+  assertEquals(lists[0]?.length, 100);
+  assertEquals(lists[1]?.length, 50);
+  assertEquals(lists[0]?.[0], '1000');
+  assertEquals(lists[1]?.[0], '1100');
+  for (const call of calls) {
+    assertStringIncludes(call.path, 'order=game_id,half,side,seq');
+    assertStringIncludes(
+      call.path,
+      'select=game_id,seq,half,side,text,points,score_home,score_away,is_deleted,is_marker',
+    );
+  }
+});
+
+Deno.test('loading play-by-play for no games makes no request', async () => {
   const { store, calls } = storeWith();
-  const events: GameEventRow[] = [{
-    game_id: 7374,
-    seq: 1,
-    half: 1,
-    side: 'home',
-    text: 'Touchdown: #3',
-    points: 6,
-    score_home: 6,
-    score_away: 0,
-    is_deleted: false,
-    is_marker: false,
-  }];
+  assertEquals(await store.loadGameEvents([]), []);
+  assertEquals(calls.length, 0);
+});
 
-  await store.replaceGameEvents(7374, events);
+Deno.test('vanished plays are deleted per game by composite key, 40 at a time', async () => {
+  const { store, calls } = storeWith();
+  const keys: EventKey[] = [];
+  for (let seq = 1; seq <= 45; seq += 1) keys.push({ game_id: 7, half: 1, side: 'home', seq });
+  keys.push({ game_id: 8, half: 2, side: 'away', seq: 3 });
 
-  assertEquals(calls[0].method, 'DELETE');
-  assertEquals(calls[0].path, '/results_game_events?game_id=eq.7374');
-  assertEquals(calls[1].method, 'POST');
-  assertStringIncludes(calls[1].path, 'on_conflict=game_id%2Chalf%2Cside%2Cseq');
+  await store.deleteGameEvents(keys);
+
+  assertEquals(calls.length, 3);
+  assert(calls.every((call) => call.method === 'DELETE'));
+  const first = calls[0].path;
+  assert(
+    first.startsWith('/results_game_events?game_id=eq.7&or=(and(half.eq.1,side.eq.home,seq.eq.1),'),
+  );
+  assertEquals(first.split('and(').length - 1, 40);
+  assertEquals(calls[1].path.split('and(').length - 1, 5);
+  assertEquals(
+    calls[2].path,
+    '/results_game_events?game_id=eq.8&or=(and(half.eq.2,side.eq.away,seq.eq.3))',
+  );
+});
+
+Deno.test('changed plays are upserted on the composite key', async () => {
+  const { store, calls } = storeWith();
+
+  await store.saveGameEvents([eventRow(7, 1), eventRow(7, 2, 2, 'away')]);
+
+  assertEquals(calls.length, 1);
+  assertEquals(calls[0].method, 'POST');
+  assertEquals(calls[0].path, '/results_game_events?on_conflict=game_id%2Chalf%2Cside%2Cseq');
+  assertEquals((calls[0].body as unknown[]).length, 2);
+});
+
+Deno.test('an empty diff makes no request', async () => {
+  const { store, calls } = storeWith();
+  await store.saveGameEvents([]);
+  await store.deleteGameEvents([]);
+  assertEquals(calls.length, 0);
 });
 
 Deno.test('standings are replaced per league season, not globally', async () => {

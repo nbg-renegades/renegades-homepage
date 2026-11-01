@@ -29,7 +29,6 @@ import {
   toGameEventRows,
   toLiveGameRows,
   toLiveTickRows,
-  involvesTrackedTeam,
   todaysTrackedGameIds,
   type ScoreDisagreement,
 } from '../_shared/leaguesphere/mappers.ts';
@@ -39,6 +38,7 @@ import {
   parseSnapshot,
   type UpstreamGameday,
 } from '../_shared/leaguesphere/schema.ts';
+import { diffEvents, gamesWithLogs, type EventDiff } from '../_shared/leaguesphere/reconcile.ts';
 import { whatIsDue, type ScheduleInput, type Task } from '../_shared/leaguesphere/schedule.ts';
 import {
   computeStandings,
@@ -348,20 +348,20 @@ async function syncTeamSnapshot(
   if (!anyFresh) return notes.join(', ');
 
   const mapped = mapTeamSnapshot(gamedays, today);
+  let diff: EventDiff = { upsert: [], remove: [] };
 
   try {
     // Parents before children: a game row's foreign key needs its gameday to exist.
     await store.saveGamedays(mapped.gamedays);
     await store.saveGames(mapped.games);
 
-    // Play-by-play is replaced per game rather than upserted, because upstream can delete an
-    // entry and an upsert would leave the stale row behind.
-    for (const gameday of gamedays) {
-      for (const game of gameday.games.filter(involvesTrackedTeam)) {
-        if (game.log === null) continue;
-        await store.replaceGameEvents(game.id, toGameEventRows(game));
-      }
-    }
+    // Play-by-play is a diff against what is stored: a game that did not change writes nothing,
+    // a new or edited play is upserted, and a play upstream removed is deleted by its key.
+    const logged = gamesWithLogs(gamedays);
+    const existing = await store.loadGameEvents(logged.map((game) => game.id));
+    diff = diffEvents(existing, logged.flatMap(toGameEventRows));
+    await store.saveGameEvents(diff.upsert);
+    await store.deleteGameEvents(diff.remove);
 
     // Keep the live tables to today's games only.
     await store.pruneLiveGames([...todaysTrackedGameIds(gamedays, today)]);
@@ -384,7 +384,7 @@ async function syncTeamSnapshot(
     disagreements.push(describeDisagreement(disagreement));
   }
 
-  return `${notes.join(', ')} → ${mapped.gamedays.length} gameday(s), ${mapped.games.length} game(s), ${mapped.events.length} event(s)`;
+  return `${notes.join(', ')} → ${mapped.gamedays.length} gameday(s), ${mapped.games.length} game(s), ${mapped.events.length} event(s), ${diff.upsert.length} written, ${diff.remove.length} removed`;
 }
 
 /**
