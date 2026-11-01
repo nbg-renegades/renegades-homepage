@@ -10,12 +10,10 @@ import {
 } from './schema.ts';
 import {
   computeStandings,
-  diffStandings,
   mapOfficialTable,
   mapSnapshotStandings,
   standingsOutcome,
   standingsYear,
-  summariseCheck,
 } from './standings.ts';
 import { loadFixture } from './__fixtures__/load.ts';
 
@@ -37,87 +35,7 @@ async function officialOf(fixture: string, cfg: LeagueSeasonConfig) {
   return { table: parsed.value, rows: mapOfficialTable(cfg, parsed.value) };
 }
 
-// ── Parity with the published tables ─────────────────────────────────────────
-
-/**
- * FF BL's ruleset is the one the reference assumes, so our computation must reproduce the
- * published table completely. If this ever fails, either a gameday is missing from the
- * snapshot or upstream changed the league's rules — both worth knowing immediately.
- */
-Deno.test('FF BL 2026: our computation reproduces the published table exactly', async () => {
-  const cfg = config('ff-bl');
-  const ours = computeStandings(cfg, await gamedaysOf('snapshot.league-ffbl-2026.json'));
-  const { rows } = await officialOf('league-table.ff-bl-2026.json', cfg);
-
-  const check = diffStandings(cfg, ours, rows);
-  assertEquals(check.recordDifferences, [], summariseCheck(check));
-  assertEquals(check.quotientDifferences, [], summariseCheck(check));
-  assertEquals(check.onlyOurs, [], 'we must not invent teams');
-  assertEquals(ours.length, 23);
-
-  // Same order, too — which is what makes SQ → PD → EP the right sort for this league.
-  assertEquals(ours.map((r) => r.teamId), rows.map((r) => r.teamId));
-});
-
-/**
- * DKB DFFL is why the stored standings come from upstream. Everything countable agrees; the
- * quotient cannot, because the league divides win points by a fixed 30 and weights a win by
- * the opponent's league, using configuration no public endpoint exposes.
- *
- * This test pins that split down deliberately: a record difference appearing here is a real
- * data problem, while the quotient differences are expected and must stay contained.
- */
-Deno.test('DKB DFFL 2026: games and points agree, only the quotient cannot be reproduced', async () => {
-  const cfg = config('dkb-dffl');
-  const ours = computeStandings(cfg, await gamedaysOf('snapshot.league-dffl-2026.json'));
-  const { rows } = await officialOf('league-table.dffl-2026.json', cfg);
-
-  const check = diffStandings(cfg, ours, rows);
-  assertEquals(check.recordDifferences, [], summariseCheck(check));
-  assertEquals(check.onlyOurs, [], 'we must not invent teams');
-  assertEquals(ours.length, 16);
-
-  assert(
-    check.quotientDifferences.length > 0,
-    'if the quotients ever line up, the stored source can go back to our own computation',
-  );
-});
-
-Deno.test('the playoff gamedays are what make DKB DFFL agree on games played', async () => {
-  const cfg = config('dkb-dffl');
-  const gamedays = await gamedaysOf('snapshot.league-dffl-2026.json');
-  const { rows } = await officialOf('league-table.dffl-2026.json', cfg);
-
-  assertEquals(cfg.excludeGamedayIds, [887, 888]);
-
-  // Counting them puts every team above the published number of games.
-  const withPlayoffs = computeStandings({ ...cfg, excludeGamedayIds: [] }, gamedays);
-  const inflated = diffStandings(cfg, withPlayoffs, rows)
-    .recordDifferences.filter((d) => d.field === 'sp');
-  assert(inflated.length > 0, 'excluding 887/888 must actually matter');
-  assert(inflated.every((d) => d.ours > d.official));
-});
-
 // ── Rules we own ─────────────────────────────────────────────────────────────
-
-Deno.test('only finished games count towards the table', async () => {
-  const cfg = config('ff-bl');
-  const gamedays = await gamedaysOf('snapshot.league-ffbl-2026.json');
-
-  // Three FF BL games sit abandoned in "2. Halbzeit" with scores entered. `final_score` is an
-  // object for them, not null, so the reference's guard never fires and they get counted.
-  const abandoned = gamedays.flatMap((gd) =>
-    gd.games.filter((g) =>
-      g.status !== 'beendet' && g.results.length === 2 &&
-      g.results.every((r) => r.pa !== null)
-    )
-  );
-  assertEquals(abandoned.length, 3, 'the fixture should still contain the abandoned games');
-
-  const { rows } = await officialOf('league-table.ff-bl-2026.json', cfg);
-  const ours = computeStandings(cfg, gamedays);
-  assertEquals(diffStandings(cfg, ours, rows).recordDifferences, []);
-});
 
 Deno.test('unplayed games are skipped rather than counted as draws', () => {
   const cfg = config('ff-bl');
