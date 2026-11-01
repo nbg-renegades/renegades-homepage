@@ -45,6 +45,36 @@ curl -X POST http://localhost:8000/ -H 'x-cron-secret: local-test-cron-secret'
 Mind the throttle while doing this: `/api/snapshot/` allows 60 requests an hour per IP, and one
 full run spends six.
 
+## Store integration test (opt-in)
+
+`supabase/functions/_shared/leaguesphere/store.integration.test.ts` runs the real `ResultsStore`
+against a throwaway Postgres 17 and PostgREST with the real results schema. It is ignored by
+`deno task test` (no `--allow-env`), so the normal suite needs no Docker.
+
+```bash
+bash scripts/results-parity/results-test-db.sh up      # prints the two export lines
+cd supabase/functions
+RESULTS_TEST_POSTGREST_URL=http://localhost:55443 RESULTS_TEST_JWT_SECRET=<printed by up>   deno task test:db
+bash ../../scripts/results-parity/results-test-db.sh down
+```
+
+It proves what a fetch stub cannot: PostgREST's 1000-row response cap (the container sets
+`PGRST_DB_MAX_ROWS=1000`, as hosted Supabase does), the foreign-key cascades from gameday to
+games, plays and live rows, and the composite-key `or=(and(...))` delete filter.
+
+The SQL in `results-test-db/` is copied byte for byte from the performance repo
+(`nbg-renegades/renegades-performance`, `supabase/migrations/`) and must be re-copied whenever
+the results tables change:
+
+| File | Performance repo commit |
+|------|-------------------------|
+| `20260927170000_results_schema.sql` | `9ffe87cffc48650fdff403c7ed7a78ea3080ffba` |
+| `20260927190000_results_live_ticks.sql` | `f515c1a5f5033cebed845c35bce0c4b501e68788` |
+
+`results_cron` is left out (it needs pg_cron, pg_net and Vault); `prelude.sql` adds the three API
+roles and the `supabase_realtime` publication the migrations expect. The test never touches the
+shared Supabase project: it uses ports 55442 and 55443 on localhost and a made-up JWT secret.
+
 ## The checks
 
 - **`compare-widget.py`** — games, team names, scores and the finished flag, over the games
