@@ -273,6 +273,68 @@ Deno.test('standings are replaced per league season, not globally', async () => 
   assert(!('leagueKey' in written), 'camelCase keys must not reach PostgREST');
 });
 
+Deno.test('standings are written before the teams that left are removed', async () => {
+  const { store, calls } = storeWith();
+  const row = (teamId: number): StandingsRow => ({
+    leagueKey: 'ff-bl',
+    season: '2026',
+    teamId,
+    rank: 3,
+    group: 'FF BL',
+    sp: 23,
+    s: 18,
+    u: 0,
+    n: 5,
+    ep: 855,
+    gp: 322,
+    pd: 533,
+    sq: 0.783,
+    promotionRestricted: false,
+    mode: 'official',
+  });
+
+  await store.saveStandings('ff-bl', '2026', [row(287), row(254)]);
+
+  // Upsert first, so a reader never sees an empty table; then drop only what is missing.
+  assertEquals(calls.map((call) => call.method), ['POST', 'DELETE']);
+  assertStringIncludes(calls[0].path, 'on_conflict=league_key%2Cseason%2Cteam_id');
+  assertStringIncludes(calls[1].path, 'league_key=eq.ff-bl');
+  assertStringIncludes(calls[1].path, 'season=eq.2026');
+  assertStringIncludes(calls[1].path, 'team_id=not.in.(287,254)');
+
+  // camelCase domain rows become snake_case columns.
+  const written = (calls[0].body as Record<string, unknown>[])[0];
+  assertEquals(written['league_key'], 'ff-bl');
+  assertEquals(written['team_id'], 287);
+  assertEquals(written['group_name'], 'FF BL');
+  assertEquals(written['promotion_restricted'], false);
+  assert(!('leagueKey' in written), 'camelCase keys must not reach PostgREST');
+});
+
+Deno.test('an empty table is never written and never deletes anything', async () => {
+  const { store, calls } = storeWith();
+
+  await store.saveStandings('ff-bl', '2026', []);
+
+  assertEquals(calls.length, 0);
+});
+
+Deno.test('the newest stored gameday date is read in one request', async () => {
+  const json = (body: unknown) =>
+    new Response(JSON.stringify(body), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+
+  const found = storeWith([json([{ date: '2026-10-04' }])]);
+  assertEquals(await found.store.newestGamedayDate(), '2026-10-04');
+  assertEquals(found.calls.length, 1);
+  assertEquals(found.calls[0].path, '/results_gamedays?select=date&order=date.desc&limit=1');
+
+  const none = storeWith([json([])]);
+  assertEquals(await none.store.newestGamedayDate(), null);
+});
+
 Deno.test('pruning live games clears both live tables, keeping today’s', async () => {
   const { store, calls } = storeWith();
 

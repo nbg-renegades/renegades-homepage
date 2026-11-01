@@ -283,6 +283,41 @@ export class ResultsStore {
     );
   }
 
+  /**
+   * Writes a league season's table without ever leaving it empty for a reader.
+   *
+   * A team can leave a league between syncs, so teams missing from the new set are removed,
+   * but only after the upsert: the old delete-then-insert showed an empty table in between.
+   * An empty list writes and deletes nothing. `season` arrives validated as four digits and
+   * is URI-encoded anyway.
+   */
+  async saveStandings(
+    leagueKey: string,
+    season: string,
+    rows: readonly StandingsRow[],
+  ): Promise<void> {
+    if (rows.length === 0) return;
+    await this.upsert(
+      'results_standings',
+      withTimestamp(rows.map(toStandingsColumns)),
+      'league_key,season,team_id',
+    );
+    await this.deleteWhere(
+      'results_standings',
+      `league_key=eq.${encodeURIComponent(leagueKey)}&season=eq.${encodeURIComponent(season)}` +
+        `&team_id=not.in.(${rows.map((row) => row.teamId).join(',')})`,
+    );
+  }
+
+  /** The date of the newest gameday we store, or null before the first sync. */
+  async newestGamedayDate(): Promise<string | null> {
+    const rows = await this.select<{ date: string }>(
+      'results_gamedays',
+      'select=date&order=date.desc&limit=1',
+    );
+    return rows[0]?.date ?? null;
+  }
+
   async saveLiveGames(rows: readonly LiveGameRow[]): Promise<void> {
     await this.upsert('results_live_games', withTimestamp(rows), 'game_id');
   }
