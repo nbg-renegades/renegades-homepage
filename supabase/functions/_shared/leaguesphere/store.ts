@@ -21,7 +21,8 @@ import type {
   LiveGameRow,
   LiveTickRow,
 } from './mappers.ts';
-import type { SnapshotBudget } from './client.ts';
+import { persistedBackoffUntil } from './client.ts';
+import type { Endpoint, SnapshotBudget, SnapshotBucket } from './client.ts';
 import type { StandingsRow } from './standings.ts';
 import type { Task } from './schedule.ts';
 
@@ -264,12 +265,12 @@ export class ResultsStore {
   }
 
   /**
-   * The snapshot budget, spent across every snapshot scope, so it is kept on one row
-   * (`SNAPSHOT_BUDGET_SOURCE`) rather than on each scope's.
+   * One snapshot budget, on the row `BUDGET_SOURCES` names for it. Only the budget columns are
+   * written, so a stored ETag, success time or 429 on the same row survives.
    */
-  async recordSnapshotBudget(budget: SnapshotBudget, at: Date): Promise<void> {
+  async recordSnapshotBudget(source: string, budget: SnapshotBudget, at: Date): Promise<void> {
     await this.upsert('results_sync_state', [{
-      source: SNAPSHOT_BUDGET_SOURCE,
+      source,
       calls_last_hour: budget.calls,
       calls_window_started_at: budget.windowStartedAt.toISOString(),
       updated_at: at.toISOString(),
@@ -315,13 +316,56 @@ function toStandingsColumns(row: StandingsRow): Record<string, unknown> {
 export const SYNC_SOURCES = {
   teamSnapshot: 'snapshot:teams',
   draftSnapshot: 'snapshot:draft',
+  standingsSnapshot: 'snapshot:standings',
   liveticker: 'liveticker',
   leagueSnapshot: (key: string, season: string) => `snapshot:league:${key}:${season}`,
   leagueTable: (key: string, season: string) => `league-table:${key}:${season}`,
 } as const;
 
-/** The row that carries the shared snapshot budget between ticks. */
-export const SNAPSHOT_BUDGET_SOURCE = SYNC_SOURCES.teamSnapshot;
+/**
+ * The rows that carry the two snapshot budgets between ticks (D-15). Each budget lives on the
+ * row of the scope that spends it most, so no migration is needed: the narrow budget stays on
+ * `snapshot:teams`, and the standings budget gets a row of its own on its first call.
+ */
+export const BUDGET_SOURCES: Readonly<Record<SnapshotBucket, string>> = {
+  snapshot: SYNC_SOURCES.teamSnapshot,
+  'snapshot-standings': SYNC_SOURCES.standingsSnapshot,
+};
+
+/**
+ * The budget a sync-state row's calls are spent against, or null for a row we do not know.
+ * Routes a persisted 429 back to the bucket that received it. `snapshot:standings` is checked
+ * before the `snapshot:` prefix that every other snapshot scope shares.
+ */
+export function endpointForSource(source: string): Endpoint | null {
+  if (source === SYNC_SOURCES.standingsSnapshot) return 'snapshot-standings';
+  if (source.startsWith('snapshot:')) return 'snapshot';
+  if (source.startsWith('league-table')) return 'league-table';
+  if (source === SYNC_SOURCES.liveticker) return 'liveticker';
+  return null;
+}
+
+/**
+ * The 429 back-offs the last ticks left in `last_error`, per bucket (D-25).
+ *
+ * The client is rebuilt every tick, so without this a `Retry-After` of ten minutes would be
+ * forgotten after one. Per bucket, because a 429 on the standings budget must not stop a live
+ * poll. The latest instant wins when several rows of one bucket carry one.
+ */
+export function blocksFromPersistedState(
+  rows: Iterable<SyncStateRow>,
+  now: number,
+): ReadonlyMap<Endpoint, number> {
+  const blocks = new Map<Endpoint, number>();
+  for (const row of rows) {
+    const endpoint = endpointForSource(row.source);
+    if (endpoint === null) continue;
+    const until = persistedBackoffUntil(row.last_error, now);
+    if (until === null) continue;
+    blocks.set(endpoint, Math.max(blocks.get(endpoint) ?? 0, until));
+  }
+  return blocks;
+}
 
 /** Maps a task to the `source` whose `last_ok_at` gates it. */
 export function taskSource(task: Task): string {

@@ -19,8 +19,10 @@ import { getCorsHeaders } from '../_shared/cors.ts';
 import {
   carriedSnapshotBudget,
   LeagueSphereClient,
+  throttledError,
   unquoteEtag,
 } from '../_shared/leaguesphere/client.ts';
+import type { SnapshotBucket } from '../_shared/leaguesphere/client.ts';
 import { LEAGUE_SEASONS, TEAM_IDS } from '../_shared/leaguesphere/config.ts';
 import {
   mapTeamSnapshot,
@@ -45,8 +47,9 @@ import {
   summariseCheck,
 } from '../_shared/leaguesphere/standings.ts';
 import {
+  blocksFromPersistedState,
+  BUDGET_SOURCES,
   ResultsStore,
-  SNAPSHOT_BUDGET_SOURCE,
   SYNC_SOURCES,
 } from '../_shared/leaguesphere/store.ts';
 import { clubToday } from '../_shared/leaguesphere/time.ts';
@@ -139,14 +142,24 @@ async function run(): Promise<RunReport> {
   const state = await store.loadSyncState();
 
   // Seed the call ledger from what earlier ticks spent, so this one does not start from zero.
-  const budgetRow = state.get(SNAPSHOT_BUDGET_SOURCE);
-  const budget = carriedSnapshotBudget(
-    budgetRow?.calls_last_hour ?? 0,
-    budgetRow?.calls_window_started_at ?? null,
-    now,
-  );
-  if (budget.calls > 0) {
-    client.ledger.seed('snapshot', budget.calls, budget.windowStartedAt.getTime());
+  const budgets = (Object.keys(BUDGET_SOURCES) as SnapshotBucket[]).map((bucket) => {
+    const source = BUDGET_SOURCES[bucket];
+    const row = state.get(source);
+    const budget = carriedSnapshotBudget(
+      row?.calls_last_hour ?? 0,
+      row?.calls_window_started_at ?? null,
+      now,
+    );
+    if (budget.calls > 0) {
+      client.ledger.seed(bucket, budget.calls, budget.windowStartedAt.getTime());
+    }
+    return { bucket, source, budget };
+  });
+
+  // A 429 an earlier tick recorded still holds, for the bucket that received it.
+  for (const [endpoint, until] of blocksFromPersistedState(state.values(), now.getTime())) {
+    client.ledger.blockUntil(endpoint, until);
+    console.log(`[sync] ${endpoint}: backing off until ${new Date(until).toISOString()} after a 429`);
   }
 
   const input = await buildScheduleInput(store, state, now, today);
@@ -181,9 +194,15 @@ async function run(): Promise<RunReport> {
   }
 
   // Once per tick, whatever the tasks did: a call that failed or 429'd still spent budget.
-  const spent = client.ledger.callsInLastHour('snapshot');
-  if (spent !== budget.calls) {
-    await store.recordSnapshotBudget({ calls: spent, windowStartedAt: budget.windowStartedAt }, now);
+  for (const { bucket, source, budget } of budgets) {
+    const spent = client.ledger.callsInLastHour(bucket);
+    if (spent !== budget.calls) {
+      await store.recordSnapshotBudget(
+        source,
+        { calls: spent, windowStartedAt: budget.windowStartedAt },
+        now,
+      );
+    }
   }
 
   await maybeAlert(store, state, now, input);
@@ -299,7 +318,7 @@ async function syncTeamSnapshot(
     }
 
     if (result.kind === 'throttled') {
-      await store.recordFailure(scope.source, now, `429, retrying after ${result.retryAfterMs}ms`);
+      await store.recordFailure(scope.source, now, throttledError(result.retryAfterMs, now.getTime()));
       notes.push(`${scope.source}: throttled`);
       continue;
     }
@@ -401,7 +420,7 @@ async function syncLiveticker(
   }
   if (result.kind === 'capped') return result.reason;
   if (result.kind === 'throttled') {
-    await store.recordFailure(source, now, `429, retrying after ${result.retryAfterMs}ms`);
+    await store.recordFailure(source, now, throttledError(result.retryAfterMs, now.getTime()));
     return 'throttled';
   }
   if (result.kind === 'error') {
@@ -461,8 +480,13 @@ async function syncLeagueTables(
       notes.push(`${config.key}: 304`);
       continue;
     }
-    if (result.kind === 'capped' || result.kind === 'throttled') {
+    if (result.kind === 'capped') {
       notes.push(`${config.key}: deferred`);
+      continue;
+    }
+    if (result.kind === 'throttled') {
+      await store.recordFailure(source, now, throttledError(result.retryAfterMs, now.getTime()));
+      notes.push(`${config.key}: throttled`);
       continue;
     }
     if (result.kind === 'error') {
@@ -533,8 +557,13 @@ async function crossCheckStandings(
       notes.push(`${config.key}: 304`);
       continue;
     }
-    if (result.kind === 'capped' || result.kind === 'throttled') {
+    if (result.kind === 'capped') {
       notes.push(`${config.key}: deferred`);
+      continue;
+    }
+    if (result.kind === 'throttled') {
+      await store.recordFailure(source, now, throttledError(result.retryAfterMs, now.getTime()));
+      notes.push(`${config.key}: throttled`);
       continue;
     }
     if (result.kind === 'error') {

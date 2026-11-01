@@ -1,12 +1,16 @@
 import { assert, assertEquals, assertRejects, assertStringIncludes } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
+import { throttledError } from './client.ts';
 import {
+  BUDGET_SOURCES,
+  blocksFromPersistedState,
+  endpointForSource,
   ResultsStore,
-  SNAPSHOT_BUDGET_SOURCE,
   SYNC_SOURCES,
   StoreError,
   taskSource,
 } from './store.ts';
+import type { SyncStateRow } from './store.ts';
 import type { GamedayRow, GameEventRow } from './mappers.ts';
 import type { StandingsRow } from './standings.ts';
 
@@ -255,16 +259,89 @@ Deno.test('a success stamps last_ok_at, stores the ETag and clears the error and
   assert(!('calls_last_hour' in row));
 });
 
-Deno.test('the snapshot budget is stored with the window it was spent in', async () => {
+Deno.test('each snapshot budget is stored on its own row', async () => {
   const { store, calls } = storeWith();
   const windowStartedAt = new Date('2026-09-30T09:15:00Z');
-  await store.recordSnapshotBudget({ calls: 7, windowStartedAt }, new Date('2026-09-30T09:40:00Z'));
+  const at = new Date('2026-09-30T09:40:00Z');
+  await store.recordSnapshotBudget(BUDGET_SOURCES['snapshot-standings'], { calls: 4, windowStartedAt }, at);
+  await store.recordSnapshotBudget(BUDGET_SOURCES.snapshot, { calls: 7, windowStartedAt }, at);
 
-  const row = (calls[0].body as Record<string, unknown>[])[0];
-  assertEquals(row['source'], SNAPSHOT_BUDGET_SOURCE);
-  assertEquals(row['calls_last_hour'], 7);
-  assertEquals(row['calls_window_started_at'], '2026-09-30T09:15:00.000Z');
-  assert(!('last_ok_at' in row), 'recording the budget is not a success');
+  const standings = (calls[0].body as Record<string, unknown>[])[0];
+  assertEquals(standings['source'], 'snapshot:standings');
+  assertEquals(standings['calls_last_hour'], 4);
+  assertEquals(standings['calls_window_started_at'], '2026-09-30T09:15:00.000Z');
+
+  const narrow = (calls[1].body as Record<string, unknown>[])[0];
+  assertEquals(narrow['source'], 'snapshot:teams');
+  assertEquals(narrow['calls_last_hour'], 7);
+
+  for (const row of [standings, narrow]) {
+    assert(!('etag' in row), 'recording the budget must not touch the ETag');
+    assert(!('last_ok_at' in row), 'recording the budget is not a success');
+    assert(!('last_error' in row), 'recording the budget must not clear a stored 429');
+  }
+});
+
+Deno.test('the two snapshot budgets live on the teams and standings rows', () => {
+  assertEquals(BUDGET_SOURCES, {
+    snapshot: 'snapshot:teams',
+    'snapshot-standings': 'snapshot:standings',
+  });
+});
+
+Deno.test('every sync-state row maps to the budget its calls spend', () => {
+  assertEquals(endpointForSource('snapshot:teams'), 'snapshot');
+  assertEquals(endpointForSource('snapshot:draft'), 'snapshot');
+  assertEquals(endpointForSource('snapshot:league:ff-bl:2026'), 'snapshot');
+  assertEquals(endpointForSource('snapshot:standings'), 'snapshot-standings');
+  assertEquals(endpointForSource('league-table:ff-bl:2026'), 'league-table');
+  assertEquals(endpointForSource('liveticker'), 'liveticker');
+  assertEquals(endpointForSource('something-else'), null);
+});
+
+function stateRow(source: string, lastError: string | null): SyncStateRow {
+  return {
+    source,
+    etag: null,
+    last_attempt_at: null,
+    last_ok_at: null,
+    last_error: lastError,
+    calls_last_hour: 0,
+    calls_window_started_at: null,
+    alerted_at: null,
+  };
+}
+
+Deno.test('a 429 stored on a row blocks the bucket of that row on the next tick', () => {
+  const now = 1_700_000_000_000;
+  // Written a minute ago with a ten-minute Retry-After: nine minutes are left.
+  const live = throttledError(600_000, now - 60_000);
+
+  const draft = blocksFromPersistedState([stateRow('snapshot:draft', live)], now);
+  assertEquals([...draft], [['snapshot', now + 540_000]]);
+
+  const standings = blocksFromPersistedState([stateRow('snapshot:standings', live)], now);
+  assertEquals([...standings], [['snapshot-standings', now + 540_000]]);
+
+  const ticker = blocksFromPersistedState([stateRow('liveticker', live)], now);
+  assertEquals([...ticker], [['liveticker', now + 540_000]]);
+
+  const expired = throttledError(60_000, now - 120_000);
+  assertEquals(blocksFromPersistedState([stateRow('snapshot:teams', expired)], now).size, 0);
+  assertEquals(
+    blocksFromPersistedState([stateRow('snapshot:teams', 'HTTP 500 — upstream down')], now).size,
+    0,
+  );
+  assertEquals(blocksFromPersistedState([stateRow('snapshot:teams', null)], now).size, 0);
+  assertEquals(blocksFromPersistedState([stateRow('something-else', live)], now).size, 0);
+
+  // Two rows of one bucket: the later instant wins.
+  const later = throttledError(600_000, now);
+  const both = blocksFromPersistedState([
+    stateRow('snapshot:teams', live),
+    stateRow('snapshot:draft', later),
+  ], now);
+  assertEquals(both.get('snapshot'), now + 600_000);
 });
 
 Deno.test('sync state loads into a map keyed by source', async () => {

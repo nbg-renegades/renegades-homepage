@@ -413,8 +413,9 @@ pg_cron (every minute)
 
 The function decides on each tick what is actually due, so most minutes it does nothing: hourly
 when there is no gameday, every ten minutes inside one, and the liveticker every minute while a
-gameday is running. `/api/snapshot/` allows 60 requests an hour per IP and the client holds
-itself to 30.
+gameday is running. Narrow `/api/snapshot/` scopes may rebuild 600 times an hour per IP and
+the client holds itself to 300; requests that include standings count against upstream's 60 an
+hour and the client holds itself to 20.
 
 **Nothing upstream is trusted.** Every response is validated against a schema before anything is
 written. On a mismatch the sync records the error and writes nothing, so the site keeps serving
@@ -493,10 +494,15 @@ select source, last_ok_at, last_error, calls_last_hour, calls_window_started_at
 from results_sync_state order by source;
 ```
 
-The snapshot budget (30 calls an hour) is shared by every snapshot scope, so it lives on the
-`snapshot:teams` row only: the calls spent and when their one-hour window opened. A run whose
-outcome reads `snapshot budget spent` is waiting for that window to close. If one still does
-more than an hour after `calls_window_started_at`, the budget is not draining, which is a bug.
+There are two snapshot budgets, each kept on one row as the calls spent and when their
+one-hour window opened: `snapshot:teams` for narrow scopes (300 calls an hour) and
+`snapshot:standings` for requests that include standings (20 an hour). A run whose outcome reads
+`<bucket> budget spent` is waiting for that window to close. If one still does more than an hour
+after `calls_window_started_at`, the budget is not draining, which is a bug.
+
+A 429 from upstream is stored as `last_error` `429 retry-after-ms=N until=<instant>` and pauses
+only the budget that received it, until that instant, across cron ticks. The next success on the
+row clears it.
 
 `last_ok_at` null or old with a `last_error` set means the site is serving stale data and saying
 so. A `schema mismatch` there is the interesting case: LeagueSphere changed shape, and the
