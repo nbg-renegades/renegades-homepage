@@ -21,7 +21,7 @@ import type {
   LiveGameRow,
   LiveTickRow,
 } from './mappers.ts';
-import type { EventKey } from './reconcile.ts';
+import type { EventKey, StoredScope } from './reconcile.ts';
 import { persistedBackoffUntil } from './client.ts';
 import type { Endpoint, SnapshotBudget, SnapshotBucket } from './client.ts';
 import type { StandingsRow } from './standings.ts';
@@ -219,6 +219,45 @@ export class ResultsStore {
           .join(',');
         await this.deleteWhere('results_game_events', `game_id=eq.${gameId}&or=(${conditions})`);
       }
+    }
+  }
+
+  /**
+   * The gamedays from `from` on and their games, as stored now.
+   *
+   * Read before a run writes anything, so the prune compares against the state the payload is
+   * about to replace. Paged for the same reason as the plays: a truncated read would hide stored
+   * rows from the prune.
+   */
+  async loadStoredScope(from: string): Promise<StoredScope> {
+    const gamedays = await this.selectAll<StoredScope['gamedays'][number]>(
+      'results_gamedays',
+      `select=id,status,date&date=gte.${encodeURIComponent(from)}&order=id`,
+    );
+    const games: StoredScope['games'][number][] = [];
+    for (let index = 0; index < gamedays.length; index += ID_CHUNK) {
+      const ids = gamedays.slice(index, index + ID_CHUNK).map((gameday) => gameday.id).join(',');
+      games.push(...await this.selectAll<StoredScope['games'][number]>(
+        'results_games',
+        `select=id,gameday_id&gameday_id=in.(${ids})&order=id`,
+      ));
+    }
+    return { gamedays, games };
+  }
+
+  /** Deletes games by id; their plays and live rows follow through the foreign keys. */
+  async deleteGames(ids: readonly number[]): Promise<void> {
+    await this.#deleteByIds('results_games', ids);
+  }
+
+  /** Deletes gamedays by id; their games, plays and live rows follow through the foreign keys. */
+  async deleteGamedays(ids: readonly number[]): Promise<void> {
+    await this.#deleteByIds('results_gamedays', ids);
+  }
+
+  async #deleteByIds(table: string, ids: readonly number[]): Promise<void> {
+    for (let index = 0; index < ids.length; index += ID_CHUNK) {
+      await this.deleteWhere(table, `id=in.(${ids.slice(index, index + ID_CHUNK).join(',')})`);
     }
   }
 
