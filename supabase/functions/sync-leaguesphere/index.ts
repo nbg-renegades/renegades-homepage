@@ -38,7 +38,14 @@ import {
   parseSnapshot,
   type UpstreamGameday,
 } from '../_shared/leaguesphere/schema.ts';
-import { diffEvents, gamesWithLogs, type EventDiff } from '../_shared/leaguesphere/reconcile.ts';
+import {
+  diffEvents,
+  gamesWithLogs,
+  livePruneAllowed,
+  type EventDiff,
+  type ScopeKind,
+  type ScopeResult,
+} from '../_shared/leaguesphere/reconcile.ts';
 import { whatIsDue, type ScheduleInput, type Task } from '../_shared/leaguesphere/schedule.ts';
 import {
   computeStandings,
@@ -282,9 +289,15 @@ async function syncTeamSnapshot(
   disagreements: string[],
 ): Promise<string> {
   const scopes = [
-    { source: SYNC_SOURCES.teamSnapshot, statuses: undefined },
-    { source: SYNC_SOURCES.draftSnapshot, statuses: ['DRAFT'] },
+    { kind: 'main', source: SYNC_SOURCES.teamSnapshot, statuses: undefined },
+    { kind: 'draft', source: SYNC_SOURCES.draftSnapshot, statuses: ['DRAFT'] },
   ] as const;
+  // What each scope told us, which is all pruning may go on. A scope that did not answer with a
+  // valid 200 stays `unknown` and proves nothing about what upstream still has.
+  const scopeResults: Record<ScopeKind, ScopeResult> = {
+    main: { outcome: 'unknown', gamedayIds: [] },
+    draft: { outcome: 'unknown', gamedayIds: [] },
+  };
 
   const gamedays: UpstreamGameday[] = [];
   const notes: string[] = [];
@@ -307,6 +320,7 @@ async function syncTeamSnapshot(
 
     if (result.kind === 'not-modified') {
       notes.push(`${scope.source}: 304`);
+      scopeResults[scope.kind] = { outcome: 'unchanged', gamedayIds: [] };
       // Still a success, and nothing to write: what we hold is already current.
       await store.recordSuccess(scope.source, now, state.get(scope.source)?.etag ?? null);
       continue;
@@ -340,6 +354,10 @@ async function syncTeamSnapshot(
     }
 
     gamedays.push(...parsed.value.gamedays);
+    scopeResults[scope.kind] = {
+      outcome: 'fresh',
+      gamedayIds: parsed.value.gamedays.map((gameday) => gameday.id),
+    };
     anyFresh = true;
     pendingSuccess.push({ source: scope.source, etag: unquoteEtag(result.etag) });
     notes.push(`${scope.source}: ${parsed.value.gamedays.length} gameday(s)`);
@@ -363,8 +381,10 @@ async function syncTeamSnapshot(
     await store.saveGameEvents(diff.upsert);
     await store.deleteGameEvents(diff.remove);
 
-    // Keep the live tables to today's games only.
-    await store.pruneLiveGames([...todaysTrackedGameIds(gamedays, today)]);
+    // Keep the live tables to today's games only, but only when this run saw today's games.
+    if (livePruneAllowed(scopeResults)) {
+      await store.pruneLiveGames([...todaysTrackedGameIds(gamedays, today)]);
+    }
   } catch (cause) {
     // The fetch was fine and the data was valid; we could not store it. Leaving `last_ok_at`
     // and the ETag alone means the next tick retries with the same conditional request rather

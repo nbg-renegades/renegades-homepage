@@ -1,6 +1,7 @@
 import { assert, assertEquals } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
-import { diffEvents, gamesWithLogs } from './reconcile.ts';
+import { diffEvents, gamesWithLogs, livePruneAllowed } from './reconcile.ts';
+import type { ScopeResult } from './reconcile.ts';
 import type { GameEventRow } from './mappers.ts';
 import { toGameEventRows } from './mappers.ts';
 import { parseSnapshot } from './schema.ts';
@@ -123,4 +124,19 @@ Deno.test('a game delivered by both scopes is diffed once, the later copy winnin
 
   assertEquals(found.length, 1);
   assertEquals(found[0].status, 'later');
+});
+
+// ── Scopes ───────────────────────────────────────────────────────────────────
+
+const fresh = (...gamedayIds: number[]): ScopeResult => ({ outcome: 'fresh', gamedayIds });
+const unchanged: ScopeResult = { outcome: 'unchanged', gamedayIds: [] };
+const unknown: ScopeResult = { outcome: 'unknown', gamedayIds: [] };
+
+Deno.test('live rows are pruned only after a fresh main scope', () => {
+  assertEquals(livePruneAllowed({ main: fresh(10), draft: fresh() }), true);
+  assertEquals(livePruneAllowed({ main: fresh(10), draft: unchanged }), true);
+  // The latent bug: with only the DRAFT scope fresh, today's game ids come out empty and an
+  // empty keep list clears every live row, including a running game's.
+  assertEquals(livePruneAllowed({ main: unchanged, draft: fresh() }), false);
+  assertEquals(livePruneAllowed({ main: unknown, draft: fresh() }), false);
 });
