@@ -282,7 +282,7 @@ async function syncTeamSnapshot(
       teamIds: [...TEAM_IDS],
       dateFrom: HISTORY_FROM,
       statuses: scope.statuses,
-      includeLogs: true,
+      include: ['games', 'logs'],
       etag: state.get(scope.source)?.etag ?? null,
     });
 
@@ -524,7 +524,7 @@ async function crossCheckStandings(
     const result = await client.snapshot({
       leaguePk: config.leaguePk,
       seasonPk: config.seasonPk,
-      includeLogs: false,
+      include: ['games'],
       etag: state.get(source)?.etag ?? null,
     });
 
