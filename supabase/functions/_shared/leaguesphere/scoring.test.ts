@@ -69,6 +69,37 @@ Deno.test('every recorded half score is reproduced from its log', async () => {
   assertEquals(checked, 144, 'the committed fixtures should yield 144 halves');
 });
 
+/**
+ * The since-2023 recording holds every game of teams 159 and 287 back to the start of 2023
+ * (36 gamedays, 123 games). Each of its 492 halves must be reproduced from the log, so a new
+ * upstream scoring event shows up here as a mismatch instead of as a wrong score on the site.
+ */
+Deno.test('every tracked game since 2023 reproduces its reported half scores', async () => {
+  const name = 'snapshot.teams-159-287-since-2023.json';
+  const parsed = parseSnapshot(await loadFixture(name));
+  assert(parsed.ok, `${name} must parse: ${parsed.ok ? '' : parsed.errors.join('; ')}`);
+
+  let checked = 0;
+  const failures: string[] = [];
+  for (const gameday of parsed.value.gamedays) {
+    for (const game of gameday.games) {
+      if (game.log === null) continue;
+      for (const side of [game.log.home, game.log.away]) {
+        for (const mismatch of checkSideScores(side)) {
+          failures.push(
+            `gameday=${gameday.id} game=${game.id} half=${mismatch.half} ` +
+              `reported=${mismatch.reported} computed=${mismatch.computed}`,
+          );
+        }
+        checked += 2;
+      }
+    }
+  }
+
+  assertEquals(failures, [], `half-score mismatches:\n${failures.join('\n')}`);
+  assertEquals(checked, 492, 'the since-2023 recording should yield 492 halves');
+});
+
 // ── Points per log entry ─────────────────────────────────────────────────────
 
 Deno.test('a touchdown is six points', () => {

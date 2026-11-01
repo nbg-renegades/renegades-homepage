@@ -20,6 +20,7 @@ Deno.test('every recorded snapshot parses', async () => {
   const fixtures = [
     'snapshot.teams-159-287.json',
     'snapshot.teams-159-287-with-time.json',
+    'snapshot.teams-159-287-since-2023.json',
     'snapshot.league-ffbl-2026.json',
     'snapshot.league-dffl-2026.json',
     'snapshot.status-draft-empty.json',

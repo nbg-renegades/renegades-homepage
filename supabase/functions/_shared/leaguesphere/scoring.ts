@@ -11,8 +11,9 @@
  * against the half-time and full-time scores LeagueSphere reports itself: over the full
  * recording of both teams' games, **1500 half-scores with 0 mismatches**. The reference is
  * missing `Safety (+2)`, which appears 68 times in our own games and breaks 52 of those 1500.
- * `scoring.test.ts` re-runs that check on every build against the committed fixtures, which
- * carry 144 of those halves.
+ * `scoring.test.ts` re-runs that check on every build against the committed fixtures: 144
+ * halves in the 2026 recordings and, in the since-2023 recording of both teams, all 492 halves
+ * of their 123 games, again with 0 mismatches.
  */
 
 import type { UpstreamLogEntry, UpstreamLogSide, UpstreamTick } from './schema.ts';
