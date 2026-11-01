@@ -156,6 +156,22 @@ Deno.test('no recorded game disagrees with upstream on its half scores', async (
   assertEquals(found, []);
 });
 
+Deno.test('the synthetic overtime game stores both points and ends at the final score', async () => {
+  const parsed = parseSnapshot(await loadFixture('snapshot.synthetic-ot-safety1.json'));
+  assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
+  const game = parsed.value.gamedays[0].games[0];
+
+  const rows = toGameEventRows(game);
+  assertEquals(rows.find((r) => r.text === 'Overtime: #23')?.points, 1);
+  assertEquals(rows.find((r) => r.text === 'Safety (+1): #8')?.points, 1);
+
+  const last = rows.at(-1);
+  assert(last !== undefined);
+  assertEquals(last.score_home, 35);
+  assertEquals(last.score_away, 38);
+  assertEquals(findScoreDisagreements(game), []);
+});
+
 Deno.test('an unknown scoring event is reported as a disagreement, not swallowed', async () => {
   const gamedays = await teamSnapshot();
   const game = gameday(gamedays, 645).games.find((g) => g.id === 7374);

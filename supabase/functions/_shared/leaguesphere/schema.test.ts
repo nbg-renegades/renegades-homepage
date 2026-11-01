@@ -21,6 +21,7 @@ Deno.test('every recorded snapshot parses', async () => {
     'snapshot.teams-159-287.json',
     'snapshot.teams-159-287-with-time.json',
     'snapshot.teams-159-287-since-2023.json',
+    'snapshot.synthetic-ot-safety1.json',
     'snapshot.league-ffbl-2026.json',
     'snapshot.league-dffl-2026.json',
     'snapshot.status-draft-empty.json',
@@ -283,6 +284,23 @@ Deno.test('a retyped scoring event is still rejected', async () => {
   const result = parseSnapshot(broken);
   assert(!result.ok, 'a pat1 number became a name: should have been rejected');
   assertStringIncludes(result.errors.join('\n'), '.pat1');
+});
+
+Deno.test('a retyped one-point safety is rejected rather than ignored', async () => {
+  const good = await loadFixture(WITH_TIME) as Record<string, unknown>;
+
+  const broken = clone(good);
+  (firstLogEntry(broken) as Record<string, unknown>)['Safety (+1)'] = 'Meier';
+  const result = parseSnapshot(broken);
+  assert(!result.ok, 'a name where the jersey number belongs should be rejected');
+  assertStringIncludes(result.errors.join('\n'), 'Safety (+1)');
+
+  for (const value of [null, 5]) {
+    const valid = clone(good);
+    (firstLogEntry(valid) as Record<string, unknown>)['Safety (+1)'] = value;
+    const parsed = parseSnapshot(valid);
+    assert(parsed.ok, `Safety (+1): ${value} should parse`);
+  }
 });
 
 Deno.test('a snapshot without include=games yields gamedays with no games', () => {

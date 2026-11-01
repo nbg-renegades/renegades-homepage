@@ -1,0 +1,210 @@
+{
+  "_synthetic": "Derived from real gameday 632 / game 7272 (Nürn 159 home versus Erlangen 243, 2026-03-21) of snapshot.teams-159-287-since-2023.json. Two home second-half log entries were added (OT: 23 at sequence 15, Safety (+1): 8 at sequence 16) and every reported home total was raised by 2 to match (log.home.secondhalf.score 21 to 23, log.home.score 33 to 35, home results sh 21 to 23, away results pa 33 to 35, final_score.home 33 to 35). Values come from upstream SCORING_EVENT_VALUES in gamedays/service/gamelog.py (Overtime 1, Safety (+1) 1), because neither event occurs in any recorded game of teams 159/287 as of 2026-10-29. Replace with a real recording if one appears.",
+  "schema_version": 1,
+  "generated_at": "2026-10-29T11:45:53.715577+00:00",
+  "scope": {
+    "league": null,
+    "season": null,
+    "team": [
+      159,
+      287
+    ],
+    "date_from": "2023-01-01",
+    "date_to": null,
+    "status": null,
+    "include": [
+      "games",
+      "logs"
+    ],
+    "count": 1
+  },
+  "gamedays": [
+    {
+      "id": 632,
+      "name": "Würzburg Wombats",
+      "season": 6,
+      "season_display": "2026",
+      "league": 7,
+      "league_display": "DKB DFFL",
+      "date": "2026-03-21",
+      "start": "10:00",
+      "format": "CUSTOM",
+      "author": 25,
+      "address": "Mergentheimer Straße 13c, 97082 Würzburg",
+      "status": "PUBLISHED",
+      "has_designer_state": false,
+      "games": [
+        {
+          "id": 7272,
+          "gameday": 632,
+          "scheduled": "12:20:00",
+          "field": 1,
+          "officials": 38,
+          "stage": "Hauptrunde",
+          "standing": "Gruppe 1",
+          "status": "beendet",
+          "results": [
+            {
+              "id": 14367,
+              "team_id": 159,
+              "team_name": "Nürn",
+              "fh": 12,
+              "sh": 23,
+              "pa": 38,
+              "isHome": true
+            },
+            {
+              "id": 14368,
+              "team_id": 243,
+              "team_name": "Erlangen",
+              "fh": 18,
+              "sh": 20,
+              "pa": 35,
+              "isHome": false
+            }
+          ],
+          "halftime_score": {
+            "home": 12,
+            "away": 18
+          },
+          "final_score": {
+            "home": 35,
+            "away": 38
+          },
+          "log": {
+            "gameId": 7272,
+            "isFirstHalf": false,
+            "home": {
+              "id": 159,
+              "name": "Nürn",
+              "score": 35,
+              "firsthalf": {
+                "score": 12,
+                "entries": [
+                  {
+                    "sequence": 5,
+                    "cop": true,
+                    "name": "Turnover",
+                    "player": null,
+                    "time": "2026-03-21T11:50:13.356457+00:00"
+                  },
+                  {
+                    "sequence": 3,
+                    "td": 83,
+                    "time": "2026-03-21T11:42:27.635815+00:00",
+                    "pat1": null
+                  },
+                  {
+                    "sequence": 1,
+                    "td": 83,
+                    "time": "2026-03-21T11:35:31.090346+00:00",
+                    "pat1": null
+                  }
+                ]
+              },
+              "secondhalf": {
+                "score": 23,
+                "entries": [
+                  {
+                    "sequence": 16,
+                    "Safety (+1)": 8,
+                    "time": "2026-03-21T12:31:29.569734+00:00"
+                  },
+                  {
+                    "sequence": 15,
+                    "OT": 23,
+                    "time": "2026-03-21T12:30:59.569734+00:00"
+                  },
+                  {
+                    "sequence": 14,
+                    "td": 23,
+                    "time": "2026-03-21T12:30:29.569734+00:00",
+                    "pat1": 23
+                  },
+                  {
+                    "sequence": 12,
+                    "td": 8,
+                    "time": "2026-03-21T12:21:23.899370+00:00",
+                    "pat1": 8
+                  },
+                  {
+                    "sequence": 8,
+                    "td": 83,
+                    "time": "2026-03-21T12:09:55.853833+00:00",
+                    "pat1": 23
+                  }
+                ]
+              }
+            },
+            "away": {
+              "id": 243,
+              "name": "Erlangen",
+              "score": 38,
+              "firsthalf": {
+                "score": 18,
+                "entries": [
+                  {
+                    "sequence": 6,
+                    "td": 21,
+                    "time": "2026-03-21T11:54:22.456572+00:00",
+                    "pat2": null
+                  },
+                  {
+                    "sequence": 4,
+                    "td": 23,
+                    "time": "2026-03-21T11:45:53.862705+00:00",
+                    "pat2": null
+                  },
+                  {
+                    "sequence": 2,
+                    "td": 5,
+                    "time": "2026-03-21T11:38:41.588277+00:00",
+                    "pat2": null
+                  }
+                ]
+              },
+              "secondhalf": {
+                "score": 20,
+                "entries": [
+                  {
+                    "sequence": 13,
+                    "td": 23,
+                    "time": "2026-03-21T12:25:04.053525+00:00",
+                    "pat2": null
+                  },
+                  {
+                    "sequence": 11,
+                    "td": 5,
+                    "time": "2026-03-21T12:17:37.512254+00:00",
+                    "pat2": null
+                  },
+                  {
+                    "sequence": 10,
+                    "cop": true,
+                    "name": "Interception",
+                    "player": 26,
+                    "time": "2026-03-21T12:13:04.860068+00:00"
+                  },
+                  {
+                    "sequence": 9,
+                    "cop": true,
+                    "name": "Turnover",
+                    "player": null,
+                    "time": "2026-03-21T12:11:53.841482+00:00"
+                  },
+                  {
+                    "sequence": 7,
+                    "td": 23,
+                    "time": "2026-03-21T12:03:55.586527+00:00",
+                    "pat2": 23
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "etag": "7bcb63bbe944cb041bd9c20c9493c1d1"
+}

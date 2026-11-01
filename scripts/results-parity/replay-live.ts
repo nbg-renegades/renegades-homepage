@@ -201,12 +201,16 @@ function emptyTable(pathname: string) {
 
 /** Mirrors `tickPoints` in `_shared/leaguesphere/scoring.ts`. */
 function points(text: string): number {
-  const failed = /:\s*-\s*$/.test(text);
-  if (text.startsWith('Touchdown')) return 6;
-  if (text.startsWith('2-Extra-Punkte')) return failed ? 0 : 2;
-  if (text.startsWith('1-Extra-Punkt')) return failed ? 0 : 1;
-  if (text.startsWith('Safety')) return 2;
-  return 0;
+  const table = new Map([
+    ['Touchdown', 6],
+    ['1-Extra-Punkt', 1],
+    ['2-Extra-Punkte', 2],
+    ['Overtime', 1],
+    ['Safety (+1)', 1],
+    ['Safety (+2)', 2],
+  ]);
+  const match = /^(.+): #\d+\s*$/.exec(text);
+  return (match === null ? undefined : table.get(match[1])) ?? 0;
 }
 
 async function loadRecordedGame(id: number): Promise<LiveGame> {

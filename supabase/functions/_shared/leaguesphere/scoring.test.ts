@@ -12,6 +12,7 @@ import {
   dedupeTicks,
   deriveLiveScore,
   isGameFinishedTick,
+  isMarkerTick,
   logEntryPoints,
   logEntryText,
   tickPoints,
@@ -100,6 +101,15 @@ Deno.test('every tracked game since 2023 reproduces its reported half scores', a
   assertEquals(checked, 492, 'the since-2023 recording should yield 492 halves');
 });
 
+Deno.test('the synthetic overtime game reproduces its reported half scores', async () => {
+  const parsed = parseSnapshot(await loadFixture('snapshot.synthetic-ot-safety1.json'));
+  assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
+  const game = parsed.value.gamedays[0].games[0];
+  assert(game.log !== null);
+  assertEquals(checkSideScores(game.log.home), []);
+  assertEquals(checkSideScores(game.log.away), []);
+});
+
 // ── Points per log entry ─────────────────────────────────────────────────────
 
 Deno.test('a touchdown is six points', () => {
@@ -118,6 +128,25 @@ Deno.test('a successful 2-point conversion adds two, a failed one adds nothing',
 
 Deno.test('Safety (+2) is two points — the reference misses it entirely', () => {
   assertEquals(logEntryPoints(entry({ sequence: 6, players: { 'Safety (+2)': 24 } })), 2);
+});
+
+Deno.test('overtime and the one-point safety score as upstream values them', () => {
+  assertEquals(logEntryPoints(entry({ sequence: 1, players: { OT: 7 } })), 1);
+  assertEquals(logEntryPoints(entry({ sequence: 1, players: { 'Safety (+1)': 5 } })), 1);
+  // Jersey 0 exists, so a null check, not truthiness.
+  assertEquals(logEntryPoints(entry({ sequence: 1, players: { OT: 0 } })), 1);
+  assertEquals(logEntryPoints(entry({ sequence: 1, players: { OT: null } })), 0);
+  assertEquals(logEntryPoints(entry({ sequence: 1, players: { 'Safety (+1)': null } })), 0);
+  assertEquals(logEntryPoints(entry({ sequence: 1, isDeleted: true, players: { OT: 7 } })), 0);
+  assertEquals(logEntryPoints(entry({ sequence: 1, players: { 'Safety (+2)': 4 } })), 2);
+});
+
+Deno.test('overtime and the one-point safety render with the liveticker wording', () => {
+  assertEquals(logEntryText(entry({ sequence: 1, players: { OT: 7 } })), 'Overtime: #7');
+  assertEquals(
+    logEntryText(entry({ sequence: 1, players: { 'Safety (+1)': 5 } })),
+    'Safety (+1): #5',
+  );
 });
 
 Deno.test('player #0 scores like any other player', () => {
@@ -210,7 +239,17 @@ Deno.test('the play-by-play runs oldest first, first half before second', async 
 
 Deno.test('tick text maps to points, including failed attempts', () => {
   assertEquals(tickPoints('Touchdown: #75'), 6);
-  assertEquals(tickPoints('Touchdown'), 6);
+  // Upstream stores a scoring event without a jersey number as value 0.
+  assertEquals(tickPoints('Touchdown'), 0);
+  assertEquals(tickPoints('Touchdown: #0'), 6);
+  assertEquals(tickPoints('Overtime: #7'), 1);
+  assertEquals(tickPoints('Overtime'), 0);
+  assertEquals(tickPoints('Safety (+1): #5'), 1);
+  assertEquals(tickPoints('Safety (+1)'), 0);
+  assertEquals(tickPoints('Safety (+2): #5'), 2);
+  assertEquals(tickPoints('Safety (+2): #0'), 2);
+  assertEquals(tickPoints('First Down: #92'), 0);
+  assertEquals(tickPoints('Interception: #23'), 0);
   assertEquals(tickPoints('1-Extra-Punkt: #92'), 1);
   assertEquals(tickPoints('1-Extra-Punkt: -'), 0);
   assertEquals(tickPoints('2-Extra-Punkte: #19'), 2);
@@ -220,6 +259,15 @@ Deno.test('tick text maps to points, including failed attempts', () => {
   assertEquals(tickPoints('Spielzeit - 10:00'), 0);
   assertEquals(tickPoints('Spiel beendet'), 0);
   assertEquals(tickPoints('Halbzeit'), 0);
+});
+
+Deno.test('an overtime tick is a play, not a phase divider', () => {
+  const time = '2026-09-27T11:40:10.009392+00:00';
+  const overtime = { text: 'Overtime: #7', team: 'home' as const, time };
+  assertEquals(isMarkerTick(overtime), false);
+
+  const touchdown = { text: 'Touchdown: #3', team: 'home' as const, time: '2026-09-27T11:41:00+00:00' };
+  assertEquals(deriveLiveScore([touchdown, overtime]), { home: 7, away: 0 });
 });
 
 Deno.test('ticks are de-duplicated by text and time together', () => {

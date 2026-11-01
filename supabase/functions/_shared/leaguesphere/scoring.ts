@@ -22,6 +22,8 @@ export const TOUCHDOWN_POINTS = 6;
 export const EXTRA_POINT_1 = 1;
 export const EXTRA_POINT_2 = 2;
 export const SAFETY_POINTS = 2;
+export const SAFETY_1_POINTS = 1;
+export const OVERTIME_POINTS = 1;
 
 /**
  * Points per snapshot-log event key.
@@ -34,6 +36,8 @@ const LOG_EVENT_POINTS: Readonly<Record<string, number>> = {
   td: TOUCHDOWN_POINTS,
   pat1: EXTRA_POINT_1,
   pat2: EXTRA_POINT_2,
+  OT: OVERTIME_POINTS,
+  'Safety (+1)': SAFETY_1_POINTS,
   'Safety (+2)': SAFETY_POINTS,
 };
 
@@ -213,23 +217,27 @@ export function buildPlayByPlay(
 
 // ── Liveticker ───────────────────────────────────────────────────────────────
 
+/** Scoring events by the name upstream writes in the tick text, with their points. */
+const TICK_EVENT_POINTS: ReadonlyMap<string, number> = new Map([
+  ['Touchdown', TOUCHDOWN_POINTS],
+  ['1-Extra-Punkt', EXTRA_POINT_1],
+  ['2-Extra-Punkte', EXTRA_POINT_2],
+  ['Overtime', OVERTIME_POINTS],
+  ['Safety (+1)', SAFETY_1_POINTS],
+  ['Safety (+2)', SAFETY_POINTS],
+]);
+
 /**
  * Points for one liveticker tick.
  *
- * The text form encodes a failed attempt as a trailing `: -`, which upstream produces when an
- * Extra-Punkt event has no player. Anything unrecognised scores 0 — clock updates, time-outs,
- * penalties and possession changes all arrive on this channel too.
+ * Upstream writes a scoring tick as `<event>: #<number>`, `<event>: -` for a failed
+ * Extra-Punkt and the bare event name when no player was chosen. It stores the last two with
+ * value 0, so only the `#<number>` form scores here too. Anything unrecognised scores 0 —
+ * clock updates, time-outs, penalties and possession changes all arrive on this channel too.
  */
 export function tickPoints(text: string): number {
-  if (text.startsWith('Touchdown')) return TOUCHDOWN_POINTS;
-  if (text.startsWith('2-Extra-Punkte')) return failedAttempt(text) ? 0 : EXTRA_POINT_2;
-  if (text.startsWith('1-Extra-Punkt')) return failedAttempt(text) ? 0 : EXTRA_POINT_1;
-  if (text.startsWith('Safety')) return SAFETY_POINTS;
-  return 0;
-}
-
-function failedAttempt(text: string): boolean {
-  return /:\s*-\s*$/.test(text);
+  const match = /^(.+): #\d+\s*$/.exec(text);
+  return (match === null ? undefined : TICK_EVENT_POINTS.get(match[1])) ?? 0;
 }
 
 /** The tick that ends a game. Upstream sends it with `team: null`. */
@@ -246,7 +254,6 @@ const MARKER_PREFIXES: readonly string[] = [
   'Halbzeit',
   '1. Halbzeit',
   '2. Halbzeit',
-  'Overtime',
 ];
 
 export function isMarkerTick(tick: UpstreamTick): boolean {
