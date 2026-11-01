@@ -4,6 +4,7 @@ import {
   parseLeagueTable,
   parseLiveticker,
   parseSnapshot,
+  parseStandings,
   type UpstreamLogEntry,
   type UpstreamSnapshot,
 } from './schema.ts';
@@ -321,6 +322,41 @@ Deno.test('a snapshot without include=games yields gamedays with no games', () =
   });
   assert(parsed.ok);
   assertEquals(parsed.value.gamedays[0].games, []);
+});
+
+// ── Snapshot standings ───────────────────────────────────────────────────────
+
+Deno.test('both standings recordings parse', async () => {
+  const full = parseStandings(await loadFixture('snapshot.standings-teams-159-287-2026.json'));
+  assert(full.ok, full.ok ? '' : full.errors.join('; '));
+  assertEquals(full.value.map((b) => b.league.slug), ['dffl', 'ff-bl']);
+  assertEquals(full.value.map((b) => b.season.slug), ['2026', '2026']);
+  assertEquals(full.value.map((b) => b.rows.length), [16, 27]);
+  assert(full.value.every((b) => b.rows.every((r) => Number.isInteger(r.rank) && r.group !== '')));
+
+  const empty = parseStandings(await loadFixture('snapshot.standings-teams-159-287-2027-empty.json'));
+  assert(empty.ok);
+  assertEquals(empty.value, []);
+});
+
+Deno.test('a malformed standings table is rejected as a whole', async () => {
+  const raw = await loadFixture('snapshot.standings-teams-159-287-2026.json') as Record<string, unknown>;
+  const blocks = (value: Record<string, unknown>) => value['standings'] as Record<string, unknown>[];
+
+  const badRank = clone(raw);
+  (blocks(badRank)[1]['rows'] as Record<string, unknown>[])[3]['rank'] = 'x';
+  const rank = parseStandings(badRank);
+  assert(!rank.ok);
+  assert(rank.errors.some((e) => e.includes('standings[1].rows[3].rank')), rank.errors.join('; '));
+
+  // A season label is a year before it may reach a PostgREST filter (T-01-22).
+  const badSeason = clone(raw);
+  (blocks(badSeason)[0]['season'] as Record<string, unknown>)['slug'] = '2026/27';
+  const season = parseStandings(badSeason);
+  assert(!season.ok);
+  assert(season.errors.some((e) => e.includes('season.slug')), season.errors.join('; '));
+
+  assert(!parseStandings({ generated_at: 'x', gamedays: [] }).ok);
 });
 
 // ── Fixture navigation helpers ───────────────────────────────────────────────

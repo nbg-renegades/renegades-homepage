@@ -32,6 +32,27 @@ export function isTrackedTeam(teamId: number | null): teamId is TeamId {
 }
 
 /**
+ * Our league key for each upstream league slug in the snapshot's `standings`.
+ *
+ * Upstream slugs are set by hand and differ from our keys: the 1st team's league is `dffl`
+ * upstream, but the frontend reads `dkb-dffl`, so the key must not change. A league whose slug
+ * is missing here is not shown. The season is not configured: it comes from the snapshot.
+ */
+export const LEAGUE_KEY_BY_SLUG: Readonly<Record<string, string>> = {
+  dffl: 'dkb-dffl',
+  'ff-bl': 'ff-bl',
+};
+
+/**
+ * Second teams, which cannot be promoted and are greyed out in the table. Upstream does not
+ * expose this. Keyed `<league_key>:<season>`; the 2026 FF BL entries are Munich Spatzen 4,
+ * Erding Bulls II and Regensburg Phoenix III.
+ */
+export const PROMOTION_RESTRICTED: Readonly<Record<string, readonly number[]>> = {
+  'ff-bl:2026': [254, 492, 505],
+};
+
+/**
  * How a league season's standings are obtained.
  *
  * `official` stores `/api/league-table/` verbatim. That is the only way to match the
@@ -96,8 +117,7 @@ export const LEAGUE_SEASONS: readonly LeagueSeasonConfig[] = [
     tableSlug: 'ff-bl',
     name: 'FF BL 2026',
     excludeGamedayIds: [],
-    // Munich Spatzen 4, Erding Bulls II, Regensburg Phoenix III.
-    promotionRestricted: [254, 492, 505],
+    promotionRestricted: PROMOTION_RESTRICTED['ff-bl:2026'],
     standingsSource: 'official',
   },
 ] as const;
