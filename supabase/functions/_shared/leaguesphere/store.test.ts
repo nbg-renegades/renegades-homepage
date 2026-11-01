@@ -509,3 +509,45 @@ Deno.test('a 204 with no body is not treated as a parse failure', async () => {
   const { store } = storeWith([new Response(null, { status: 204 })]);
   await store.saveGamedays([gameday(1)]);
 });
+
+// ── Pruning ──────────────────────────────────────────────────────────────────
+
+Deno.test('the stored scope is read from historyFrom on, with each gameday’s games', async () => {
+  const gamedays = new Response(JSON.stringify(
+    Array.from({ length: 150 }, (_, i) => ({ id: i + 1, status: 'PUBLISHED', date: '2026-06-20' })),
+  ));
+  const games = new Response(JSON.stringify([{ id: 900, gameday_id: 1 }]));
+  const { store, calls } = storeWith([gamedays, jsonPage(0), games, jsonPage(0), jsonPage(0)]);
+
+  const scope = await store.loadStoredScope('2026-01-01');
+
+  assertEquals(scope.gamedays.length, 150);
+  assertEquals(scope.games, [{ id: 900, gameday_id: 1 }]);
+  assertStringIncludes(calls[0].path, '/results_gamedays?select=id,status,date&date=gte.2026-01-01');
+  assertStringIncludes(calls[0].path, 'order=id');
+  // Games come per 100 gamedays: chunks of 100 and 50 ids, each paged to its empty page.
+  const chunks = calls.slice(2).filter((call) => call.path.includes('offset=0'));
+  assertEquals(chunks.length, 2);
+  assertStringIncludes(chunks[0].path, '/results_games?select=id,gameday_id&gameday_id=in.(1,2,');
+  assertStringIncludes(chunks[1].path, 'gameday_id=in.(101,102,');
+});
+
+Deno.test('games and gamedays are deleted by id in chunks of 100', async () => {
+  const { store, calls } = storeWith();
+
+  await store.deleteGames(Array.from({ length: 150 }, (_, i) => i + 1));
+  await store.deleteGamedays([7, 8]);
+
+  assertEquals(calls.map((call) => call.method), ['DELETE', 'DELETE', 'DELETE']);
+  assertStringIncludes(calls[0].path, '/results_games?id=in.(1,2,');
+  assertEquals(calls[0].path.split(',').length, 100);
+  assertStringIncludes(calls[1].path, '/results_games?id=in.(101,');
+  assertEquals(calls[2].path, '/results_gamedays?id=in.(7,8)');
+});
+
+Deno.test('an empty delete list makes no request', async () => {
+  const { store, calls } = storeWith();
+  await store.deleteGames([]);
+  await store.deleteGamedays([]);
+  assertEquals(calls.length, 0);
+});

@@ -332,3 +332,73 @@ Deno.test({
       assertEquals(diff.remove, []);
     }),
 });
+
+Deno.test({
+  name: 'deleteGamedays removes the gameday with its games, plays and live rows',
+  ignore: !enabled,
+  fn: () =>
+    withStore(async (store) => {
+      await store.saveGamedays([gameday(GAMEDAY_ID), gameday(GAMEDAY_ID + 1)]);
+      await store.saveGames([game(GAME_ID, GAMEDAY_ID), game(GAME_ID + 1, GAMEDAY_ID + 1)]);
+      await store.saveGameEvents([event(GAME_ID, 1), event(GAME_ID + 1, 1)]);
+      await store.saveLiveGames([{
+        game_id: GAME_ID,
+        home_score: 6,
+        away_score: 0,
+        last_tick_at: null,
+        finished: false,
+      }]);
+
+      await store.deleteGamedays([GAMEDAY_ID]);
+
+      assertEquals((await store.select('results_gamedays', `id=eq.${GAMEDAY_ID}`)).length, 0);
+      assertEquals((await store.select('results_games', `id=eq.${GAME_ID}`)).length, 0);
+      assertEquals((await store.loadGameEvents([GAME_ID])).length, 0);
+      assertEquals((await store.select('results_live_games', `game_id=eq.${GAME_ID}`)).length, 0);
+      assertEquals((await store.loadGameEvents([GAME_ID + 1])).length, 1, 'the sibling survives');
+    }),
+});
+
+Deno.test({
+  name: 'deleteGames keeps the gameday and the sibling game',
+  ignore: !enabled,
+  fn: () =>
+    withStore(async (store) => {
+      await store.saveGamedays([gameday(GAMEDAY_ID)]);
+      await store.saveGames([game(GAME_ID, GAMEDAY_ID), game(GAME_ID + 1, GAMEDAY_ID)]);
+      await store.saveGameEvents([event(GAME_ID, 1), event(GAME_ID + 1, 1)]);
+
+      await store.deleteGames([GAME_ID]);
+
+      assertEquals((await store.select('results_games', `id=eq.${GAME_ID}`)).length, 0);
+      assertEquals((await store.loadGameEvents([GAME_ID])).length, 0);
+      assertEquals((await store.select('results_gamedays', `id=eq.${GAMEDAY_ID}`)).length, 1);
+      assertEquals((await store.select('results_games', `id=eq.${GAME_ID + 1}`)).length, 1);
+      assertEquals((await store.loadGameEvents([GAME_ID + 1])).length, 1);
+    }),
+});
+
+Deno.test({
+  name: 'loadStoredScope returns only gamedays from the given date on',
+  ignore: !enabled,
+  fn: () =>
+    withStore(async (store) => {
+      await store.saveGamedays([
+        { ...gameday(GAMEDAY_ID), date: '2025-08-02' },
+        { ...gameday(GAMEDAY_ID + 1), date: '2026-06-20', status: 'DRAFT' },
+      ]);
+      await store.saveGames([game(GAME_ID, GAMEDAY_ID), game(GAME_ID + 1, GAMEDAY_ID + 1)]);
+
+      const scope = await store.loadStoredScope('2026-01-01');
+
+      // Other rows may exist in a shared database, so look only at the reserved range.
+      assertEquals(
+        scope.gamedays.filter((row) => row.id >= RESERVED_GAMEDAYS_FROM),
+        [{ id: GAMEDAY_ID + 1, status: 'DRAFT', date: '2026-06-20' }],
+      );
+      assertEquals(
+        scope.games.filter((row) => row.id >= GAME_ID),
+        [{ id: GAME_ID + 1, gameday_id: GAMEDAY_ID + 1 }],
+      );
+    }),
+});
