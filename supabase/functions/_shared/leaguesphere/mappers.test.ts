@@ -1,13 +1,11 @@
 import { assert, assertEquals } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
-import { findLeagueSeason } from './config.ts';
 import { parseLiveticker, parseSnapshot, type UpstreamGameday } from './schema.ts';
 import {
   classifyGameday,
   findScoreDisagreements,
   involvesTrackedTeam,
   mapTeamSnapshot,
-  selectLeagueSeasonGamedays,
   todaysTrackedGameIds,
   toGamedayRow,
   toGameEventRows,
@@ -265,21 +263,6 @@ Deno.test('a gameday with none of our games produces no rows at all', () => {
   const mapped = mapTeamSnapshot([foreign], '2026-09-27');
   assertEquals(mapped.gamedays, []);
   assertEquals(mapped.games, []);
-});
-
-Deno.test('league-season selection honours the league, the year and the exclusions', async () => {
-  const parsed = parseSnapshot(await loadFixture('snapshot.league-dffl-2026.json'));
-  assert(parsed.ok);
-  const cfg = findLeagueSeason('dkb-dffl', '2026');
-  assert(cfg !== undefined);
-
-  const selected = selectLeagueSeasonGamedays(cfg, parsed.value.gamedays);
-  assert(selected.length > 0);
-  assertEquals(selected.every((gd) => gd.league_display === 'DKB DFFL'), true);
-  assertEquals(selected.every((gd) => gd.date.startsWith('2026')), true);
-  // The two playoff gamedays are excluded.
-  assertEquals(selected.some((gd) => gd.id === 887 || gd.id === 888), false);
-  assertEquals(selected.length, parsed.value.gamedays.length - 2);
 });
 
 // ── Live games ───────────────────────────────────────────────────────────────

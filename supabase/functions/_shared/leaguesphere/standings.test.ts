@@ -1,61 +1,9 @@
 import { assert, assertEquals } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
-import { findLeagueSeason, normaliseAddress, type LeagueSeasonConfig } from './config.ts';
-import { parseLeagueTable, parseStandings, type UpstreamStandingsBlock } from './schema.ts';
-import {
-  mapOfficialTable,
-  mapSnapshotStandings,
-  standingsOutcome,
-  standingsYear,
-} from './standings.ts';
+import { normaliseAddress } from './config.ts';
+import { parseStandings, type UpstreamStandingsBlock } from './schema.ts';
+import { mapSnapshotStandings, standingsOutcome, standingsYear } from './standings.ts';
 import { loadFixture } from './__fixtures__/load.ts';
-
-function config(key: string, season = '2026'): LeagueSeasonConfig {
-  const found = findLeagueSeason(key, season);
-  assert(found !== undefined, `${key}/${season} must be configured`);
-  return found;
-}
-
-async function officialOf(fixture: string, cfg: LeagueSeasonConfig) {
-  const parsed = parseLeagueTable(await loadFixture(fixture));
-  assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
-  return { table: parsed.value, rows: mapOfficialTable(cfg, parsed.value) };
-}
-
-// ── The stored rows ──────────────────────────────────────────────────────────
-
-Deno.test('promotion-restricted teams are flagged, and only those', async () => {
-  const cfg = config('ff-bl');
-  const { rows } = await officialOf('league-table.ff-bl-2026.json', cfg);
-
-  const flagged = rows.filter((r) => r.promotionRestricted).map((r) => r.teamId).sort();
-  assertEquals(flagged, [254, 492, 505]);
-
-  // Our own team is not restricted, and the flag is per league season.
-  assertEquals(rows.find((r) => r.teamId === 287)?.promotionRestricted, false);
-});
-
-Deno.test('teams with no games are left out of the stored table', async () => {
-  const cfg = config('ff-bl');
-  const { table, rows } = await officialOf('league-table.ff-bl-2026.json', cfg);
-
-  const initial = table.standing.filter((r) => r.games_played === 0);
-  assertEquals(initial.length, 4, 'the fixture should still contain "Initial" rows');
-  assert(rows.every((r) => r.sp > 0));
-  assertEquals(rows.length, table.standing.length - initial.length);
-});
-
-Deno.test('rank follows the published order rather than being recomputed', async () => {
-  const cfg = config('dkb-dffl');
-  const { table, rows } = await officialOf('league-table.dffl-2026.json', cfg);
-
-  assertEquals(rows.map((r) => r.rank), rows.map((_, i) => i + 1));
-  assertEquals(
-    rows.map((r) => r.teamId),
-    table.standing.filter((r) => r.games_played > 0).map((r) => r.team_id),
-  );
-  assertEquals(rows.every((r) => r.mode === 'official'), true);
-});
 
 // ── Standings from the snapshot ──────────────────────────────────────────────
 

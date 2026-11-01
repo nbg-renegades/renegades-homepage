@@ -31,15 +31,12 @@ function entry(partial: Partial<UpstreamLogEntry> & { sequence: number }): Upstr
  * found `Safety (+2)`.
  *
  * The committed fixtures yield 144 halves: only `snapshot.teams-159-287.json` carries logs,
- * the two league-scoped ones were recorded with `include=games` because standings need no
- * play-by-play. The same check over the full untrimmed recording covered 1500 halves and
+ * the league-scoped recordings carry no play-by-play. The same check over the full untrimmed recording covered 1500 halves and
  * also matched completely; 52 of those 1500 fail without the `Safety (+2)` rule.
  */
 Deno.test('every recorded half score is reproduced from its log', async () => {
   const fixtures = [
     'snapshot.teams-159-287.json',
-    'snapshot.league-ffbl-2026.json',
-    'snapshot.league-dffl-2026.json',
   ];
 
   let checked = 0;

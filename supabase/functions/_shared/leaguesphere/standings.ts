@@ -1,25 +1,13 @@
 /**
- * Standings: the table we store, and the cross-check that guards it.
+ * Standings: the table we store, read from the snapshot's `standings`.
  *
- * Two functions that must not be confused:
+ * We display the table the league publishes and never compute one ourselves, because the two
+ * configured leagues do not share a ruleset and only one of them is reproducible from public
+ * data.
  *
- *  - `mapOfficialTable` turns `/api/league-table/` into the rows we store and display. This
- *    is the source of truth, because it is the table the league publishes.
- *  - `computeStandings` is our own port of the reference rules (SQ → PD → EP). It is *not*
- *    displayed. It runs on every sync and `diffStandings` reports where it disagrees, which
- *    is how we notice that a gameday is missing, an exclusion is stale, or upstream changed
- *    a rule.
- *
- * Why the official table rather than our computation, given we own the domain logic
- * elsewhere: the two configured leagues do not share a ruleset, and only one of them is
- * reproducible from public data.
- *
- *   FF BL 2026     win_points = 2·S + U,  quotient = win_points / (2 · games_played)
- *                  → our computation reproduces the published table exactly, 23/23 teams.
+ *   FF BL 2026     win_points = 2·S + U,  quotient = win_points / (2 · games_played).
  *   DKB DFFL 2026  quotient = win_points / 30 — a fixed divisor, not games played — and
- *                  win_points weights a win by the opponent's league. We reproduce games,
- *                  W/D/L, points for and points against exactly (16/16 teams), but not the
- *                  quotient, and therefore not the order.
+ *                  win_points weights a win by the opponent's league.
  *
  * The divisor, the per-league point weights, the per-team point adjustments and the tie-break
  * chain live in LeagueSphere's `LeagueRuleset` and `LeagueSeasonConfig`, none of which any
@@ -28,8 +16,8 @@
  * team's table is worse than depending on upstream for it.
  */
 
-import { LEAGUE_KEY_BY_SLUG, type LeagueSeasonConfig, PROMOTION_RESTRICTED } from './config.ts';
-import type { UpstreamLeagueTable, UpstreamStandingsBlock } from './schema.ts';
+import { LEAGUE_KEY_BY_SLUG, PROMOTION_RESTRICTED } from './config.ts';
+import type { UpstreamStandingsBlock } from './schema.ts';
 
 /** The game status upstream uses for a finished game. */
 export const FINISHED_STATUS = 'beendet';
@@ -54,38 +42,6 @@ export interface StandingsRow {
   readonly sq: number;
   readonly promotionRestricted: boolean;
   readonly mode: 'official';
-}
-
-/**
- * Maps the published table onto our rows.
- *
- * Rank is the position in the response, which is already sorted by the league's own
- * tie-break chain — re-sorting here would replace that chain with a guess at it. Teams with
- * no games (`standing: 'Initial'`) are dropped: they carry no information and would otherwise
- * pad the bottom of every table with zeroes.
- */
-export function mapOfficialTable(
-  config: LeagueSeasonConfig,
-  table: UpstreamLeagueTable,
-): readonly StandingsRow[] {
-  const played = table.standing.filter((row) => row.games_played > 0);
-  return played.map((row, index) => ({
-    leagueKey: config.key,
-    season: config.season,
-    teamId: row.team_id,
-    rank: index + 1,
-    group: row.standing,
-    sp: row.games_played,
-    s: row.wins,
-    u: row.draws,
-    n: row.losses,
-    ep: row.pf,
-    gp: row.pa,
-    pd: row.diff,
-    sq: row.win_quotient,
-    promotionRestricted: config.promotionRestricted.includes(row.team_id),
-    mode: 'official',
-  }));
 }
 
 /**

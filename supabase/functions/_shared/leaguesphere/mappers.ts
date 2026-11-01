@@ -6,14 +6,7 @@
  * against, that a game's status is German free text, or that `""` is a gameday status.
  */
 
-import {
-  belongsToLeagueSeason,
-  isTrackedTeam,
-  normaliseAddress,
-  TEAM_IDS,
-  type LeagueSeasonConfig,
-  type TeamId,
-} from './config.ts';
+import { isTrackedTeam, normaliseAddress, TEAM_IDS, type TeamId } from './config.ts';
 import {
   buildPlayByPlay,
   checkSideScores,
@@ -391,19 +384,6 @@ export function mapTeamSnapshot(
     events: [...eventRows.values()].flat(),
     disagreements,
   };
-}
-
-/**
- * The gamedays of one league season, for the standings cross-check.
- *
- * Takes a league-scoped snapshot: scoped by team it would only hold gamedays our teams
- * attended, and every other club in the table would be short of games.
- */
-export function selectLeagueSeasonGamedays(
-  config: LeagueSeasonConfig,
-  gamedays: readonly UpstreamGameday[],
-): readonly UpstreamGameday[] {
-  return gamedays.filter((gameday) => belongsToLeagueSeason(config, gameday));
 }
 
 /** Games of our teams that are scheduled for today — the only ones the live tab may poll. */

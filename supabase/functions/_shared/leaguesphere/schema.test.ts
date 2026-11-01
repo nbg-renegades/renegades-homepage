@@ -1,7 +1,6 @@
 import { assert, assertEquals, assertStringIncludes } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
 import {
-  parseLeagueTable,
   parseLiveticker,
   parseSnapshot,
   parseStandings,
@@ -49,16 +48,11 @@ Deno.test('a gameday whose status is the empty string is accepted', async () => 
   assertEquals(result.value.gamedays[0].status, '');
 });
 
-Deno.test('both liveticker recordings and both league tables parse', async () => {
+Deno.test('both liveticker recordings parse', async () => {
   for (const name of ['liveticker.default-5-ticks.json', 'liveticker.get-all-ticks-for.json']) {
     const result = parseLiveticker(await loadFixture(name));
     assert(result.ok, `${name}: ${result.ok ? '' : result.errors.join('; ')}`);
     assert(result.value.length > 0);
-  }
-  for (const name of ['league-table.ff-bl-2026.json', 'league-table.dffl-2026.json']) {
-    const result = parseLeagueTable(await loadFixture(name));
-    assert(result.ok, `${name}: ${result.ok ? '' : result.errors.join('; ')}`);
-    assert(result.value.standing.length > 0);
   }
 });
 
@@ -157,13 +151,19 @@ Deno.test('a liveticker tick with an unexpected team value is rejected', async (
   assert(!parseLiveticker(brokenScore).ok);
 });
 
-Deno.test('a league table row missing a column is rejected', async () => {
-  const good = await loadFixture('league-table.ff-bl-2026.json') as Record<string, unknown>;
+Deno.test('a standings row missing a column is rejected', async () => {
+  const good = await loadFixture('snapshot.standings-teams-159-287-2026.json') as Record<
+    string,
+    unknown
+  >;
 
-  for (const column of ['team_id', 'games_played', 'win_quotient', 'pf', 'team__description']) {
+  for (
+    const column of ['team_id', 'games_played', 'win_quotient', 'pf', 'team__description', 'group']
+  ) {
     const broken = clone(good);
-    delete ((broken['standing'] as Record<string, unknown>[])[0])[column];
-    const result = parseLeagueTable(broken);
+    const block = (broken['standings'] as Record<string, unknown>[])[0];
+    delete ((block['rows'] as Record<string, unknown>[])[0])[column];
+    const result = parseStandings(broken);
     assert(!result.ok, `a table without ${column} should be rejected`);
     assertStringIncludes(result.errors.join('\n'), column);
   }
@@ -173,7 +173,6 @@ Deno.test('an error response body is rejected rather than read as data', async (
   // Recorded 400/404 bodies. A caller that ignored the status code must still not get rows.
   assert(!parseSnapshot(await loadFixture('snapshot.error-unknown-season-pk.json')).ok);
   assert(!parseSnapshot(await loadFixture('snapshot.error-unknown-status.json')).ok);
-  assert(!parseLeagueTable(await loadFixture('league-table.error-unknown-league.json')).ok);
 });
 
 Deno.test('every error names a path, so a failure is actionable from the logs alone', () => {
