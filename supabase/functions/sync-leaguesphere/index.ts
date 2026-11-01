@@ -42,7 +42,10 @@ import {
   diffEvents,
   gamesWithLogs,
   livePruneAllowed,
+  MAX_PRUNED_GAMEDAYS_PER_RUN,
+  planPrune,
   type EventDiff,
+  type PrunePlan,
   type ScopeKind,
   type ScopeResult,
 } from '../_shared/leaguesphere/reconcile.ts';
@@ -367,8 +370,12 @@ async function syncTeamSnapshot(
 
   const mapped = mapTeamSnapshot(gamedays, today);
   let diff: EventDiff = { upsert: [], remove: [] };
+  let pruned: PrunePlan = { gamedayIds: [], gameIds: [], skipped: null };
 
   try {
+    // Read before anything is written: the prune compares the payload with the state it replaces.
+    const stored = await store.loadStoredScope(HISTORY_FROM);
+
     // Parents before children: a game row's foreign key needs its gameday to exist.
     await store.saveGamedays(mapped.gamedays);
     await store.saveGames(mapped.games);
@@ -380,6 +387,27 @@ async function syncTeamSnapshot(
     diff = diffEvents(existing, logged.flatMap(toGameEventRows));
     await store.saveGameEvents(diff.upsert);
     await store.deleteGameEvents(diff.remove);
+
+    // Remove what upstream deleted or re-published under new ids. Games first, then gamedays;
+    // the foreign keys take the plays and live rows along.
+    pruned = planPrune({
+      historyFrom: HISTORY_FROM,
+      stored,
+      scopes: scopeResults,
+      kept: {
+        gamedayIds: mapped.gamedays.map((gameday) => gameday.id),
+        gameIds: mapped.games.map((game) => game.id),
+      },
+      maxGamedays: MAX_PRUNED_GAMEDAYS_PER_RUN,
+    });
+    if (pruned.skipped !== null) {
+      // Reported, not failed: the data is fine, we just declined to delete on this evidence.
+      console.warn(`[sync] prune skipped: ${pruned.skipped}`);
+      notes.push(`prune skipped: ${pruned.skipped}`);
+    } else {
+      await store.deleteGames(pruned.gameIds);
+      await store.deleteGamedays(pruned.gamedayIds);
+    }
 
     // Keep the live tables to today's games only, but only when this run saw today's games.
     if (livePruneAllowed(scopeResults)) {
@@ -404,7 +432,8 @@ async function syncTeamSnapshot(
     disagreements.push(describeDisagreement(disagreement));
   }
 
-  return `${notes.join(', ')} → ${mapped.gamedays.length} gameday(s), ${mapped.games.length} game(s), ${mapped.events.length} event(s), ${diff.upsert.length} written, ${diff.remove.length} removed`;
+  return `${notes.join(', ')} → ${mapped.gamedays.length} gameday(s), ${mapped.games.length} game(s), ${mapped.events.length} event(s), ${diff.upsert.length} written, ${diff.remove.length} removed, ` +
+    `pruned ${pruned.gameIds.length} game(s), ${pruned.gamedayIds.length} gameday(s)`;
 }
 
 /**

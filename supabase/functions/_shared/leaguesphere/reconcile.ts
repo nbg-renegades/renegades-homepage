@@ -110,3 +110,102 @@ export interface ScopeResult {
 export function livePruneAllowed(scopes: Readonly<Record<ScopeKind, ScopeResult>>): boolean {
   return scopes.main.outcome === 'fresh';
 }
+
+// ── Pruning ──────────────────────────────────────────────────────────────────
+
+/** What is stored for the synced window, read before this run writes anything. */
+export interface StoredScope {
+  readonly gamedays: readonly { readonly id: number; readonly status: string; readonly date: string }[];
+  readonly games: readonly { readonly id: number; readonly gameday_id: number }[];
+}
+
+export interface PruneInput {
+  /** Gamedays dated before this are outside the synced window and never touched. */
+  readonly historyFrom: string;
+  readonly stored: StoredScope;
+  readonly scopes: Readonly<Record<ScopeKind, ScopeResult>>;
+  /** What the fresh payloads map to: the gamedays and games the site should hold. */
+  readonly kept: { readonly gamedayIds: readonly number[]; readonly gameIds: readonly number[] };
+  readonly maxGamedays: number;
+}
+
+export interface PrunePlan {
+  readonly gamedayIds: readonly number[];
+  /** Games to delete on their own; the games of a deleted gameday go with it by cascade. */
+  readonly gameIds: readonly number[];
+  /** Why nothing is pruned although something looked prunable, or null. */
+  readonly skipped: string | null;
+}
+
+/** One run deleting more gamedays than this is a bad payload, not a clean-up. */
+export const MAX_PRUNED_GAMEDAYS_PER_RUN = 10;
+
+const NOTHING: PrunePlan = { gamedayIds: [], gameIds: [], skipped: null };
+
+/**
+ * Which stored games and gamedays upstream no longer has.
+ *
+ * Deleting is the one irreversible thing the sync does, and an outage, a truncated payload or a
+ * half-failed run must never empty the site, so every rule errs towards keeping:
+ *
+ * 1. A stored gameday belongs to the scope that can see it: `DRAFT` to the draft call, the rest
+ *    to the main call.
+ * 2. It is only a candidate if its date is on or after `historyFrom`, its own scope was `fresh`
+ *    this run, and the other scope is not `unknown`. With the other one unknown, a gameday that
+ *    moved between DRAFT and published cannot be told from a deleted one. A 304 on the other
+ *    scope is fine: a move would have changed its ETag.
+ * 3. A candidate goes when no fresh scope delivered it with a tracked game (`kept`). That covers
+ *    a deleted gameday, one re-published under a new id, and one that lost our teams.
+ * 4. The main scope returning no gamedays at all while main-owned gamedays are stored is an
+ *    outage until proven otherwise: nothing is pruned and the reason is reported. The draft
+ *    scope is empty in normal operation, so it never trips this.
+ * 5. A stored game goes when its gameday is kept and the game is nowhere in `kept`, which also
+ *    removes the old row when a game is re-published under a new id. A game that moved to
+ *    another kept gameday is in `kept` and survives. The games of a deleted gameday are not
+ *    listed: the foreign key cascade removes them with their plays and live rows.
+ * 6. More than `maxGamedays` gamedays in one run deletes nothing and reports it.
+ */
+export function planPrune(input: PruneInput): PrunePlan {
+  const { historyFrom, stored, scopes, kept, maxGamedays } = input;
+  const keptGamedays = new Set(kept.gamedayIds);
+  const keptGames = new Set(kept.gameIds);
+
+  const inWindow = stored.gamedays.filter((gameday) => gameday.date >= historyFrom);
+  const ownedBy = (gameday: { readonly status: string }): ScopeKind =>
+    gameday.status === 'DRAFT' ? 'draft' : 'main';
+
+  const mainOwned = inWindow.filter((gameday) => ownedBy(gameday) === 'main');
+  if (
+    scopes.main.outcome === 'fresh' && scopes.main.gamedayIds.length === 0 && mainOwned.length > 0
+  ) {
+    return {
+      ...NOTHING,
+      skipped: `the main scope returned no gamedays while ${mainOwned.length} are stored`,
+    };
+  }
+
+  const gamedayIds = inWindow
+    .filter((gameday) => {
+      const own = ownedBy(gameday);
+      const other = own === 'main' ? 'draft' : 'main';
+      return scopes[own].outcome === 'fresh' && scopes[other].outcome !== 'unknown' &&
+        !keptGamedays.has(gameday.id);
+    })
+    .map((gameday) => gameday.id)
+    .sort((a, b) => a - b);
+
+  if (gamedayIds.length > maxGamedays) {
+    return {
+      ...NOTHING,
+      skipped: `${gamedayIds.length} gamedays would be deleted, more than the ${maxGamedays} ` +
+        `allowed per run`,
+    };
+  }
+
+  const gameIds = stored.games
+    .filter((game) => keptGamedays.has(game.gameday_id) && !keptGames.has(game.id))
+    .map((game) => game.id)
+    .sort((a, b) => a - b);
+
+  return { gamedayIds, gameIds, skipped: null };
+}
