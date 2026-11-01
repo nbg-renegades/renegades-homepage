@@ -146,10 +146,6 @@ export interface UpstreamLogEntry {
   readonly cop?: boolean;
   readonly name?: string;
   readonly isDeleted?: boolean;
-  /** When the play was entered, an ISO instant (since LeagueSphere 4.42). */
-  readonly time?: string;
-  /** A possession marker's player, e.g. the interceptor; null when none was entered. */
-  readonly player?: number | null;
   /** `td`, `pat1`, `pat2`, `OT` and free-form event names such as `Safety (+2)`. */
   readonly players: Readonly<Record<string, number | null>>;
 }
@@ -247,7 +243,12 @@ export interface UpstreamLeagueTable {
 
 // ── Parsers ──────────────────────────────────────────────────────────────────
 
-/** Log entry keys that describe the entry itself rather than an event with a jersey number. */
+/**
+ * Log entry keys that describe the entry itself rather than an event with a jersey number.
+ * `time` (an ISO instant) and a possession marker's `player` came with LeagueSphere 4.42.
+ * Nothing reads them, so they are skipped unvalidated: rejecting the snapshot over a field
+ * we ignore is how 4.42 stopped the sync.
+ */
 const ENTRY_FIELDS: ReadonlySet<string> = new Set([
   'sequence',
   'cop',
@@ -270,14 +271,16 @@ function parseLogEntry(v: Validation, path: string, raw: unknown): UpstreamLogEn
   const players: Record<string, number | null> = {};
   for (const [key, value] of Object.entries(obj)) {
     if (ENTRY_FIELDS.has(key)) continue;
+    // Any other key is an event carrying a jersey number. A known event must stay a number
+    // or null; an unknown key holding anything else, null included, is a field upstream
+    // added, not an event. Kept as a failed event, a new null field would be printed in
+    // the play-by-play.
+    if (!SCORING_EVENTS.has(key) && typeof value !== 'number') continue;
     if (value === null) {
       // A failed attempt: the event happened, nobody is credited, it scores nothing.
       players[key] = null;
       continue;
     }
-    // Any other key is an event carrying a jersey number. A known event must stay a number;
-    // an unknown key holding something else is a field upstream added, not an event.
-    if (!SCORING_EVENTS.has(key) && typeof value !== 'number') continue;
     const player = int(v, `${path}.${key}`, value);
     if (player === null) return null;
     players[key] = player;
@@ -290,12 +293,6 @@ function parseLogEntry(v: Validation, path: string, raw: unknown): UpstreamLogEn
     isDeleted: obj['isDeleted'] === undefined
       ? undefined
       : (bool(v, `${path}.isDeleted`, obj['isDeleted']) ?? undefined),
-    time: obj['time'] === undefined
-      ? undefined
-      : (str(v, `${path}.time`, obj['time']) ?? undefined),
-    player: obj['player'] === undefined
-      ? undefined
-      : nullableInt(v, `${path}.player`, obj['player']),
     players,
   };
 }
