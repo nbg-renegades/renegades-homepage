@@ -1,15 +1,8 @@
 import { assert, assertEquals } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
 import { findLeagueSeason, normaliseAddress, type LeagueSeasonConfig } from './config.ts';
+import { parseLeagueTable, parseStandings, type UpstreamStandingsBlock } from './schema.ts';
 import {
-  parseLeagueTable,
-  parseSnapshot,
-  parseStandings,
-  type UpstreamGameday,
-  type UpstreamStandingsBlock,
-} from './schema.ts';
-import {
-  computeStandings,
   mapOfficialTable,
   mapSnapshotStandings,
   standingsOutcome,
@@ -23,145 +16,11 @@ function config(key: string, season = '2026'): LeagueSeasonConfig {
   return found;
 }
 
-async function gamedaysOf(fixture: string): Promise<readonly UpstreamGameday[]> {
-  const parsed = parseSnapshot(await loadFixture(fixture));
-  assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
-  return parsed.value.gamedays;
-}
-
 async function officialOf(fixture: string, cfg: LeagueSeasonConfig) {
   const parsed = parseLeagueTable(await loadFixture(fixture));
   assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
   return { table: parsed.value, rows: mapOfficialTable(cfg, parsed.value) };
 }
-
-// ── Rules we own ─────────────────────────────────────────────────────────────
-
-Deno.test('unplayed games are skipped rather than counted as draws', () => {
-  const cfg = config('ff-bl');
-  const gameday: UpstreamGameday = {
-    id: 1,
-    name: 'FF BL Spieltag',
-    date: '2026-06-20',
-    start: '10:00',
-    league: 18,
-    league_display: 'FF BL',
-    season: 6,
-    season_display: '2026',
-    address: null,
-    status: 'PUBLISHED',
-    games: [{
-      id: 1,
-      gameday: 1,
-      scheduled: '10:00:00',
-      field: 1,
-      stage: null,
-      standing: null,
-      status: 'Geplant',
-      results: [
-        { team_id: 287, team_name: 'Nürn2', fh: null, sh: null, pa: null, isHome: true },
-        { team_id: 223, team_name: 'Königsbrunn', fh: null, sh: null, pa: null, isHome: false },
-      ],
-      log: null,
-    }],
-  };
-
-  assertEquals(computeStandings(cfg, [gameday]), []);
-});
-
-Deno.test('the winner is the side with the lower points-against', () => {
-  const cfg = config('ff-bl');
-  const gameday: UpstreamGameday = {
-    id: 1,
-    name: 'FF BL Spieltag',
-    date: '2026-06-20',
-    start: '10:00',
-    league: 18,
-    league_display: 'FF BL',
-    season: 6,
-    season_display: '2026',
-    address: null,
-    status: 'PUBLISHED',
-    games: [{
-      id: 1,
-      gameday: 1,
-      scheduled: '10:00:00',
-      field: 1,
-      stage: null,
-      standing: null,
-      status: 'beendet',
-      results: [
-        // Home scored 20 (so conceded 13), away scored 13.
-        { team_id: 287, team_name: 'Nürn2', fh: 13, sh: 7, pa: 13, isHome: true },
-        { team_id: 223, team_name: 'Kö', fh: 6, sh: 7, pa: 20, isHome: false },
-      ],
-      log: null,
-    }],
-  };
-
-  const rows = computeStandings(cfg, [gameday]);
-  const home = rows.find((r) => r.teamId === 287);
-  const away = rows.find((r) => r.teamId === 223);
-  assert(home !== undefined && away !== undefined);
-
-  assertEquals(home.s, 1);
-  assertEquals(home.n, 0);
-  assertEquals(home.ep, 20, 'points scored is the opponent’s points-against');
-  assertEquals(home.gp, 13);
-  assertEquals(home.pd, 7);
-  assertEquals(home.sq, 1);
-
-  assertEquals(away.s, 0);
-  assertEquals(away.n, 1);
-  assertEquals(away.ep, 13);
-  assertEquals(away.gp, 20);
-  assertEquals(away.sq, 0);
-});
-
-Deno.test('a draw counts half a win towards the quotient', () => {
-  const cfg = config('ff-bl');
-  const draw = (id: number): UpstreamGameday => ({
-    id,
-    name: 'FF BL Spieltag',
-    date: '2026-06-20',
-    start: '10:00',
-    league: 18,
-    league_display: 'FF BL',
-    season: 6,
-    season_display: '2026',
-    address: null,
-    status: 'PUBLISHED',
-    games: [{
-      id,
-      gameday: id,
-      scheduled: '10:00:00',
-      field: 1,
-      stage: null,
-      standing: null,
-      status: 'beendet',
-      results: [
-        { team_id: 287, team_name: 'A', fh: 7, sh: 7, pa: 14, isHome: true },
-        { team_id: 223, team_name: 'B', fh: 7, sh: 7, pa: 14, isHome: false },
-      ],
-      log: null,
-    }],
-  });
-
-  const rows = computeStandings(cfg, [draw(1)]);
-  assertEquals(rows[0].u, 1);
-  assertEquals(rows[0].sq, 0.5);
-});
-
-Deno.test('a gameday from another league or another season is ignored', async () => {
-  const cfg = config('ff-bl');
-  // The DKB DFFL fixture contains no FF BL gamedays at all.
-  assertEquals(computeStandings(cfg, await gamedaysOf('snapshot.league-dffl-2026.json')), []);
-
-  // And a 2025 FF BL gameday must not count towards 2026.
-  const gamedays = await gamedaysOf('snapshot.league-ffbl-2026.json');
-  const shifted = gamedays.map((gd) => ({ ...gd, date: gd.date.replace('2026', '2025') }));
-  assertEquals(computeStandings(cfg, shifted), []);
-});
 
 // ── The stored rows ──────────────────────────────────────────────────────────
 

@@ -28,13 +28,8 @@
  * team's table is worse than depending on upstream for it.
  */
 
-import {
-  belongsToLeagueSeason,
-  LEAGUE_KEY_BY_SLUG,
-  type LeagueSeasonConfig,
-  PROMOTION_RESTRICTED,
-} from './config.ts';
-import type { UpstreamGameday, UpstreamLeagueTable, UpstreamStandingsBlock } from './schema.ts';
+import { LEAGUE_KEY_BY_SLUG, type LeagueSeasonConfig, PROMOTION_RESTRICTED } from './config.ts';
+import type { UpstreamLeagueTable, UpstreamStandingsBlock } from './schema.ts';
 
 /** The game status upstream uses for a finished game. */
 export const FINISHED_STATUS = 'beendet';
@@ -178,113 +173,4 @@ export function standingsOutcome(rows: readonly StandingsRow[]): StandingsOutcom
     tables.set(id, table);
   }
   return { kind: 'write', tables: [...tables.values()] };
-}
-
-// ── Our own computation, used only to cross-check ─────────────────────────────
-
-export interface ComputedRow {
-  readonly teamId: number;
-  /** The short name upstream puts on a game result, e.g. `Nürn`. */
-  readonly teamName: string;
-  readonly sp: number;
-  readonly s: number;
-  readonly u: number;
-  readonly n: number;
-  readonly ep: number;
-  readonly gp: number;
-  readonly pd: number;
-  readonly sq: number;
-}
-
-/**
- * Computes a league-season table from gamedays, porting the reference's rules.
- *
- * Two corrections to that port, both established by comparing against the published table:
- *
- *  - **Only finished games count.** The reference skips a game when `final_score == null`, but
- *    `/api/snapshot/` always returns an object — `{home: 0, away: 0}` while unplayed — so that
- *    guard never fires. Three abandoned games left in `2. Halbzeit` with scores entered were
- *    being counted, which is what kept FF BL at 18/23 teams instead of 23/23.
- *  - **`pa` is points against.** The winner is the side with the *lower* `pa`, a team's own
- *    points scored are its opponent's `pa`, and its conceded points are its own `pa`.
- *
- * The caller must pass gamedays from a **league**-scoped snapshot. Scoped by team, the
- * response only contains gamedays our teams attended, so every other club in the league is
- * short of games and the table is quietly wrong.
- */
-export function computeStandings(
-  config: LeagueSeasonConfig,
-  gamedays: readonly UpstreamGameday[],
-): readonly ComputedRow[] {
-  interface Tally {
-    teamName: string;
-    sp: number;
-    s: number;
-    u: number;
-    n: number;
-    ep: number;
-    gp: number;
-  }
-
-  const tallies = new Map<number, Tally>();
-
-  for (const gameday of gamedays) {
-    if (!belongsToLeagueSeason(config, gameday)) continue;
-
-    for (const game of gameday.games) {
-      if (game.status !== FINISHED_STATUS) continue;
-      if (game.results.length < 2) continue;
-
-      const [first, second] = game.results;
-      // A placeholder fixture has rows but no teams or scores yet.
-      if (first.pa === null || second.pa === null) continue;
-      if (first.team_id === null || second.team_id === null) continue;
-
-      for (const [self, opponent] of [[first, second], [second, first]] as const) {
-        const teamId = self.team_id;
-        const selfPa = self.pa;
-        const opponentPa = opponent.pa;
-        if (teamId === null || selfPa === null || opponentPa === null) continue;
-
-        let tally = tallies.get(teamId);
-        if (tally === undefined) {
-          tally = { teamName: self.team_name ?? String(teamId), sp: 0, s: 0, u: 0, n: 0, ep: 0, gp: 0 };
-          tallies.set(teamId, tally);
-        }
-
-        tally.sp += 1;
-        tally.ep += opponentPa; // our points scored = what the opponent conceded
-        tally.gp += selfPa; // our points conceded
-        if (selfPa < opponentPa) tally.s += 1;
-        else if (selfPa === opponentPa) tally.u += 1;
-        else tally.n += 1;
-      }
-    }
-  }
-
-  const rows: ComputedRow[] = [];
-  for (const [teamId, tally] of tallies) {
-    rows.push({
-      teamId,
-      teamName: tally.teamName,
-      sp: tally.sp,
-      s: tally.s,
-      u: tally.u,
-      n: tally.n,
-      ep: tally.ep,
-      gp: tally.gp,
-      pd: tally.ep - tally.gp,
-      // A win is 2, a draw 1, out of 2 per game played. Rounded to 4 places, matching the
-      // reference; the published tables round to 3, which `diffStandings` allows for.
-      sq: round((2 * tally.s + tally.u) / (2 * tally.sp), 4),
-    });
-  }
-
-  rows.sort((a, b) => (b.sq - a.sq) || (b.pd - a.pd) || (b.ep - a.ep));
-  return rows;
-}
-
-function round(value: number, places: number): number {
-  const factor = 10 ** places;
-  return Math.round(value * factor) / factor;
 }
