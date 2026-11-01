@@ -253,3 +253,24 @@ Deno.test({
       assertEquals(rows.length, 3);
     }),
 });
+
+Deno.test({
+  name: 'selectAll reads past the 1000-row cap',
+  ignore: !enabled,
+  fn: () =>
+    withStore(async (store) => {
+      await store.saveGamedays([gameday(GAMEDAY_ID)]);
+      await store.saveGames([game(GAME_ID, GAMEDAY_ID)]);
+      const events = Array.from({ length: 1200 }, (_, index) => event(GAME_ID, index + 1));
+      await store.upsert('results_game_events', events, 'game_id,half,side,seq');
+
+      const rows = await store.selectAll<{ seq: number }>(
+        'results_game_events',
+        `select=seq&game_id=eq.${GAME_ID}&order=half,side,seq`,
+      );
+
+      assertEquals(rows.length, 1200);
+      assertEquals(rows[0].seq, 1);
+      assertEquals(rows[1199].seq, 1200);
+    }),
+});

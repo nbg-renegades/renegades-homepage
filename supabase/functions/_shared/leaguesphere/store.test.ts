@@ -115,6 +115,45 @@ Deno.test('a large batch is chunked rather than sent as one vast body', async ()
   assertEquals((calls[2].body as unknown[]).length, 200);
 });
 
+// ── Paged reads ──────────────────────────────────────────────────────────────
+
+function jsonPage(rows: number): Response {
+  return new Response(JSON.stringify(Array.from({ length: rows }, (_, i) => ({ id: i }))), {
+    status: 200,
+  });
+}
+
+Deno.test('selectAll pages until an empty page', async () => {
+  const { store, calls } = storeWith([jsonPage(500), jsonPage(500), jsonPage(274), jsonPage(0)]);
+
+  const rows = await store.selectAll('results_games', 'select=id&order=id');
+
+  assertEquals(rows.length, 1274);
+  assertEquals(calls.map((call) => call.method), ['GET', 'GET', 'GET', 'GET']);
+  assertEquals(calls.map((call) => call.path), [
+    '/results_games?select=id&order=id&limit=500&offset=0',
+    '/results_games?select=id&order=id&limit=500&offset=500',
+    '/results_games?select=id&order=id&limit=500&offset=1000',
+    '/results_games?select=id&order=id&limit=500&offset=1274',
+  ]);
+});
+
+Deno.test('selectAll keeps paging when the server caps below the page size', async () => {
+  const { store, calls } = storeWith([jsonPage(300), jsonPage(300), jsonPage(0)]);
+
+  const rows = await store.selectAll('results_games', 'select=id&order=id');
+
+  // A short page does not mean the last one: PostgREST may be configured with a lower cap.
+  assertEquals(rows.length, 600);
+  assertEquals(calls.length, 3);
+});
+
+Deno.test('selectAll fails loudly on a non-array page', async () => {
+  const { store } = storeWith([new Response('{"message":"nope"}', { status: 200 })]);
+
+  await assertRejects(() => store.selectAll('results_games', 'select=id&order=id'), StoreError);
+});
+
 // ── Replace semantics ────────────────────────────────────────────────────────
 
 /**
