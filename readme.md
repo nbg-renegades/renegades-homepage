@@ -425,11 +425,6 @@ the other end.
 
 ### Things that will bite you
 
-- **`league` and `season` in `/api/snapshot/` are primary keys, not names.** `season=2026` is a
-  400; the 2026 season is id `6`. The league ids are in
-  `supabase/functions/_shared/leaguesphere/config.ts`.
-- **`/api/league-table/` takes slugs, and they are not our config keys.** The first team's league
-  is `dffl`; `dkb-dffl` is a 404.
 - **`final_score` is never null** — it is `{home: 0, away: 0}` for a game nobody has played. Use
   `status === 'beendet'`.
 - **`pa` is points *against*.** A team's own score is `fh + sh`, which is its opponent's `pa`.
@@ -451,28 +446,14 @@ points by games played, DKB DFFL by a fixed 30 and weights a win by the opponent
 rulesets and the per-team adjustments are admin configuration upstream that no public endpoint
 exposes, so figures of our own would be wrong for DKB DFFL.
 
-### Adding a league season
+### Adding a league
 
-Add an entry to `LEAGUE_SEASONS` in `supabase/functions/_shared/leaguesphere/config.ts`:
-
-```ts
-{
-  key: 'ff-bl',              // ours; appears in results_standings.league_key
-  season: '2027',
-  leaguePk: 18,              // /api/snapshot/?league=
-  seasonPk: 7,               // /api/snapshot/?season=  — a PK, not a year
-  leagueDisplay: 'FF BL',    // the only league name a gameday carries
-  tableSlug: 'ff-bl',        // /api/league-table/<slug>/<season>/
-  name: 'FF BL 2027',
-  excludeGamedayIds: [],     // playoff gamedays that must not count
-  promotionRestricted: [],   // second teams, greyed out in the table
-  standingsSource: 'official',
-}
-```
-
-Then map the team to it in `src/app/components/results/results.config.ts`. Find the primary keys
-by fetching one gameday of that league and reading its `league` and `season` fields. Deploy the
-function afterwards — the config ships inside it.
+Add the upstream league slug to `LEAGUE_KEY_BY_SLUG` in
+`supabase/functions/_shared/leaguesphere/config.ts`, with the key the frontend reads. The season
+needs no entry: it comes from the snapshot. List a league's second teams, which cannot be
+promoted, in `PROMOTION_RESTRICTED` under `<league_key>:<season>`. Then map the team to it in
+`src/app/components/results/results.config.ts` and deploy the function afterwards, because the
+config ships inside it.
 
 ### Team names and logos
 

@@ -535,7 +535,7 @@ function num(v: Validation, path: string, value: unknown): number | null {
   return value;
 }
 
-/** A row of the snapshot's `standings`: the league-table columns plus upstream's own order. */
+/** A row of the snapshot's `standings`: the table columns plus upstream's own order. */
 export interface UpstreamSnapshotStandingRow extends UpstreamStandingRow {
   readonly group: string;
   readonly rank: number;

@@ -90,7 +90,6 @@ Deno.serve({ port }, (req) => {
     }
     return json(currentSnapshot());
   }
-  if (url.pathname.startsWith('/api/league-table/')) return json(emptyTable(url.pathname));
 
   return new Response('not found', { status: 404 });
 });
@@ -193,17 +192,6 @@ function emptyLog() {
     secondhalf: { score: 0, entries: [] },
   });
   return { gameId, isFirstHalf: false, home: side(159, 'Nürn'), away: side(112, 'LLions') };
-}
-
-function emptyTable(pathname: string) {
-  const [, , , slug = 'dffl', season = '2026'] = pathname.split('/');
-  return {
-    league: { slug, name: slug },
-    season: { slug: season, name: season },
-    // Empty on purpose: the sync refuses to overwrite a good table with an empty one, so a
-    // replay cannot wipe the standings it is not testing.
-    standing: [],
-  };
 }
 
 /** Mirrors `tickPoints` in `_shared/leaguesphere/scoring.ts`. */

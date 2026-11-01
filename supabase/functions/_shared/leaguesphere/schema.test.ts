@@ -22,8 +22,6 @@ Deno.test('every recorded snapshot parses', async () => {
     'snapshot.teams-159-287-with-time.json',
     'snapshot.teams-159-287-since-2023.json',
     'snapshot.synthetic-ot-safety1.json',
-    'snapshot.league-ffbl-2026.json',
-    'snapshot.league-dffl-2026.json',
     'snapshot.status-draft-empty.json',
     'snapshot.synthetic-draft-gameday.json',
     'snapshot.synthetic-empty-status-gameday.json',
@@ -171,7 +169,6 @@ Deno.test('a standings row missing a column is rejected', async () => {
 
 Deno.test('an error response body is rejected rather than read as data', async () => {
   // Recorded 400/404 bodies. A caller that ignored the status code must still not get rows.
-  assert(!parseSnapshot(await loadFixture('snapshot.error-unknown-season-pk.json')).ok);
   assert(!parseSnapshot(await loadFixture('snapshot.error-unknown-status.json')).ok);
 });
 

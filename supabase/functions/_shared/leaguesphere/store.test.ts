@@ -413,7 +413,7 @@ Deno.test('every sync-state row maps to the budget its calls spend', () => {
   assertEquals(endpointForSource('snapshot:draft'), 'snapshot');
   assertEquals(endpointForSource('snapshot:league:ff-bl:2026'), 'snapshot');
   assertEquals(endpointForSource('snapshot:standings'), 'snapshot-standings');
-  assertEquals(endpointForSource('league-table:ff-bl:2026'), 'league-table');
+  assertEquals(endpointForSource('league-table:ff-bl:2026'), null);
   assertEquals(endpointForSource('liveticker'), 'liveticker');
   assertEquals(endpointForSource('something-else'), null);
 });
@@ -475,13 +475,6 @@ Deno.test('sync state loads into a map keyed by source', async () => {
   assertEquals(state.size, 2);
   assertEquals(state.get('snapshot:teams')?.etag, 'abc');
   assertEquals(state.get('liveticker')?.last_ok_at, null);
-});
-
-Deno.test('the league-scoped sources are distinct per league season', () => {
-  assertEquals(SYNC_SOURCES.leagueTable('ff-bl', '2026'), 'league-table:ff-bl:2026');
-  assertEquals(SYNC_SOURCES.leagueSnapshot('dkb-dffl', '2026'), 'snapshot:league:dkb-dffl:2026');
-  // One league season failing must not look like another one succeeding.
-  assert(SYNC_SOURCES.leagueTable('ff-bl', '2026') !== SYNC_SOURCES.leagueTable('dkb-dffl', '2026'));
 });
 
 Deno.test('every task maps to a source', () => {

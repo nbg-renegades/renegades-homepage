@@ -436,8 +436,6 @@ export const SYNC_SOURCES = {
   draftSnapshot: 'snapshot:draft',
   standingsSnapshot: 'snapshot:standings',
   liveticker: 'liveticker',
-  leagueSnapshot: (key: string, season: string) => `snapshot:league:${key}:${season}`,
-  leagueTable: (key: string, season: string) => `league-table:${key}:${season}`,
 } as const;
 
 /**
@@ -458,7 +456,6 @@ export const BUDGET_SOURCES: Readonly<Record<SnapshotBucket, string>> = {
 export function endpointForSource(source: string): Endpoint | null {
   if (source === SYNC_SOURCES.standingsSnapshot) return 'snapshot-standings';
   if (source.startsWith('snapshot:')) return 'snapshot';
-  if (source.startsWith('league-table')) return 'league-table';
   if (source === SYNC_SOURCES.liveticker) return 'liveticker';
   return null;
 }
