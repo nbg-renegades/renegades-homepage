@@ -80,3 +80,33 @@ export function gamesWithLogs(gamedays: readonly UpstreamGameday[]): readonly Up
   }
   return [...games.values()];
 }
+
+// ── Scopes ───────────────────────────────────────────────────────────────────
+
+/** The two snapshot calls: everything but drafts, then `status=DRAFT`. */
+export type ScopeKind = 'main' | 'draft';
+
+/**
+ * What a scope told us this run. Only `fresh` is evidence of absence: `unchanged` (a 304) says
+ * nothing has changed since the last 200, and `unknown` (429, cap, error, rejected payload)
+ * says nothing at all.
+ */
+export type ScopeOutcome = 'fresh' | 'unchanged' | 'unknown';
+
+export interface ScopeResult {
+  readonly outcome: ScopeOutcome;
+  /** Every gameday id the scope's payload held; empty unless `fresh`. */
+  readonly gamedayIds: readonly number[];
+}
+
+/**
+ * Whether the live tables may be pruned to today's games.
+ *
+ * Today's game ids come from this run's fresh payloads. When the main scope was a 304 and only
+ * the draft scope answered, they come out empty, and an empty keep list clears every live row,
+ * including a running game's, until the liveticker refills it. Only a fresh main scope sees
+ * today's games, so only then is the list trustworthy.
+ */
+export function livePruneAllowed(scopes: Readonly<Record<ScopeKind, ScopeResult>>): boolean {
+  return scopes.main.outcome === 'fresh';
+}
