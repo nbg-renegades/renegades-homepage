@@ -28,14 +28,15 @@ traffic is **120/min per IP**.
 
 ## Synthetic fixtures
 
-Two cases the brief asks for do not exist upstream right now. They are derived from real
-gameday 852 with one field changed, carry a `_synthetic` key explaining exactly what was
-changed and why, and must be replaced with real recordings if such a gameday ever appears.
+Cases that do not exist upstream right now are derived from a real gameday with a minimal
+change, carry a `_synthetic` key explaining exactly what was changed and why, and must be
+replaced with real recordings if such a case ever appears.
 
 | File | What was forced |
 | --- | --- |
 | `snapshot.synthetic-draft-gameday.json` | `status: "DRAFT"`. No DRAFT gameday exists for teams 159/287 as of 2026-09-27. |
 | `snapshot.synthetic-empty-status-gameday.json` | `status: ""`. Every gameday for our teams is currently `PUBLISHED`. |
+| `snapshot.synthetic-ot-safety1.json` | Real gameday 632 / game 7272 (from the since-2023 recording) with two home second-half entries added, `OT: 23` and `Safety (+1): 8`, and every reported home total raised by 2. Neither event occurs in any recorded game of teams 159/287 as of 2026-10-29. |
 
 ## Facts these recordings pin down
 
@@ -49,6 +50,9 @@ changed and why, and must be replaced with real recordings if such a gameday eve
   closed enum.
 - **Log entries** are grouped by `sequence` and carry player numbers as values. Player number `0`
   occurs, so presence must be tested with a null check, never truthiness.
-- **Points**, validated against all 1500 upstream half-scores with zero mismatches:
+- **Points**, validated against all 1500 upstream half-scores with zero mismatches, and against
+  the 492 halves of the 123 tracked games in `snapshot.teams-159-287-since-2023.json`:
   `td` → 6, `pat1` non-null → 1, `pat2` non-null → 2, `Safety (+2)` non-null → 2,
   `cop: true` → 0 (possession marker), and any entry with `isDeleted: true` contributes 0.
+  `OT` non-null → 1 and `Safety (+1)` non-null → 1 come from upstream's own table
+  (`SCORING_EVENT_VALUES`) and are proven on the synthetic fixture only.

@@ -259,7 +259,14 @@ const ENTRY_FIELDS: ReadonlySet<string> = new Set([
 ]);
 
 /** Events whose value we read as a jersey number, so a retyped value is a breakage. */
-const SCORING_EVENTS: ReadonlySet<string> = new Set(['td', 'pat1', 'pat2', 'OT', 'Safety (+2)']);
+const SCORING_EVENTS: ReadonlySet<string> = new Set([
+  'td',
+  'pat1',
+  'pat2',
+  'OT',
+  'Safety (+1)',
+  'Safety (+2)',
+]);
 
 function parseLogEntry(v: Validation, path: string, raw: unknown): UpstreamLogEntry | null {
   const obj = record(v, path, raw);
