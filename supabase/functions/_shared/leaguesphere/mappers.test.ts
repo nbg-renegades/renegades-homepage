@@ -185,6 +185,19 @@ Deno.test('an unknown scoring event is reported as a disagreement, not swallowed
 
 // ── The whole snapshot ───────────────────────────────────────────────────────
 
+Deno.test('the 4.42 log fields change no stored row', async () => {
+  // Same four gamedays, recorded before (2026-09-27) and after (2026-10-28) upstream added
+  // `time` and the marker `player`. Their logs are otherwise identical, so the first sync
+  // after the deploy must rewrite nothing.
+  const after = parseSnapshot(await loadFixture('snapshot.teams-159-287-with-time.json'));
+  assert(after.ok, after.ok ? '' : after.errors.join('; '));
+
+  const before = mapTeamSnapshot(await teamSnapshot(), '2026-09-27');
+  const now = mapTeamSnapshot(after.value.gamedays, '2026-09-27');
+  assertEquals(now.events, before.events);
+  assertEquals(now.disagreements, []);
+});
+
 Deno.test('mapping a team snapshot keeps only our games', async () => {
   const gamedays = await teamSnapshot();
   const mapped = mapTeamSnapshot(gamedays, '2026-09-27');

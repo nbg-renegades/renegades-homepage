@@ -1,0 +1,5996 @@
+{
+ "schema_version": 1,
+ "generated_at": "2026-10-28T19:17:06.464317+00:00",
+ "scope": {
+  "league": null,
+  "season": [
+   6
+  ],
+  "team": [
+   159,
+   287
+  ],
+  "date_from": null,
+  "date_to": null,
+  "status": null,
+  "include": [
+   "games",
+   "logs"
+  ],
+  "count": 4
+ },
+ "gamedays": [
+  {
+   "id": 645,
+   "name": "Nürnberg Renegades",
+   "season": 6,
+   "season_display": "2026",
+   "league": 7,
+   "league_display": "DKB DFFL",
+   "date": "2026-05-09",
+   "start": "10:00",
+   "format": "CUSTOM",
+   "author": 10,
+   "address": "Hofer Straße 30, 90411 Nürnberg",
+   "status": "PUBLISHED",
+   "has_designer_state": false,
+   "games": [
+    {
+     "id": 7372,
+     "gameday": 645,
+     "scheduled": "10:00:00",
+     "field": 1,
+     "officials": 159,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14567,
+       "team_id": 20,
+       "team_name": "Spatz",
+       "fh": 20,
+       "sh": 14,
+       "pa": 32,
+       "isHome": true
+      },
+      {
+       "id": 14568,
+       "team_id": 48,
+       "team_name": "Kelk",
+       "fh": 20,
+       "sh": 12,
+       "pa": 34,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 20,
+      "away": 20
+     },
+     "final_score": {
+      "home": 34,
+      "away": 32
+     },
+     "log": {
+      "gameId": 7372,
+      "isFirstHalf": false,
+      "home": {
+       "id": 20,
+       "name": "Spatz",
+       "score": 34,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 5,
+          "time": "2026-05-09T08:34:10.387499+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T08:21:58.881349+00:00"
+         },
+         {
+          "sequence": 3,
+          "td": 44,
+          "time": "2026-05-09T08:15:13.402551+00:00",
+          "pat2": 5
+         },
+         {
+          "sequence": 1,
+          "td": 14,
+          "time": "2026-05-09T08:08:03.105910+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 44,
+          "time": "2026-05-09T09:02:22.895568+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "td": 4,
+          "time": "2026-05-09T08:46:25.484468+00:00",
+          "pat2": 5
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 48,
+       "name": "Kelk",
+       "score": 32,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 4,
+          "time": "2026-05-09T08:28:49.267257+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 4,
+          "td": 15,
+          "time": "2026-05-09T08:19:03.471652+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 26,
+          "time": "2026-05-09T08:13:09.382700+00:00",
+          "pat2": 26
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 22,
+          "time": "2026-05-09T08:55:07.410109+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 8,
+          "td": 4,
+          "time": "2026-05-09T08:42:48.356101+00:00",
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7373,
+     "gameday": 645,
+     "scheduled": "10:00:00",
+     "field": 2,
+     "officials": 243,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14569,
+       "team_id": 22,
+       "team_name": "Lions",
+       "fh": 7,
+       "sh": 7,
+       "pa": 42,
+       "isHome": true
+      },
+      {
+       "id": 14570,
+       "team_id": 30,
+       "team_name": "Wall",
+       "fh": 28,
+       "sh": 14,
+       "pa": 14,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 7,
+      "away": 28
+     },
+     "final_score": {
+      "home": 14,
+      "away": 42
+     },
+     "log": {
+      "gameId": 7373,
+      "isFirstHalf": true,
+      "home": {
+       "id": 22,
+       "name": "Lions",
+       "score": 14,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T08:43:10.120001+00:00"
+         },
+         {
+          "sequence": 3,
+          "td": 80,
+          "time": "2026-05-09T08:42:21.330941+00:00",
+          "pat1": 25
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T08:41:22.443247+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 80,
+          "time": "2026-05-09T08:48:21.055371+00:00",
+          "pat1": 2
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 30,
+       "name": "Wall",
+       "score": 42,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 3,
+          "time": "2026-05-09T08:43:30.426382+00:00",
+          "pat2": 0
+         },
+         {
+          "sequence": 6,
+          "td": 3,
+          "time": "2026-05-09T08:43:07.134002+00:00",
+          "pat2": 77
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception",
+          "player": 96,
+          "time": "2026-05-09T08:42:54.182815+00:00"
+         },
+         {
+          "sequence": 4,
+          "td": 3,
+          "time": "2026-05-09T08:42:45.257659+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "td": 3,
+          "time": "2026-05-09T08:41:31.797064+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 23,
+          "time": "2026-05-09T08:53:45.563944+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 9,
+          "td": 17,
+          "time": "2026-05-09T08:44:13.685277+00:00",
+          "pat2": 0
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7374,
+     "gameday": 645,
+     "scheduled": "11:10:00",
+     "field": 1,
+     "officials": 20,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14571,
+       "team_id": 112,
+       "team_name": "LLions",
+       "fh": 28,
+       "sh": 24,
+       "pa": 32,
+       "isHome": true
+      },
+      {
+       "id": 14572,
+       "team_id": 159,
+       "team_name": "Nürn",
+       "fh": 19,
+       "sh": 13,
+       "pa": 52,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 28,
+      "away": 19
+     },
+     "final_score": {
+      "home": 52,
+      "away": 32
+     },
+     "log": {
+      "gameId": 7374,
+      "isFirstHalf": true,
+      "home": {
+       "id": 112,
+       "name": "LLions",
+       "score": 52,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 3,
+          "time": "2026-05-09T09:51:53.399540+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "td": 3,
+          "time": "2026-05-09T09:42:04.457224+00:00",
+          "pat2": 19
+         },
+         {
+          "sequence": 4,
+          "td": 19,
+          "time": "2026-05-09T09:36:57.922079+00:00",
+          "pat2": 3
+         },
+         {
+          "sequence": 2,
+          "td": 30,
+          "time": "2026-05-09T09:29:11.384536+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception",
+          "player": 26,
+          "time": "2026-05-09T09:25:58.130684+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 24,
+        "entries": [
+         {
+          "sequence": 18,
+          "td": 19,
+          "time": "2026-05-09T10:26:27.028150+00:00",
+          "pat2": 19
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Interception",
+          "player": 26,
+          "time": "2026-05-09T10:21:58.179164+00:00"
+         },
+         {
+          "sequence": 16,
+          "td": 3,
+          "time": "2026-05-09T10:21:22.543977+00:00",
+          "pat2": 30
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T10:14:01.364559+00:00"
+         },
+         {
+          "sequence": 11,
+          "td": 1,
+          "time": "2026-05-09T10:03:11.351418+00:00",
+          "pat2": 30
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception",
+          "player": 22,
+          "time": "2026-05-09T09:59:46.966640+00:00"
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T09:58:29.696529+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 159,
+       "name": "Nürn",
+       "score": 32,
+       "firsthalf": {
+        "score": 19,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 8,
+          "time": "2026-05-09T09:46:19.631054+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 5,
+          "td": 18,
+          "time": "2026-05-09T09:40:49.144083+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "td": 23,
+          "time": "2026-05-09T09:33:18.427851+00:00",
+          "pat1": 8
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 0,
+          "time": "2026-05-09T10:18:14.969393+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 13,
+          "td": 8,
+          "time": "2026-05-09T10:09:13.569388+00:00",
+          "pat1": 18
+         },
+         {
+          "sequence": 12,
+          "td": 8,
+          "isDeleted": true,
+          "time": "2026-05-09T10:07:37.569353+00:00",
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7375,
+     "gameday": 645,
+     "scheduled": "11:10:00",
+     "field": 2,
+     "officials": 22,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14573,
+       "team_id": 115,
+       "team_name": "Dukes",
+       "fh": 6,
+       "sh": 0,
+       "pa": 46,
+       "isHome": true
+      },
+      {
+       "id": 14574,
+       "team_id": 243,
+       "team_name": "Erlangen",
+       "fh": 26,
+       "sh": 20,
+       "pa": 6,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 26
+     },
+     "final_score": {
+      "home": 6,
+      "away": 46
+     },
+     "log": {
+      "gameId": 7375,
+      "isFirstHalf": false,
+      "home": {
+       "id": 115,
+       "name": "Dukes",
+       "score": 6,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T09:53:56.583590+00:00"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T09:35:51.341139+00:00"
+         },
+         {
+          "sequence": 2,
+          "td": 24,
+          "time": "2026-05-09T09:29:11.510268+00:00",
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T10:19:12.987986+00:00"
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T10:05:55.408675+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 243,
+       "name": "Erlangen",
+       "score": 46,
+       "firsthalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 4,
+          "time": "2026-05-09T09:46:52.240330+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Interception",
+          "player": 44,
+          "time": "2026-05-09T09:42:53.749135+00:00"
+         },
+         {
+          "sequence": 5,
+          "td": 23,
+          "time": "2026-05-09T09:40:44.683363+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "td": 23,
+          "time": "2026-05-09T09:31:04.877364+00:00",
+          "pat2": 23
+         },
+         {
+          "sequence": 1,
+          "td": 5,
+          "time": "2026-05-09T09:26:02.417478+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 23,
+          "time": "2026-05-09T10:15:16.800074+00:00",
+          "pat2": 5
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Interception",
+          "player": 29,
+          "time": "2026-05-09T10:12:05.908086+00:00"
+         },
+         {
+          "sequence": 12,
+          "td": 23,
+          "time": "2026-05-09T10:09:21.187318+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 10,
+          "td": 23,
+          "time": "2026-05-09T10:03:18.093571+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception",
+          "player": 29,
+          "time": "2026-05-09T10:00:49.856616+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7376,
+     "gameday": 645,
+     "scheduled": "12:20:00",
+     "field": 2,
+     "officials": 112,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14575,
+       "team_id": 30,
+       "team_name": "Wall",
+       "fh": 12,
+       "sh": 14,
+       "pa": 6,
+       "isHome": true
+      },
+      {
+       "id": 14576,
+       "team_id": 20,
+       "team_name": "Spatz",
+       "fh": 6,
+       "sh": 0,
+       "pa": 26,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 12,
+      "away": 6
+     },
+     "final_score": {
+      "home": 26,
+      "away": 6
+     },
+     "log": {
+      "gameId": 7376,
+      "isFirstHalf": false,
+      "home": {
+       "id": 30,
+       "name": "Wall",
+       "score": 26,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 4,
+          "td": 3,
+          "time": "2026-05-09T10:53:21.511574+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 3,
+          "time": "2026-05-09T10:40:53.808324+00:00",
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception",
+          "player": 32,
+          "time": "2026-05-09T11:31:17.833236+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 3,
+          "time": "2026-05-09T11:26:13.815862+00:00",
+          "pat2": 3
+         },
+         {
+          "sequence": 8,
+          "td": 0,
+          "time": "2026-05-09T11:13:04.088700+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T11:03:59.432487+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 20,
+       "name": "Spatz",
+       "score": 6,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T10:56:33.991603+00:00"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T10:45:36.178072+00:00"
+         },
+         {
+          "sequence": 1,
+          "td": 44,
+          "time": "2026-05-09T10:38:51.831025+00:00",
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T11:17:27.372078+00:00"
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T11:06:45.589115+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7377,
+     "gameday": 645,
+     "scheduled": "12:20:00",
+     "field": 1,
+     "officials": 115,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14577,
+       "team_id": 48,
+       "team_name": "Kelk",
+       "fh": 8,
+       "sh": 8,
+       "pa": 33,
+       "isHome": true
+      },
+      {
+       "id": 14578,
+       "team_id": 22,
+       "team_name": "Lions",
+       "fh": 21,
+       "sh": 12,
+       "pa": 16,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 8,
+      "away": 21
+     },
+     "final_score": {
+      "home": 16,
+      "away": 33
+     },
+     "log": {
+      "gameId": 7377,
+      "isFirstHalf": true,
+      "home": {
+       "id": 48,
+       "name": "Kelk",
+       "score": 16,
+       "firsthalf": {
+        "score": 8,
+        "entries": [
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T11:01:59.894804+00:00"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T10:52:34.138089+00:00"
+         },
+         {
+          "sequence": 2,
+          "td": 22,
+          "time": "2026-05-09T10:43:54.072591+00:00",
+          "pat2": 15
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 8,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 4,
+          "time": "2026-05-09T11:14:16.903940+00:00",
+          "pat2": 15
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T11:06:04.429306+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 22,
+       "name": "Lions",
+       "score": 33,
+       "firsthalf": {
+        "score": 21,
+        "entries": [
+         {
+          "sequence": 5,
+          "td": 25,
+          "time": "2026-05-09T10:57:12.997145+00:00",
+          "pat1": 80
+         },
+         {
+          "sequence": 3,
+          "td": 2,
+          "time": "2026-05-09T10:49:41.994891+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 1,
+          "td": 5,
+          "time": "2026-05-09T10:37:54.175092+00:00",
+          "pat2": 25
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 12,
+          "td": 80,
+          "time": "2026-05-09T11:27:16.476549+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception",
+          "player": 72,
+          "time": "2026-05-09T11:20:03.283329+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 5,
+          "time": "2026-05-09T11:18:20.404457+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T11:09:21.070575+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7378,
+     "gameday": 645,
+     "scheduled": "13:30:00",
+     "field": 2,
+     "officials": 30,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14579,
+       "team_id": 159,
+       "team_name": "Nürn",
+       "fh": 13,
+       "sh": 7,
+       "pa": 27,
+       "isHome": true
+      },
+      {
+       "id": 14580,
+       "team_id": 115,
+       "team_name": "Dukes",
+       "fh": 12,
+       "sh": 15,
+       "pa": 20,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 13,
+      "away": 12
+     },
+     "final_score": {
+      "home": 20,
+      "away": 27
+     },
+     "log": {
+      "gameId": 7378,
+      "isFirstHalf": true,
+      "home": {
+       "id": 159,
+       "name": "Nürn",
+       "score": 20,
+       "firsthalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T12:08:37.423024+00:00"
+         },
+         {
+          "sequence": 7,
+          "td": 8,
+          "time": "2026-05-09T12:03:44.533773+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T11:57:44.378652+00:00"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception",
+          "player": 17,
+          "time": "2026-05-09T11:52:59.406401+00:00"
+         },
+         {
+          "sequence": 2,
+          "td": 18,
+          "time": "2026-05-09T11:49:41.296328+00:00",
+          "pat1": 18
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T12:30:12.039331+00:00"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T12:22:14.967681+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 8,
+          "time": "2026-05-09T12:12:33.669431+00:00",
+          "pat1": 23
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 115,
+       "name": "Dukes",
+       "score": 27,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 24,
+          "time": "2026-05-09T12:06:35.121718+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T11:59:54.576229+00:00"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Interception",
+          "player": 17,
+          "isDeleted": true,
+          "time": "2026-05-09T11:55:11.661511+00:00"
+         },
+         {
+          "sequence": 1,
+          "td": 4,
+          "time": "2026-05-09T11:44:59.592279+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 15,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 14,
+          "time": "2026-05-09T12:26:57.965139+00:00",
+          "pat1": 31
+         },
+         {
+          "sequence": 11,
+          "td": 31,
+          "time": "2026-05-09T12:17:33.197879+00:00",
+          "pat2": 24
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7379,
+     "gameday": 645,
+     "scheduled": "13:30:00",
+     "field": 1,
+     "officials": 48,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14581,
+       "team_id": 243,
+       "team_name": "Erlangen",
+       "fh": 32,
+       "sh": 14,
+       "pa": 52,
+       "isHome": true
+      },
+      {
+       "id": 14582,
+       "team_id": 112,
+       "team_name": "LLions",
+       "fh": 30,
+       "sh": 22,
+       "pa": 46,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 32,
+      "away": 30
+     },
+     "final_score": {
+      "home": 46,
+      "away": 52
+     },
+     "log": {
+      "gameId": 7379,
+      "isFirstHalf": true,
+      "home": {
+       "id": 243,
+       "name": "Erlangen",
+       "score": 46,
+       "firsthalf": {
+        "score": 32,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 23,
+          "time": "2026-05-09T12:09:35.398580+00:00",
+          "pat2": 23
+         },
+         {
+          "sequence": 5,
+          "td": 23,
+          "time": "2026-05-09T12:03:53.648365+00:00",
+          "pat2": 11
+         },
+         {
+          "sequence": 3,
+          "td": 5,
+          "time": "2026-05-09T11:56:52.834731+00:00",
+          "pat2": 22
+         },
+         {
+          "sequence": 1,
+          "td": 9,
+          "time": "2026-05-09T11:48:54.933267+00:00",
+          "pat2": 5
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 23,
+          "time": "2026-05-09T12:36:35.050916+00:00",
+          "pat2": 23
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T12:31:41.016628+00:00"
+         },
+         {
+          "sequence": 11,
+          "td": 23,
+          "time": "2026-05-09T12:23:57.871713+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception",
+          "player": 29,
+          "time": "2026-05-09T12:17:50.085100+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 112,
+       "name": "LLions",
+       "score": 52,
+       "firsthalf": {
+        "score": 30,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 19,
+          "time": "2026-05-09T12:12:51.617052+00:00",
+          "pat2": 1
+         },
+         {
+          "sequence": 7,
+          "td": 19,
+          "time": "2026-05-09T12:07:54.417495+00:00",
+          "pat2": 19
+         },
+         {
+          "sequence": 6,
+          "td": 19,
+          "isDeleted": true,
+          "time": "2026-05-09T12:07:15.471578+00:00",
+          "pat1": 19
+         },
+         {
+          "sequence": 4,
+          "td": 30,
+          "time": "2026-05-09T12:00:33.335619+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 3,
+          "time": "2026-05-09T11:52:04.343879+00:00",
+          "pat2": 3
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 22,
+        "entries": [
+         {
+          "sequence": 17,
+          "Safety (+2)": 2,
+          "time": "2026-05-09T12:44:08.543289+00:00"
+         },
+         {
+          "sequence": 16,
+          "td": 1,
+          "time": "2026-05-09T12:41:09.115857+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 14,
+          "td": 30,
+          "time": "2026-05-09T12:33:37.053748+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 12,
+          "td": 19,
+          "time": "2026-05-09T12:29:16.840625+00:00",
+          "pat2": 1
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7380,
+     "gameday": 645,
+     "scheduled": "14:40:00",
+     "field": 1,
+     "officials": 20,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14583,
+       "team_id": 115,
+       "team_name": "Dukes",
+       "fh": 19,
+       "sh": 13,
+       "pa": 46,
+       "isHome": true
+      },
+      {
+       "id": 14584,
+       "team_id": 30,
+       "team_name": "Wall",
+       "fh": 28,
+       "sh": 18,
+       "pa": 32,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 19,
+      "away": 28
+     },
+     "final_score": {
+      "home": 32,
+      "away": 46
+     },
+     "log": {
+      "gameId": 7380,
+      "isFirstHalf": true,
+      "home": {
+       "id": 115,
+       "name": "Dukes",
+       "score": 32,
+       "firsthalf": {
+        "score": 19,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 14,
+          "time": "2026-05-09T13:22:32.214946+00:00",
+          "pat1": 4
+         },
+         {
+          "sequence": 6,
+          "td": 24,
+          "time": "2026-05-09T13:14:59.499925+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 4,
+          "time": "2026-05-09T13:06:08.506747+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T12:58:07.984505+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 4,
+          "time": "2026-05-09T13:54:08.812566+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Interception",
+          "player": 15,
+          "time": "2026-05-09T13:51:33.561502+00:00"
+         },
+         {
+          "sequence": 13,
+          "td": 4,
+          "time": "2026-05-09T13:48:33.457635+00:00",
+          "pat1": 14
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T13:40:44.731777+00:00"
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T13:31:41.692841+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 30,
+       "name": "Wall",
+       "score": 46,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 18,
+          "time": "2026-05-09T13:17:11.063435+00:00",
+          "pat2": 3
+         },
+         {
+          "sequence": 5,
+          "td": 0,
+          "time": "2026-05-09T13:09:24.834861+00:00",
+          "pat2": 0
+         },
+         {
+          "sequence": 3,
+          "td": 0,
+          "time": "2026-05-09T13:01:28.011269+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 1,
+          "td": 0,
+          "time": "2026-05-09T12:55:51.699233+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 3,
+          "time": "2026-05-09T13:55:54.622526+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 12,
+          "td": 3,
+          "time": "2026-05-09T13:44:55.484831+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 10,
+          "td": 77,
+          "time": "2026-05-09T13:35:22.025609+00:00",
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7381,
+     "gameday": 645,
+     "scheduled": "14:40:00",
+     "field": 2,
+     "officials": 22,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14585,
+       "team_id": 112,
+       "team_name": "LLions",
+       "fh": 28,
+       "sh": 15,
+       "pa": 40,
+       "isHome": true
+      },
+      {
+       "id": 14586,
+       "team_id": 48,
+       "team_name": "Kelk",
+       "fh": 20,
+       "sh": 20,
+       "pa": 43,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 28,
+      "away": 20
+     },
+     "final_score": {
+      "home": 43,
+      "away": 40
+     },
+     "log": {
+      "gameId": 7381,
+      "isFirstHalf": false,
+      "home": {
+       "id": 112,
+       "name": "LLions",
+       "score": 43,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 30,
+          "time": "2026-05-09T13:16:25.416435+00:00",
+          "pat2": 1
+         },
+         {
+          "sequence": 5,
+          "td": 3,
+          "time": "2026-05-09T13:08:33.859689+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "td": 1,
+          "time": "2026-05-09T13:02:25.343601+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 1,
+          "td": 30,
+          "time": "2026-05-09T12:56:45.809539+00:00",
+          "pat2": 19
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 15,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 30,
+          "time": "2026-05-09T13:35:20.070904+00:00",
+          "pat2": 19
+         },
+         {
+          "sequence": 9,
+          "td": 1,
+          "time": "2026-05-09T13:30:03.196546+00:00",
+          "pat1": 30
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 48,
+       "name": "Kelk",
+       "score": 40,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 26,
+          "time": "2026-05-09T13:14:44.356377+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 26,
+          "time": "2026-05-09T13:06:08.799126+00:00",
+          "pat2": 26
+         },
+         {
+          "sequence": 2,
+          "td": 15,
+          "time": "2026-05-09T12:58:18.008209+00:00",
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 12,
+          "td": 4,
+          "time": "2026-05-09T13:41:22.057946+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 10,
+          "td": 4,
+          "time": "2026-05-09T13:33:53.500917+00:00",
+          "pat2": 26
+         },
+         {
+          "sequence": 8,
+          "td": 4,
+          "time": "2026-05-09T13:26:50.019707+00:00",
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7382,
+     "gameday": 645,
+     "scheduled": "15:50:00",
+     "field": 1,
+     "officials": 115,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14587,
+       "team_id": 159,
+       "team_name": "Nürn",
+       "fh": 7,
+       "sh": 6,
+       "pa": 48,
+       "isHome": true
+      },
+      {
+       "id": 14588,
+       "team_id": 20,
+       "team_name": "Spatz",
+       "fh": 26,
+       "sh": 22,
+       "pa": 13,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 7,
+      "away": 26
+     },
+     "final_score": {
+      "home": 13,
+      "away": 48
+     },
+     "log": {
+      "gameId": 7382,
+      "isFirstHalf": true,
+      "home": {
+       "id": 159,
+       "name": "Nürn",
+       "score": 13,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 18,
+          "time": "2026-05-09T14:26:22.910234+00:00",
+          "pat1": 18
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T14:19:44.761128+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T14:08:43.706459+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T14:57:24.199367+00:00"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T14:47:50.850588+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 8,
+          "time": "2026-05-09T14:40:35.212918+00:00",
+          "pat1": null
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 20,
+       "name": "Spatz",
+       "score": 48,
+       "firsthalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 44,
+          "time": "2026-05-09T14:31:05.900769+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "td": 0,
+          "time": "2026-05-09T14:21:03.693775+00:00",
+          "pat2": 5
+         },
+         {
+          "sequence": 4,
+          "td": 9,
+          "time": "2026-05-09T14:15:47.944182+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception",
+          "player": 9,
+          "time": "2026-05-09T14:15:09.391680+00:00"
+         },
+         {
+          "sequence": 2,
+          "td": 0,
+          "time": "2026-05-09T14:12:40.846156+00:00",
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 22,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 14,
+          "time": "2026-05-09T14:52:30.833499+00:00",
+          "pat2": 5
+         },
+         {
+          "sequence": 11,
+          "td": 44,
+          "time": "2026-05-09T14:43:02.809696+00:00",
+          "pat2": 14
+         },
+         {
+          "sequence": 9,
+          "td": 14,
+          "time": "2026-05-09T14:36:54.617780+00:00",
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 7383,
+     "gameday": 645,
+     "scheduled": "15:50:00",
+     "field": 2,
+     "officials": 112,
+     "stage": "Hauptrunde",
+     "standing": "Gruppe 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 14589,
+       "team_id": 243,
+       "team_name": "Erlangen",
+       "fh": 20,
+       "sh": 12,
+       "pa": 32,
+       "isHome": true
+      },
+      {
+       "id": 14590,
+       "team_id": 22,
+       "team_name": "Lions",
+       "fh": 12,
+       "sh": 20,
+       "pa": 32,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 20,
+      "away": 12
+     },
+     "final_score": {
+      "home": 32,
+      "away": 32
+     },
+     "log": {
+      "gameId": 7383,
+      "isFirstHalf": true,
+      "home": {
+       "id": 243,
+       "name": "Erlangen",
+       "score": 32,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 5,
+          "td": 23,
+          "time": "2026-05-09T14:30:30.035291+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "td": 23,
+          "time": "2026-05-09T14:19:29.940087+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 1,
+          "td": 4,
+          "time": "2026-05-09T14:09:51.955678+00:00",
+          "pat2": 5
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 4,
+          "time": "2026-05-09T14:59:44.408230+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-09T14:48:42.116390+00:00"
+         },
+         {
+          "sequence": 7,
+          "td": 5,
+          "time": "2026-05-09T14:43:41.867780+00:00",
+          "pat1": null
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 22,
+       "name": "Lions",
+       "score": 32,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 4,
+          "td": 25,
+          "time": "2026-05-09T14:23:39.925935+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "td": 25,
+          "time": "2026-05-09T14:12:31.774202+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 80,
+          "time": "2026-05-09T14:52:15.092568+00:00",
+          "pat2": 22
+         },
+         {
+          "sequence": 8,
+          "td": 22,
+          "time": "2026-05-09T14:46:19.317827+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "td": 25,
+          "time": "2026-05-09T14:39:26.326870+00:00",
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": 844,
+   "name": "FF BL Spieltag in Rödental",
+   "season": 6,
+   "season_display": "2026",
+   "league": 18,
+   "league_display": "FF BL",
+   "date": "2026-05-23",
+   "start": "10:00",
+   "format": "6_2",
+   "author": 205,
+   "address": "Adresse folgt in der Einladung",
+   "status": "PUBLISHED",
+   "has_designer_state": true,
+   "games": [
+    {
+     "id": 8933,
+     "gameday": 844,
+     "scheduled": "10:00:00",
+     "field": 1,
+     "officials": 501,
+     "stage": "Liga",
+     "standing": "Game 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17687,
+       "team_id": 391,
+       "team_name": "Rödental",
+       "fh": 0,
+       "sh": 6,
+       "pa": 65,
+       "isHome": true
+      },
+      {
+       "id": 17688,
+       "team_id": 393,
+       "team_name": "Erlangen2",
+       "fh": 29,
+       "sh": 36,
+       "pa": 6,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 29
+     },
+     "final_score": {
+      "home": 6,
+      "away": 65
+     },
+     "log": {
+      "gameId": 8933,
+      "isFirstHalf": false,
+      "home": {
+       "id": 391,
+       "name": "Rödental",
+       "score": 6,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T08:32:14.173854+00:00"
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T08:24:15.541304+00:00"
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception",
+          "player": 92,
+          "time": "2026-05-23T08:17:53.760289+00:00"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T08:14:38.505320+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception",
+          "player": 25,
+          "time": "2026-05-23T08:11:45.063073+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 20,
+          "td": 1,
+          "time": "2026-05-23T08:57:02.384961+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T08:44:47.302851+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 393,
+       "name": "Erlangen2",
+       "score": 65,
+       "firsthalf": {
+        "score": 29,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 85,
+          "time": "2026-05-23T08:38:50.513335+00:00",
+          "pat1": 85
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Interception",
+          "player": 82,
+          "time": "2026-05-23T08:37:01.399604+00:00"
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T08:35:03.815572+00:00"
+         },
+         {
+          "sequence": 9,
+          "td": 69,
+          "time": "2026-05-23T08:28:57.857834+00:00",
+          "pat2": 35
+         },
+         {
+          "sequence": 7,
+          "td": 82,
+          "time": "2026-05-23T08:21:59.050073+00:00",
+          "pat1": 82
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Interception",
+          "player": 85,
+          "time": "2026-05-23T08:20:21.013339+00:00"
+         },
+         {
+          "sequence": 3,
+          "td": 25,
+          "time": "2026-05-23T08:12:22.473322+00:00",
+          "pat1": 15
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Interception",
+          "player": 25,
+          "time": "2026-05-23T08:12:01.611755+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 36,
+        "entries": [
+         {
+          "sequence": 23,
+          "td": 51,
+          "time": "2026-05-23T09:07:57.955893+00:00",
+          "pat2": 25
+         },
+         {
+          "sequence": 22,
+          "cop": true,
+          "name": "Interception",
+          "player": 82,
+          "time": "2026-05-23T09:05:30.527142+00:00"
+         },
+         {
+          "sequence": 21,
+          "td": 85,
+          "time": "2026-05-23T09:04:38.044544+00:00",
+          "pat1": 85
+         },
+         {
+          "sequence": 19,
+          "td": 25,
+          "time": "2026-05-23T08:53:34.192965+00:00",
+          "pat1": 10
+         },
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Interception",
+          "player": 82,
+          "time": "2026-05-23T08:52:02.398297+00:00"
+         },
+         {
+          "sequence": 17,
+          "td": 15,
+          "time": "2026-05-23T08:49:44.116230+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Interception",
+          "player": 25,
+          "time": "2026-05-23T08:48:31.444335+00:00"
+         },
+         {
+          "sequence": 15,
+          "td": 25,
+          "time": "2026-05-23T08:47:14.582301+00:00",
+          "pat2": 82
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8934,
+     "gameday": 844,
+     "scheduled": "11:10:00",
+     "field": 1,
+     "officials": 393,
+     "stage": "Liga",
+     "standing": "Game 2",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17689,
+       "team_id": 501,
+       "team_name": "Ramsenthal2",
+       "fh": 6,
+       "sh": 12,
+       "pa": 46,
+       "isHome": true
+      },
+      {
+       "id": 17690,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 20,
+       "sh": 26,
+       "pa": 18,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 20
+     },
+     "final_score": {
+      "home": 18,
+      "away": 46
+     },
+     "log": {
+      "gameId": 8934,
+      "isFirstHalf": false,
+      "home": {
+       "id": 501,
+       "name": "Ramsenthal2",
+       "score": 18,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 99,
+          "time": "2026-05-23T09:49:25.152824+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T09:35:47.329521+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception",
+          "player": 11,
+          "time": "2026-05-23T09:33:24.623711+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 17,
+          "time": "2026-05-23T10:23:23.235870+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "td": 18,
+          "time": "2026-05-23T10:12:36.630734+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T10:06:43.009784+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 46,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 19,
+          "time": "2026-05-23T09:53:13.578897+00:00",
+          "pat1": 99
+         },
+         {
+          "sequence": 5,
+          "td": 7,
+          "time": "2026-05-23T09:45:20.148380+00:00",
+          "pat1": 6
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Interception",
+          "player": 16,
+          "time": "2026-05-23T09:43:15.150949+00:00"
+         },
+         {
+          "sequence": 3,
+          "td": 99,
+          "time": "2026-05-23T09:39:41.171625+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 32,
+          "time": "2026-05-23T10:29:17.795338+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "td": 6,
+          "time": "2026-05-23T10:15:39.933594+00:00",
+          "pat1": 19
+         },
+         {
+          "sequence": 11,
+          "td": 6,
+          "time": "2026-05-23T10:08:49.432989+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "td": 19,
+          "time": "2026-05-23T10:01:58.168429+00:00",
+          "pat1": 32
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Interception",
+          "player": 44,
+          "time": "2026-05-23T09:59:00.623251+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8935,
+     "gameday": 844,
+     "scheduled": "12:20:00",
+     "field": 1,
+     "officials": 391,
+     "stage": "Liga",
+     "standing": "Game 3",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17691,
+       "team_id": 393,
+       "team_name": "Erlangen2",
+       "fh": 25,
+       "sh": 43,
+       "pa": 12,
+       "isHome": true
+      },
+      {
+       "id": 17692,
+       "team_id": 501,
+       "team_name": "Ramsenthal2",
+       "fh": 12,
+       "sh": 0,
+       "pa": 68,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 25,
+      "away": 12
+     },
+     "final_score": {
+      "home": 68,
+      "away": 12
+     },
+     "log": {
+      "gameId": 8935,
+      "isFirstHalf": false,
+      "home": {
+       "id": 393,
+       "name": "Erlangen2",
+       "score": 68,
+       "firsthalf": {
+        "score": 25,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 82,
+          "time": "2026-05-23T11:09:23.291979+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 5,
+          "td": 17,
+          "time": "2026-05-23T10:59:33.292695+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "td": 82,
+          "time": "2026-05-23T10:52:37.511385+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 1,
+          "td": 17,
+          "time": "2026-05-23T10:46:44.199824+00:00",
+          "pat1": 15
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 43,
+        "entries": [
+         {
+          "sequence": 20,
+          "td": 35,
+          "time": "2026-05-23T11:41:31.089634+00:00",
+          "pat1": 69
+         },
+         {
+          "sequence": 18,
+          "td": 10,
+          "time": "2026-05-23T11:36:00.083971+00:00",
+          "pat2": 82
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Interception",
+          "player": 10,
+          "time": "2026-05-23T11:35:18.705249+00:00"
+         },
+         {
+          "sequence": 16,
+          "td": 15,
+          "time": "2026-05-23T11:34:19.438665+00:00",
+          "pat2": 35
+         },
+         {
+          "sequence": 14,
+          "td": 85,
+          "time": "2026-05-23T11:29:15.860728+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Interception",
+          "player": 85,
+          "time": "2026-05-23T11:27:52.497787+00:00"
+         },
+         {
+          "sequence": 12,
+          "td": 10,
+          "time": "2026-05-23T11:26:39.203078+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception",
+          "player": 51,
+          "time": "2026-05-23T11:24:29.405272+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 35,
+          "time": "2026-05-23T11:22:53.477581+00:00",
+          "pat2": 85
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 501,
+       "name": "Ramsenthal2",
+       "score": 12,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 17,
+          "time": "2026-05-23T11:06:34.230020+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 99,
+          "time": "2026-05-23T10:56:18.449748+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "isDeleted": true,
+          "time": "2026-05-23T10:49:31.317290+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T11:39:25.401333+00:00"
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T11:31:29.759359+00:00"
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception",
+          "player": 85,
+          "time": "2026-05-23T11:19:16.508661+00:00"
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T11:16:02.478848+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8936,
+     "gameday": 844,
+     "scheduled": "13:30:00",
+     "field": 1,
+     "officials": 501,
+     "stage": "Liga",
+     "standing": "Game 4",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17693,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 0,
+       "sh": 7,
+       "pa": 19,
+       "isHome": true
+      },
+      {
+       "id": 17694,
+       "team_id": 393,
+       "team_name": "Erlangen2",
+       "fh": 13,
+       "sh": 6,
+       "pa": 7,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 13
+     },
+     "final_score": {
+      "home": 7,
+      "away": 19
+     },
+     "log": {
+      "gameId": 8936,
+      "isFirstHalf": false,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 7,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T12:16:25.723428+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T11:58:35.323459+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 19,
+          "time": "2026-05-23T12:46:16.873841+00:00",
+          "pat1": 19
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T12:37:00.050571+00:00"
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T12:27:56.032374+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 393,
+       "name": "Erlangen2",
+       "score": 19,
+       "firsthalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 25,
+          "time": "2026-05-23T12:25:21.777621+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 85,
+          "time": "2026-05-23T12:13:28.567970+00:00",
+          "pat1": 85
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception",
+          "player": 51,
+          "time": "2026-05-23T12:08:10.551590+00:00"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T12:04:03.063803+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T12:52:14.310318+00:00"
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T12:42:54.052827+00:00"
+         },
+         {
+          "sequence": 8,
+          "td": 85,
+          "time": "2026-05-23T12:32:20.945496+00:00",
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8937,
+     "gameday": 844,
+     "scheduled": "14:40:00",
+     "field": 1,
+     "officials": 393,
+     "stage": "Liga",
+     "standing": "Game 5",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17695,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 20,
+       "sh": 20,
+       "pa": 15,
+       "isHome": true
+      },
+      {
+       "id": 17696,
+       "team_id": 391,
+       "team_name": "Rödental",
+       "fh": 6,
+       "sh": 9,
+       "pa": 40,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 20,
+      "away": 6
+     },
+     "final_score": {
+      "home": 40,
+      "away": 15
+     },
+     "log": {
+      "gameId": 8937,
+      "isFirstHalf": false,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 40,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 19,
+          "time": "2026-05-23T13:45:42.772791+00:00",
+          "pat1": 7
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Interception",
+          "player": 44,
+          "time": "2026-05-23T13:42:52.414168+00:00"
+         },
+         {
+          "sequence": 5,
+          "td": 32,
+          "time": "2026-05-23T13:39:39.672427+00:00",
+          "pat1": 6
+         },
+         {
+          "sequence": 3,
+          "td": 32,
+          "time": "2026-05-23T13:28:39.933298+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T13:22:11.073413+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 18,
+          "td": 42,
+          "time": "2026-05-23T14:16:01.589423+00:00",
+          "pat1": 32
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Interception",
+          "player": 42,
+          "time": "2026-05-23T14:15:18.105559+00:00"
+         },
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T14:13:47.078179+00:00"
+         },
+         {
+          "sequence": 14,
+          "td": 32,
+          "time": "2026-05-23T14:04:23.556521+00:00",
+          "pat1": 19
+         },
+         {
+          "sequence": 10,
+          "td": 33,
+          "time": "2026-05-23T13:52:00.760700+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception",
+          "player": 33,
+          "time": "2026-05-23T13:51:03.249259+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 391,
+       "name": "Rödental",
+       "score": 15,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 1,
+          "time": "2026-05-23T13:46:46.163905+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T13:37:03.012954+00:00"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T13:23:42.978327+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 9,
+        "entries": [
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T14:19:27.339997+00:00"
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T14:09:39.043359+00:00"
+         },
+         {
+          "sequence": 13,
+          "td": 1,
+          "time": "2026-05-23T14:02:08.837006+00:00",
+          "pat1": 1
+         },
+         {
+          "sequence": 12,
+          "Safety (+2)": 1,
+          "time": "2026-05-23T13:58:40.245594+00:00"
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T13:56:38.152511+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8938,
+     "gameday": 844,
+     "scheduled": "15:50:00",
+     "field": 1,
+     "officials": 287,
+     "stage": "Liga",
+     "standing": "Game 6",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17697,
+       "team_id": 391,
+       "team_name": "Rödental",
+       "fh": 12,
+       "sh": 14,
+       "pa": 0,
+       "isHome": true
+      },
+      {
+       "id": 17698,
+       "team_id": 501,
+       "team_name": "Ramsenthal2",
+       "fh": 0,
+       "sh": 0,
+       "pa": 26,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 12,
+      "away": 0
+     },
+     "final_score": {
+      "home": 26,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8938,
+      "isFirstHalf": false,
+      "home": {
+       "id": 391,
+       "name": "Rödental",
+       "score": 26,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T15:03:14.617029+00:00"
+         },
+         {
+          "sequence": 6,
+          "td": 7,
+          "time": "2026-05-23T14:57:07.088007+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception",
+          "player": 92,
+          "time": "2026-05-23T14:54:52.970340+00:00"
+         },
+         {
+          "sequence": 4,
+          "td": 20,
+          "time": "2026-05-23T14:53:18.351548+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception",
+          "player": 20,
+          "time": "2026-05-23T14:52:29.157437+00:00"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T14:49:37.649241+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T15:41:13.894399+00:00"
+         },
+         {
+          "sequence": 14,
+          "td": 7,
+          "time": "2026-05-23T15:33:58.725038+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "td": 48,
+          "time": "2026-05-23T15:25:10.769104+00:00",
+          "pat2": 1
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception",
+          "player": 48,
+          "time": "2026-05-23T15:24:13.076778+00:00"
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T15:20:49.166375+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 501,
+       "name": "Ramsenthal2",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T15:06:59.595976+00:00"
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T15:00:14.018557+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T14:46:55.737086+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T15:44:25.260665+00:00"
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T15:37:32.673182+00:00"
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-05-23T15:32:17.713148+00:00"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": 852,
+   "name": "FF BL Spieltag in Königsbrunn",
+   "season": 6,
+   "season_display": "2026",
+   "league": 18,
+   "league_display": "FF BL",
+   "date": "2026-06-20",
+   "start": "10:00",
+   "format": "6_2",
+   "author": 205,
+   "address": "Königsbrunn",
+   "status": "PUBLISHED",
+   "has_designer_state": true,
+   "games": [
+    {
+     "id": 8981,
+     "gameday": 852,
+     "scheduled": "10:00:00",
+     "field": 1,
+     "officials": 493,
+     "stage": "Liga",
+     "standing": "Game 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17783,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 28,
+       "sh": 25,
+       "pa": 12,
+       "isHome": true
+      },
+      {
+       "id": 17784,
+       "team_id": 389,
+       "team_name": "Gendorf",
+       "fh": 6,
+       "sh": 6,
+       "pa": 53,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 28,
+      "away": 6
+     },
+     "final_score": {
+      "home": 53,
+      "away": 12
+     },
+     "log": {
+      "gameId": 8981,
+      "isFirstHalf": false,
+      "home": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 53,
+       "firsthalf": {
+        "score": 28,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 24,
+          "time": "2026-06-20T10:01:01.133568+00:00",
+          "pat1": 84
+         },
+         {
+          "sequence": 7,
+          "td": 56,
+          "time": "2026-06-20T09:54:41.148637+00:00",
+          "pat1": 8
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T09:46:07.177913+00:00"
+         },
+         {
+          "sequence": 3,
+          "td": 24,
+          "time": "2026-06-20T09:40:41.594488+00:00",
+          "pat2": 8
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Interception",
+          "player": 79,
+          "time": "2026-06-20T09:38:52.950724+00:00"
+         },
+         {
+          "sequence": 1,
+          "td": 8,
+          "time": "2026-06-20T09:35:44.212572+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 25,
+        "entries": [
+         {
+          "sequence": 17,
+          "td": 84,
+          "time": "2026-06-20T10:28:06.102570+00:00",
+          "pat1": 61
+         },
+         {
+          "sequence": 15,
+          "td": 84,
+          "time": "2026-06-20T10:21:22.062040+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "td": 84,
+          "time": "2026-06-20T10:13:01.500710+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "td": 24,
+          "time": "2026-06-20T10:07:22.738420+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception",
+          "player": 7,
+          "time": "2026-06-20T10:06:05.112436+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 389,
+       "name": "Gendorf",
+       "score": 12,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T09:56:54.430054+00:00"
+         },
+         {
+          "sequence": 6,
+          "td": 5,
+          "time": "2026-06-20T09:51:18.738794+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T09:42:38.262337+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T10:23:45.030581+00:00"
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T10:19:24.753275+00:00"
+         },
+         {
+          "sequence": 12,
+          "td": 5,
+          "time": "2026-06-20T10:10:31.877087+00:00",
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8982,
+     "gameday": 852,
+     "scheduled": "10:00:00",
+     "field": 2,
+     "officials": 287,
+     "stage": "Liga",
+     "standing": "Game 2",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17785,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 6,
+       "sh": 7,
+       "pa": 0,
+       "isHome": true
+      },
+      {
+       "id": 17786,
+       "team_id": 315,
+       "team_name": "Passau",
+       "fh": 0,
+       "sh": 0,
+       "pa": 13,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 0
+     },
+     "final_score": {
+      "home": 13,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8982,
+      "isFirstHalf": false,
+      "home": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 13,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 92,
+          "time": "2026-06-20T09:00:06.260242+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T08:30:11.741453+00:00"
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception",
+          "player": 23,
+          "time": "2026-06-20T08:25:59.685313+00:00"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T08:24:12.253893+00:00"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T08:16:24.413377+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T08:12:55.712586+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 86,
+          "time": "2026-06-20T08:45:17.503038+00:00",
+          "pat1": 92
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 315,
+       "name": "Passau",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T09:08:13.291806+00:00"
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T08:35:03.507867+00:00"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T08:12:57.736628+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T08:54:27.166000+00:00"
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception",
+          "player": 11,
+          "time": "2026-06-20T08:49:24.564373+00:00"
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T08:48:20.164856+00:00"
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T08:42:31.204541+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8983,
+     "gameday": 852,
+     "scheduled": "11:10:00",
+     "field": 1,
+     "officials": 254,
+     "stage": "Liga",
+     "standing": "Game 3",
+     "status": "Geplant",
+     "results": [
+      {
+       "id": 17787,
+       "team_id": 389,
+       "team_name": "Gendorf",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": true
+      },
+      {
+       "id": 17788,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 0
+     },
+     "final_score": {
+      "home": 0,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8983,
+      "isFirstHalf": true,
+      "home": {
+       "id": 389,
+       "name": "Gendorf",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      },
+      "away": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      }
+     }
+    },
+    {
+     "id": 8984,
+     "gameday": 852,
+     "scheduled": "11:10:00",
+     "field": 2,
+     "officials": 223,
+     "stage": "Liga",
+     "standing": "Game 4",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17789,
+       "team_id": 315,
+       "team_name": "Passau",
+       "fh": 13,
+       "sh": 7,
+       "pa": 39,
+       "isHome": true
+      },
+      {
+       "id": 17790,
+       "team_id": 493,
+       "team_name": "Fursty2",
+       "fh": 19,
+       "sh": 20,
+       "pa": 20,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 13,
+      "away": 19
+     },
+     "final_score": {
+      "home": 20,
+      "away": 39
+     },
+     "log": {
+      "gameId": 8984,
+      "isFirstHalf": false,
+      "home": {
+       "id": 315,
+       "name": "Passau",
+       "score": 20,
+       "firsthalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T09:58:28.458034+00:00"
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T09:48:07.691650+00:00"
+         },
+         {
+          "sequence": 4,
+          "td": 21,
+          "time": "2026-06-20T09:40:15.499305+00:00",
+          "pat1": 12
+         },
+         {
+          "sequence": 2,
+          "td": 12,
+          "time": "2026-06-20T09:33:39.035983+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T10:35:22.077652+00:00"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T10:15:53.098711+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 21,
+          "time": "2026-06-20T10:06:18.003674+00:00",
+          "pat1": 10
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 493,
+       "name": "Fursty2",
+       "score": 39,
+       "firsthalf": {
+        "score": 19,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 28,
+          "time": "2026-06-20T09:59:23.888272+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T09:53:57.476742+00:00"
+         },
+         {
+          "sequence": 5,
+          "td": 4,
+          "time": "2026-06-20T09:45:33.857267+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "td": 18,
+          "time": "2026-06-20T09:36:09.304968+00:00",
+          "pat1": 31
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T09:31:27.151572+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 28,
+          "time": "2026-06-20T10:30:24.539983+00:00",
+          "pat1": 75
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Interception",
+          "player": 75,
+          "time": "2026-06-20T10:25:25.807572+00:00"
+         },
+         {
+          "sequence": 13,
+          "td": 31,
+          "time": "2026-06-20T10:21:57.926869+00:00",
+          "pat1": 31
+         },
+         {
+          "sequence": 11,
+          "td": 75,
+          "time": "2026-06-20T10:13:28.082322+00:00",
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8985,
+     "gameday": 852,
+     "scheduled": "12:20:00",
+     "field": 1,
+     "officials": 315,
+     "stage": "Liga",
+     "standing": "Game 5",
+     "status": "Geplant",
+     "results": [
+      {
+       "id": 17791,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": true
+      },
+      {
+       "id": 17792,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 0
+     },
+     "final_score": {
+      "home": 0,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8985,
+      "isFirstHalf": true,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      },
+      "away": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      }
+     }
+    },
+    {
+     "id": 8986,
+     "gameday": 852,
+     "scheduled": "12:20:00",
+     "field": 2,
+     "officials": 389,
+     "stage": "Liga",
+     "standing": "Game 6",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17793,
+       "team_id": 493,
+       "team_name": "Fursty2",
+       "fh": 7,
+       "sh": 0,
+       "pa": 34,
+       "isHome": true
+      },
+      {
+       "id": 17794,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 20,
+       "sh": 14,
+       "pa": 7,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 7,
+      "away": 20
+     },
+     "final_score": {
+      "home": 7,
+      "away": 34
+     },
+     "log": {
+      "gameId": 8986,
+      "isFirstHalf": false,
+      "home": {
+       "id": 493,
+       "name": "Fursty2",
+       "score": 7,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T11:28:53.170695+00:00"
+         },
+         {
+          "sequence": 10,
+          "pat1": 28,
+          "time": "2026-06-20T11:21:03.350034+00:00"
+         },
+         {
+          "sequence": 9,
+          "td": 18,
+          "time": "2026-06-20T11:20:25.330194+00:00"
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T11:14:44.896723+00:00"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T11:05:44.037031+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T10:59:36.192651+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 22,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T12:05:18.188838+00:00"
+         },
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T11:55:19.690371+00:00"
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T11:48:46.728792+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 34,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T11:31:42.023642+00:00"
+         },
+         {
+          "sequence": 12,
+          "pat1": 85,
+          "time": "2026-06-20T11:25:22.836263+00:00"
+         },
+         {
+          "sequence": 11,
+          "td": 85,
+          "time": "2026-06-20T11:24:30.275189+00:00"
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T11:17:22.114011+00:00"
+         },
+         {
+          "sequence": 6,
+          "pat1": null,
+          "time": "2026-06-20T11:11:55.650728+00:00"
+         },
+         {
+          "sequence": 5,
+          "td": 98,
+          "time": "2026-06-20T11:11:28.813890+00:00"
+         },
+         {
+          "sequence": 3,
+          "pat1": 86,
+          "time": "2026-06-20T11:01:42.728145+00:00"
+         },
+         {
+          "sequence": 2,
+          "td": 85,
+          "time": "2026-06-20T11:01:02.309940+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 21,
+          "pat1": 86,
+          "time": "2026-06-20T12:00:41.821192+00:00"
+         },
+         {
+          "sequence": 20,
+          "td": 85,
+          "time": "2026-06-20T11:59:38.194075+00:00"
+         },
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T11:51:41.131694+00:00"
+         },
+         {
+          "sequence": 16,
+          "pat1": 86,
+          "time": "2026-06-20T11:44:39.978677+00:00"
+         },
+         {
+          "sequence": 15,
+          "td": 85,
+          "time": "2026-06-20T11:43:48.438716+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8987,
+     "gameday": 852,
+     "scheduled": "13:30:00",
+     "field": 1,
+     "officials": 493,
+     "stage": "Liga",
+     "standing": "Game 7",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17795,
+       "team_id": 389,
+       "team_name": "Gendorf",
+       "fh": 18,
+       "sh": 0,
+       "pa": 27,
+       "isHome": true
+      },
+      {
+       "id": 17796,
+       "team_id": 315,
+       "team_name": "Passau",
+       "fh": 14,
+       "sh": 13,
+       "pa": 18,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 18,
+      "away": 14
+     },
+     "final_score": {
+      "home": 18,
+      "away": 27
+     },
+     "log": {
+      "gameId": 8987,
+      "isFirstHalf": false,
+      "home": {
+       "id": 389,
+       "name": "Gendorf",
+       "score": 18,
+       "firsthalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T12:55:02.355150+00:00"
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Interception",
+          "player": 11,
+          "time": "2026-06-20T12:52:17.854837+00:00"
+         },
+         {
+          "sequence": 7,
+          "td": 19,
+          "time": "2026-06-20T12:48:26.884851+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 5,
+          "td": 5,
+          "time": "2026-06-20T12:40:43.071369+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Interception",
+          "player": 49,
+          "time": "2026-06-20T12:37:18.804853+00:00"
+         },
+         {
+          "sequence": 1,
+          "td": 5,
+          "time": "2026-06-20T12:30:04.576926+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T13:16:43.236854+00:00"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T13:06:26.499315+00:00"
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T13:00:47.231870+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 315,
+       "name": "Passau",
+       "score": 27,
+       "firsthalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 11,
+          "time": "2026-06-20T12:43:29.119434+00:00",
+          "pat1": 10
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Interception",
+          "player": 20,
+          "time": "2026-06-20T12:35:57.869062+00:00"
+         },
+         {
+          "sequence": 2,
+          "td": 10,
+          "time": "2026-06-20T12:32:06.282846+00:00",
+          "pat1": 16
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T13:25:25.207656+00:00"
+         },
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Interception",
+          "player": 15,
+          "time": "2026-06-20T13:20:30.415311+00:00"
+         },
+         {
+          "sequence": 17,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T13:19:17.947445+00:00"
+         },
+         {
+          "sequence": 15,
+          "td": 12,
+          "time": "2026-06-20T13:14:28.559652+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Interception",
+          "player": 20,
+          "time": "2026-06-20T13:12:41.401336+00:00"
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T13:09:07.654909+00:00"
+         },
+         {
+          "sequence": 11,
+          "td": 12,
+          "time": "2026-06-20T13:04:30.377187+00:00",
+          "pat1": 16
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 8988,
+     "gameday": 852,
+     "scheduled": "13:30:00",
+     "field": 2,
+     "officials": 223,
+     "stage": "Liga",
+     "standing": "Game 8",
+     "status": "Geplant",
+     "results": [
+      {
+       "id": 17797,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": true
+      },
+      {
+       "id": 17798,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": null,
+       "sh": null,
+       "pa": null,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 0
+     },
+     "final_score": {
+      "home": 0,
+      "away": 0
+     },
+     "log": {
+      "gameId": 8988,
+      "isFirstHalf": true,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      },
+      "away": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": []
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": []
+       }
+      }
+     }
+    },
+    {
+     "id": 8989,
+     "gameday": 852,
+     "scheduled": "14:40:00",
+     "field": 1,
+     "officials": 315,
+     "stage": "Liga",
+     "standing": "Game 9",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 17799,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 25,
+       "sh": 26,
+       "pa": 6,
+       "isHome": true
+      },
+      {
+       "id": 17800,
+       "team_id": 493,
+       "team_name": "Fursty2",
+       "fh": 0,
+       "sh": 6,
+       "pa": 51,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 25,
+      "away": 0
+     },
+     "final_score": {
+      "home": 51,
+      "away": 6
+     },
+     "log": {
+      "gameId": 8989,
+      "isFirstHalf": false,
+      "home": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 51,
+       "firsthalf": {
+        "score": 25,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 84,
+          "time": "2026-06-20T14:23:03.392782+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Interception",
+          "player": 79,
+          "time": "2026-06-20T14:17:22.115554+00:00"
+         },
+         {
+          "sequence": 7,
+          "td": 84,
+          "time": "2026-06-20T14:14:51.513201+00:00",
+          "pat1": 56
+         },
+         {
+          "sequence": 5,
+          "td": 8,
+          "time": "2026-06-20T14:08:17.323468+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 3,
+          "td": 24,
+          "time": "2026-06-20T14:03:31.561165+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Interception",
+          "player": 41,
+          "time": "2026-06-20T13:58:38.656501+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T13:57:26.869001+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 17,
+          "td": 56,
+          "time": "2026-06-20T14:50:08.208747+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 15,
+          "td": 24,
+          "time": "2026-06-20T14:45:20.904705+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "td": 24,
+          "time": "2026-06-20T14:34:39.601539+00:00",
+          "pat1": 8
+         },
+         {
+          "sequence": 11,
+          "td": 24,
+          "time": "2026-06-20T14:28:20.497259+00:00",
+          "pat1": 35
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 493,
+       "name": "Fursty2",
+       "score": 6,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 84,
+          "isDeleted": true,
+          "time": "2026-06-20T14:22:00.714945+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T14:10:45.394447+00:00"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T14:05:25.985353+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 18,
+          "time": "2026-06-20T14:47:29.334471+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T14:42:42.011501+00:00"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-06-20T14:31:17.709755+00:00"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": 893,
+   "name": "FF BL Spieltag in Oberammergau",
+   "season": 6,
+   "season_display": "2026",
+   "league": 18,
+   "league_display": "FF BL",
+   "date": "2026-07-25",
+   "start": "10:00",
+   "format": "6_2",
+   "author": 205,
+   "address": "Oberammergau",
+   "status": "PUBLISHED",
+   "has_designer_state": true,
+   "games": [
+    {
+     "id": 9344,
+     "gameday": 893,
+     "scheduled": "10:00:00",
+     "field": 1,
+     "officials": 287,
+     "stage": "FF BL",
+     "standing": "Game 1",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18509,
+       "team_id": 235,
+       "team_name": "Oberammergau",
+       "fh": 18,
+       "sh": 12,
+       "pa": 33,
+       "isHome": true
+      },
+      {
+       "id": 18510,
+       "team_id": 502,
+       "team_name": "Neustadt",
+       "fh": 15,
+       "sh": 18,
+       "pa": 30,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 18,
+      "away": 15
+     },
+     "final_score": {
+      "home": 30,
+      "away": 33
+     },
+     "log": {
+      "gameId": 9344,
+      "isFirstHalf": false,
+      "home": {
+       "id": 235,
+       "name": "Oberammergau",
+       "score": 30,
+       "firsthalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 10,
+          "td": 27,
+          "time": "2026-07-25T08:28:53.661399+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:23:25.409529+00:00"
+         },
+         {
+          "sequence": 6,
+          "td": 7,
+          "time": "2026-07-25T08:16:51.122248+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 65,
+          "time": "2026-07-25T08:10:25.169215+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 19,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:55:32.821056+00:00"
+         },
+         {
+          "sequence": 17,
+          "td": 7,
+          "time": "2026-07-25T08:46:01.453266+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Interception",
+          "player": 84,
+          "time": "2026-07-25T08:44:28.141423+00:00"
+         },
+         {
+          "sequence": 13,
+          "td": 59,
+          "time": "2026-07-25T08:39:27.369972+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:34:14.982174+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 502,
+       "name": "Neustadt",
+       "score": 33,
+       "firsthalf": {
+        "score": 15,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 80,
+          "time": "2026-07-25T08:25:31.800185+00:00",
+          "pat2": 99
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:20:23.671255+00:00"
+         },
+         {
+          "sequence": 5,
+          "td": 23,
+          "time": "2026-07-25T08:15:09.250158+00:00",
+          "pat1": 80
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:06:47.143197+00:00"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Interception",
+          "player": 99,
+          "time": "2026-07-25T08:04:17.286076+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T07:59:37.682299+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:50:34.945774+00:00"
+         },
+         {
+          "sequence": 15,
+          "Safety (+2)": 8,
+          "time": "2026-07-25T08:43:45.207940+00:00"
+         },
+         {
+          "sequence": 14,
+          "td": 23,
+          "time": "2026-07-25T08:41:55.125916+00:00",
+          "pat2": 23
+         },
+         {
+          "sequence": 12,
+          "td": 8,
+          "time": "2026-07-25T08:37:00.617944+00:00",
+          "pat2": 99
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9345,
+     "gameday": 893,
+     "scheduled": "10:00:00",
+     "field": 2,
+     "officials": 152,
+     "stage": "FF BL",
+     "standing": "Game 2",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18511,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 14,
+       "sh": 13,
+       "pa": 21,
+       "isHome": true
+      },
+      {
+       "id": 18512,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 7,
+       "sh": 14,
+       "pa": 27,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 14,
+      "away": 7
+     },
+     "final_score": {
+      "home": 27,
+      "away": 21
+     },
+     "log": {
+      "gameId": 9345,
+      "isFirstHalf": false,
+      "home": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 27,
+       "firsthalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 85,
+          "time": "2026-07-25T08:20:35.496444+00:00",
+          "pat1": 71
+         },
+         {
+          "sequence": 3,
+          "td": 92,
+          "time": "2026-07-25T08:10:32.676360+00:00",
+          "pat1": 92
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:04:41.114060+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 5,
+          "time": "2026-07-25T08:52:24.554461+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "td": 5,
+          "time": "2026-07-25T08:45:57.274162+00:00",
+          "pat1": 85
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 21,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:22:49.413373+00:00"
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:18:02.474617+00:00"
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception",
+          "player": 7,
+          "time": "2026-07-25T08:15:24.617066+00:00"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:13:05.246480+00:00"
+         },
+         {
+          "sequence": 2,
+          "td": 24,
+          "time": "2026-07-25T08:07:20.957427+00:00",
+          "pat1": 24
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 24,
+          "time": "2026-07-25T08:54:21.266143+00:00",
+          "pat1": 8
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:48:40.719206+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 35,
+          "time": "2026-07-25T08:41:27.553692+00:00",
+          "pat1": 24
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T08:33:05.106859+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9346,
+     "gameday": 893,
+     "scheduled": "11:10:00",
+     "field": 1,
+     "officials": 254,
+     "stage": "FF BL",
+     "standing": "Game 3",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18513,
+       "team_id": 502,
+       "team_name": "Neustadt",
+       "fh": 18,
+       "sh": 6,
+       "pa": 32,
+       "isHome": true
+      },
+      {
+       "id": 18514,
+       "team_id": 152,
+       "team_name": "Ingol",
+       "fh": 20,
+       "sh": 12,
+       "pa": 24,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 18,
+      "away": 20
+     },
+     "final_score": {
+      "home": 24,
+      "away": 32
+     },
+     "log": {
+      "gameId": 9346,
+      "isFirstHalf": false,
+      "home": {
+       "id": 502,
+       "name": "Neustadt",
+       "score": 24,
+       "firsthalf": {
+        "score": 18,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 23,
+          "time": "2026-07-25T09:44:04.520199+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "td": 8,
+          "time": "2026-07-25T09:34:41.849662+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 8,
+          "time": "2026-07-25T09:27:19.297471+00:00",
+          "pat2": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T10:24:30.879171+00:00"
+         },
+         {
+          "sequence": 11,
+          "td": 8,
+          "time": "2026-07-25T10:10:59.037218+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T09:55:37.734987+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 152,
+       "name": "Ingol",
+       "score": 32,
+       "firsthalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 5,
+          "td": 59,
+          "time": "2026-07-25T09:38:06.588050+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 3,
+          "td": 32,
+          "time": "2026-07-25T09:30:38.930732+00:00",
+          "pat2": 5
+         },
+         {
+          "sequence": 1,
+          "td": 33,
+          "time": "2026-07-25T09:23:32.010599+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T10:14:31.183739+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 18,
+          "time": "2026-07-25T10:04:59.459064+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception",
+          "player": 43,
+          "time": "2026-07-25T10:02:55.656350+00:00"
+         },
+         {
+          "sequence": 8,
+          "td": 32,
+          "time": "2026-07-25T09:58:22.611515+00:00",
+          "pat2": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9347,
+     "gameday": 893,
+     "scheduled": "11:10:00",
+     "field": 2,
+     "officials": 235,
+     "stage": "FF BL",
+     "standing": "Game 4",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18515,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 6,
+       "sh": 14,
+       "pa": 27,
+       "isHome": true
+      },
+      {
+       "id": 18516,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 7,
+       "sh": 20,
+       "pa": 20,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 7
+     },
+     "final_score": {
+      "home": 20,
+      "away": 27
+     },
+     "log": {
+      "gameId": 9347,
+      "isFirstHalf": false,
+      "home": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 20,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 6,
+          "td": 24,
+          "time": "2026-07-25T09:36:07.197411+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T09:33:44.235375+00:00"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T09:25:54.479456+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception",
+          "player": 12,
+          "time": "2026-07-25T09:21:29.600320+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 13,
+          "td": 7,
+          "time": "2026-07-25T10:21:53.670300+00:00",
+          "pat2": 35
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception",
+          "player": 33,
+          "time": "2026-07-25T10:03:22.497942+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 25,
+          "time": "2026-07-25T09:57:07.470921+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T09:49:17.580475+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 27,
+       "firsthalf": {
+        "score": 7,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 9,
+          "time": "2026-07-25T09:41:31.823296+00:00",
+          "pat1": 99
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T09:35:27.493908+00:00"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T09:30:07.448174+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 19,
+          "time": "2026-07-25T10:26:42.822416+00:00",
+          "pat1": 6
+         },
+         {
+          "sequence": 12,
+          "td": 33,
+          "time": "2026-07-25T10:11:14.986861+00:00",
+          "pat1": 9
+         },
+         {
+          "sequence": 9,
+          "td": 6,
+          "time": "2026-07-25T09:52:08.252619+00:00",
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9348,
+     "gameday": 893,
+     "scheduled": "12:20:00",
+     "field": 1,
+     "officials": 223,
+     "stage": "FF BL",
+     "standing": "Game 5",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18517,
+       "team_id": 152,
+       "team_name": "Ingol",
+       "fh": 24,
+       "sh": 20,
+       "pa": 6,
+       "isHome": true
+      },
+      {
+       "id": 18518,
+       "team_id": 235,
+       "team_name": "Oberammergau",
+       "fh": 0,
+       "sh": 6,
+       "pa": 44,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 24,
+      "away": 0
+     },
+     "final_score": {
+      "home": 44,
+      "away": 6
+     },
+     "log": {
+      "gameId": 9348,
+      "isFirstHalf": false,
+      "home": {
+       "id": 152,
+       "name": "Ingol",
+       "score": 44,
+       "firsthalf": {
+        "score": 24,
+        "entries": [
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception",
+          "player": 66,
+          "time": "2026-07-25T11:19:10.256789+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 18,
+          "time": "2026-07-25T11:17:15.395707+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception",
+          "player": 43,
+          "time": "2026-07-25T11:15:05.273451+00:00"
+         },
+         {
+          "sequence": 8,
+          "td": 5,
+          "time": "2026-07-25T11:13:04.911716+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 6,
+          "td": 18,
+          "time": "2026-07-25T11:06:38.558114+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 4,
+          "td": 18,
+          "time": "2026-07-25T10:59:46.612515+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T10:53:28.456576+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 32,
+          "time": "2026-07-25T11:41:37.280243+00:00",
+          "pat1": 5
+         },
+         {
+          "sequence": 14,
+          "td": 32,
+          "time": "2026-07-25T11:35:42.118688+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "td": 59,
+          "time": "2026-07-25T11:28:17.365682+00:00",
+          "pat1": 59
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 235,
+       "name": "Oberammergau",
+       "score": 6,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T11:09:23.463451+00:00"
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T11:02:06.118406+00:00"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T10:56:00.461805+00:00"
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T10:51:07.908179+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 17,
+          "td": 59,
+          "time": "2026-07-25T11:47:06.436328+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T11:38:03.699835+00:00"
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T11:30:43.811907+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9349,
+     "gameday": 893,
+     "scheduled": "12:20:00",
+     "field": 2,
+     "officials": 502,
+     "stage": "FF BL",
+     "standing": "Game 6",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18519,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 0,
+       "sh": 13,
+       "pa": 33,
+       "isHome": true
+      },
+      {
+       "id": 18520,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 19,
+       "sh": 14,
+       "pa": 13,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 0,
+      "away": 19
+     },
+     "final_score": {
+      "home": 13,
+      "away": 33
+     },
+     "log": {
+      "gameId": 9349,
+      "isFirstHalf": false,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 13,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T11:11:30.401091+00:00"
+         },
+         {
+          "sequence": 7,
+          "td": 85,
+          "isDeleted": true,
+          "time": "2026-07-25T11:07:31.392169+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Interception",
+          "player": 23,
+          "isDeleted": true,
+          "time": "2026-07-25T11:06:10.964973+00:00"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T10:57:51.711466+00:00"
+         },
+         {
+          "sequence": 2,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T10:51:35.123074+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 17,
+          "td": 9,
+          "time": "2026-07-25T11:39:28.719494+00:00",
+          "pat1": 6
+         },
+         {
+          "sequence": 13,
+          "td": 19,
+          "time": "2026-07-25T11:26:27.894744+00:00",
+          "pat1": null
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 33,
+       "firsthalf": {
+        "score": 19,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 92,
+          "time": "2026-07-25T11:16:51.255447+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 9,
+          "td": 85,
+          "time": "2026-07-25T11:08:35.387569+00:00",
+          "pat1": 85
+         },
+         {
+          "sequence": 8,
+          "td": 85,
+          "time": "2026-07-25T11:08:18.891982+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception",
+          "player": 22,
+          "isDeleted": true,
+          "time": "2026-07-25T11:05:49.994685+00:00"
+         },
+         {
+          "sequence": 4,
+          "td": 5,
+          "isDeleted": true,
+          "time": "2026-07-25T11:03:28.527985+00:00",
+          "pat1": 85
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T10:51:22.612503+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 14,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 71,
+          "time": "2026-07-25T11:34:38.494683+00:00",
+          "pat2": 5
+         },
+         {
+          "sequence": 15,
+          "cop": true,
+          "name": "Interception",
+          "player": 23,
+          "time": "2026-07-25T11:33:02.530986+00:00"
+         },
+         {
+          "sequence": 14,
+          "td": 71,
+          "time": "2026-07-25T11:30:41.596217+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T11:22:35.233744+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9350,
+     "gameday": 893,
+     "scheduled": "13:30:00",
+     "field": 1,
+     "officials": 223,
+     "stage": "FF BL",
+     "standing": "Game 7",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18521,
+       "team_id": 502,
+       "team_name": "Neustadt",
+       "fh": 12,
+       "sh": 0,
+       "pa": 33,
+       "isHome": true
+      },
+      {
+       "id": 18522,
+       "team_id": 254,
+       "team_name": "Spatz4",
+       "fh": 13,
+       "sh": 20,
+       "pa": 12,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 12,
+      "away": 13
+     },
+     "final_score": {
+      "home": 12,
+      "away": 33
+     },
+     "log": {
+      "gameId": 9350,
+      "isFirstHalf": false,
+      "home": {
+       "id": 502,
+       "name": "Neustadt",
+       "score": 12,
+       "firsthalf": {
+        "score": 12,
+        "entries": [
+         {
+          "sequence": 6,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T12:30:25.368072+00:00"
+         },
+         {
+          "sequence": 4,
+          "td": 8,
+          "time": "2026-07-25T12:20:05.563531+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 2,
+          "td": 8,
+          "time": "2026-07-25T12:10:36.740212+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 14,
+          "td": 5,
+          "isDeleted": true,
+          "time": "2026-07-25T13:02:27.784104+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Interception",
+          "player": 31,
+          "time": "2026-07-25T12:58:17.486142+00:00"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Interception",
+          "player": 8,
+          "time": "2026-07-25T12:56:01.318362+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 254,
+       "name": "Spatz4",
+       "score": 33,
+       "firsthalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 7,
+          "td": 85,
+          "time": "2026-07-25T12:37:24.246008+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T12:22:36.556202+00:00"
+         },
+         {
+          "sequence": 3,
+          "td": 5,
+          "time": "2026-07-25T12:16:02.547060+00:00",
+          "pat1": 85
+         },
+         {
+          "sequence": 1,
+          "td": 8,
+          "isDeleted": true,
+          "time": "2026-07-25T12:10:07.487968+00:00",
+          "pat1": null
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 20,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 5,
+          "time": "2026-07-25T13:03:27.438167+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception",
+          "player": 20,
+          "time": "2026-07-25T12:52:44.443244+00:00"
+         },
+         {
+          "sequence": 10,
+          "td": 23,
+          "time": "2026-07-25T12:48:32.296190+00:00",
+          "pat2": 4
+         },
+         {
+          "sequence": 9,
+          "cop": true,
+          "name": "Interception",
+          "player": 23,
+          "time": "2026-07-25T12:47:26.193861+00:00"
+         },
+         {
+          "sequence": 8,
+          "td": 92,
+          "time": "2026-07-25T12:45:38.604468+00:00",
+          "pat1": null
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9351,
+     "gameday": 893,
+     "scheduled": "13:30:00",
+     "field": 2,
+     "officials": 235,
+     "stage": "FF BL",
+     "standing": "Game 8",
+     "status": "beendet",
+     "results": [
+      {
+       "id": 18523,
+       "team_id": 287,
+       "team_name": "Nürn2",
+       "fh": 29,
+       "sh": 6,
+       "pa": 0,
+       "isHome": true
+      },
+      {
+       "id": 18524,
+       "team_id": 152,
+       "team_name": "Ingol",
+       "fh": 0,
+       "sh": 0,
+       "pa": 35,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 29,
+      "away": 0
+     },
+     "final_score": {
+      "home": 35,
+      "away": 0
+     },
+     "log": {
+      "gameId": 9351,
+      "isFirstHalf": false,
+      "home": {
+       "id": 287,
+       "name": "Nürn2",
+       "score": 35,
+       "firsthalf": {
+        "score": 29,
+        "entries": [
+         {
+          "sequence": 11,
+          "td": 19,
+          "time": "2026-07-25T12:31:07.872281+00:00",
+          "pat1": 71
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception",
+          "player": 44,
+          "time": "2026-07-25T12:28:38.077834+00:00"
+         },
+         {
+          "sequence": 9,
+          "td": 71,
+          "time": "2026-07-25T12:26:46.122092+00:00",
+          "pat1": 71
+         },
+         {
+          "sequence": 7,
+          "td": 9,
+          "time": "2026-07-25T12:20:05.113460+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 6,
+          "Safety (+2)": 25,
+          "time": "2026-07-25T12:16:07.733972+00:00"
+         },
+         {
+          "sequence": 4,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T12:13:18.216101+00:00"
+         },
+         {
+          "sequence": 2,
+          "td": 9,
+          "time": "2026-07-25T12:08:34.334840+00:00",
+          "pat1": 71
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 15,
+          "td": 71,
+          "time": "2026-07-25T12:51:08.034175+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 13,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T12:42:23.406278+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 152,
+       "name": "Ingol",
+       "score": 0,
+       "firsthalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 8,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T12:22:41.938004+00:00"
+         },
+         {
+          "sequence": 5,
+          "Safety (+2)": 25,
+          "isDeleted": true,
+          "time": "2026-07-25T12:15:51.718411+00:00"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T12:10:44.999536+00:00"
+         },
+         {
+          "sequence": 1,
+          "td": 9,
+          "isDeleted": true,
+          "time": "2026-07-25T12:07:44.812899+00:00",
+          "pat1": 71
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 0,
+        "entries": [
+         {
+          "sequence": 16,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T12:55:32.456094+00:00"
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T12:45:01.923811+00:00"
+         },
+         {
+          "sequence": 12,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T12:37:13.000854+00:00"
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": 9352,
+     "gameday": 893,
+     "scheduled": "14:40:00",
+     "field": 1,
+     "officials": 254,
+     "stage": "FF BL",
+     "standing": "Game 9",
+     "status": "2. Halbzeit",
+     "results": [
+      {
+       "id": 18525,
+       "team_id": 235,
+       "team_name": "Oberammergau",
+       "fh": 6,
+       "sh": 13,
+       "pa": 53,
+       "isHome": true
+      },
+      {
+       "id": 18526,
+       "team_id": 223,
+       "team_name": "Königsbrunn",
+       "fh": 27,
+       "sh": 26,
+       "pa": 19,
+       "isHome": false
+      }
+     ],
+     "halftime_score": {
+      "home": 6,
+      "away": 27
+     },
+     "final_score": {
+      "home": 19,
+      "away": 53
+     },
+     "log": {
+      "gameId": 9352,
+      "isFirstHalf": false,
+      "home": {
+       "id": 235,
+       "name": "Oberammergau",
+       "score": 19,
+       "firsthalf": {
+        "score": 6,
+        "entries": [
+         {
+          "sequence": 9,
+          "td": 27,
+          "time": "2026-07-25T13:47:00.476940+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 7,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T13:40:37.961510+00:00"
+         },
+         {
+          "sequence": 3,
+          "cop": true,
+          "name": "Turnover",
+          "player": null,
+          "time": "2026-07-25T13:31:11.077735+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 13,
+        "entries": [
+         {
+          "sequence": 16,
+          "td": 27,
+          "time": "2026-07-25T14:11:31.242581+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 12,
+          "td": 7,
+          "time": "2026-07-25T13:58:55.681771+00:00",
+          "pat1": 27
+         },
+         {
+          "sequence": 11,
+          "cop": true,
+          "name": "Interception",
+          "player": 23,
+          "time": "2026-07-25T13:56:27.809125+00:00"
+         }
+        ]
+       }
+      },
+      "away": {
+       "id": 223,
+       "name": "Königsbrunn",
+       "score": 53,
+       "firsthalf": {
+        "score": 27,
+        "entries": [
+         {
+          "sequence": 8,
+          "td": 8,
+          "time": "2026-07-25T13:44:12.438237+00:00",
+          "pat2": 24
+         },
+         {
+          "sequence": 6,
+          "td": 35,
+          "time": "2026-07-25T13:37:51.321096+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 5,
+          "cop": true,
+          "name": "Interception",
+          "player": 12,
+          "time": "2026-07-25T13:36:02.382680+00:00"
+         },
+         {
+          "sequence": 4,
+          "td": 35,
+          "time": "2026-07-25T13:33:29.695205+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 2,
+          "td": 12,
+          "time": "2026-07-25T13:28:34.336900+00:00",
+          "pat1": 8
+         },
+         {
+          "sequence": 1,
+          "cop": true,
+          "name": "Interception",
+          "player": 12,
+          "isDeleted": true,
+          "time": "2026-07-25T13:27:44.089220+00:00"
+         }
+        ]
+       },
+       "secondhalf": {
+        "score": 26,
+        "entries": [
+         {
+          "sequence": 19,
+          "td": 7,
+          "time": "2026-07-25T14:24:51.520270+00:00",
+          "pat2": null
+         },
+         {
+          "sequence": 18,
+          "cop": true,
+          "name": "Interception",
+          "player": 8,
+          "time": "2026-07-25T14:21:47.640355+00:00"
+         },
+         {
+          "sequence": 17,
+          "td": 24,
+          "time": "2026-07-25T14:19:17.619983+00:00",
+          "pat1": 24
+         },
+         {
+          "sequence": 15,
+          "td": 12,
+          "time": "2026-07-25T14:09:55.779378+00:00",
+          "pat1": null
+         },
+         {
+          "sequence": 14,
+          "cop": true,
+          "name": "Interception",
+          "player": 12,
+          "time": "2026-07-25T14:09:13.532716+00:00"
+         },
+         {
+          "sequence": 13,
+          "td": 8,
+          "time": "2026-07-25T14:03:38.608003+00:00",
+          "pat1": 8
+         },
+         {
+          "sequence": 10,
+          "cop": true,
+          "name": "Interception",
+          "player": 23,
+          "time": "2026-07-25T13:55:58.053298+00:00"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "etag": "4e56cc47c0c918dfec321c0722568ecc"
+}

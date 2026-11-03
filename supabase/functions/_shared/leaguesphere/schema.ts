@@ -243,6 +243,24 @@ export interface UpstreamLeagueTable {
 
 // ── Parsers ──────────────────────────────────────────────────────────────────
 
+/**
+ * Log entry keys that describe the entry itself rather than an event with a jersey number.
+ * `time` (an ISO instant) and a possession marker's `player` came with LeagueSphere 4.42.
+ * Nothing reads them, so they are skipped unvalidated: rejecting the snapshot over a field
+ * we ignore is how 4.42 stopped the sync.
+ */
+const ENTRY_FIELDS: ReadonlySet<string> = new Set([
+  'sequence',
+  'cop',
+  'name',
+  'isDeleted',
+  'time',
+  'player',
+]);
+
+/** Events whose value we read as a jersey number, so a retyped value is a breakage. */
+const SCORING_EVENTS: ReadonlySet<string> = new Set(['td', 'pat1', 'pat2', 'OT', 'Safety (+2)']);
+
 function parseLogEntry(v: Validation, path: string, raw: unknown): UpstreamLogEntry | null {
   const obj = record(v, path, raw);
   if (obj === null) return null;
@@ -252,7 +270,12 @@ function parseLogEntry(v: Validation, path: string, raw: unknown): UpstreamLogEn
 
   const players: Record<string, number | null> = {};
   for (const [key, value] of Object.entries(obj)) {
-    if (key === 'sequence' || key === 'cop' || key === 'name' || key === 'isDeleted') continue;
+    if (ENTRY_FIELDS.has(key)) continue;
+    // Any other key is an event carrying a jersey number. A known event must stay a number
+    // or null; an unknown key holding anything else, null included, is a field upstream
+    // added, not an event. Kept as a failed event, a new null field would be printed in
+    // the play-by-play.
+    if (!SCORING_EVENTS.has(key) && typeof value !== 'number') continue;
     if (value === null) {
       // A failed attempt: the event happened, nobody is credited, it scores nothing.
       players[key] = null;
