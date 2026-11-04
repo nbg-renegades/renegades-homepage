@@ -11,10 +11,14 @@
  * whatever we assumed about them.
  */
 
-import { assertEquals } from 'https://deno.land/std@0.224.0/assert/mod.ts';
+import { assert, assertEquals } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
+import { diffEvents } from './reconcile.ts';
 import { ResultsStore } from './store.ts';
+import { toGameEventRows } from './mappers.ts';
 import type { GameEventRow, GameRow, GamedayRow, LiveGameRow, LiveTickRow } from './mappers.ts';
+import { parseSnapshot } from './schema.ts';
+import { loadFixture } from './__fixtures__/load.ts';
 
 /** `Deno.env` throws without `--allow-env`; without it these tests are simply ignored. */
 function readEnv(name: string): string | undefined {
@@ -272,5 +276,129 @@ Deno.test({
       assertEquals(rows.length, 1200);
       assertEquals(rows[0].seq, 1);
       assertEquals(rows[1199].seq, 1200);
+    }),
+});
+
+Deno.test({
+  name: 'deleteGameEvents removes exactly the given keys',
+  ignore: !enabled,
+  fn: () =>
+    withStore(async (store) => {
+      await store.saveGamedays([gameday(GAMEDAY_ID)]);
+      await store.saveGames([game(GAME_ID, GAMEDAY_ID), game(GAME_ID + 1, GAMEDAY_ID)]);
+      await store.saveGameEvents([
+        event(GAME_ID, 1, { half: 1, side: 'home' }),
+        event(GAME_ID, 2, { half: 1, side: 'away' }),
+        event(GAME_ID, 3, { half: 2, side: 'home' }),
+        event(GAME_ID, 4, { half: 2, side: 'away' }),
+        event(GAME_ID + 1, 1),
+      ]);
+
+      await store.deleteGameEvents([
+        { game_id: GAME_ID, half: 1, side: 'away', seq: 2 },
+        { game_id: GAME_ID, half: 2, side: 'home', seq: 3 },
+      ]);
+
+      const left = await store.loadGameEvents([GAME_ID, GAME_ID + 1]);
+      assertEquals(
+        left.map((row) => `${row.game_id}|${row.half}|${row.side}|${row.seq}`),
+        [`${GAME_ID}|1|home|1`, `${GAME_ID}|2|away|4`, `${GAME_ID + 1}|1|home|1`],
+      );
+    }),
+});
+
+Deno.test({
+  name: 'a stored play-by-play read back diffs to nothing',
+  ignore: !enabled,
+  fn: () =>
+    withStore(async (store) => {
+      const parsed = parseSnapshot(await loadFixture('snapshot.teams-159-287.json'));
+      assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
+      const real = parsed.value.gamedays.flatMap((day) => day.games).find((g) => g.id === 7374);
+      assert(real !== undefined, 'game 7374 must be in the fixture');
+      // Moved into the reserved id range, so the test never collides with real rows.
+      const written = toGameEventRows(real).map((row) => ({ ...row, game_id: GAME_ID }));
+      assert(written.length > 0, 'the recorded game must have plays');
+
+      await store.saveGamedays([gameday(GAMEDAY_ID)]);
+      await store.saveGames([game(GAME_ID, GAMEDAY_ID)]);
+      await store.saveGameEvents(written);
+      const read = await store.loadGameEvents([GAME_ID]);
+
+      // PostgREST hands smallints, booleans and text back exactly as the mapper produced them,
+      // so an unchanged game costs no writes on the next run.
+      const diff = diffEvents(read, written);
+      assertEquals(diff.upsert, []);
+      assertEquals(diff.remove, []);
+    }),
+});
+
+Deno.test({
+  name: 'deleteGamedays removes the gameday with its games, plays and live rows',
+  ignore: !enabled,
+  fn: () =>
+    withStore(async (store) => {
+      await store.saveGamedays([gameday(GAMEDAY_ID), gameday(GAMEDAY_ID + 1)]);
+      await store.saveGames([game(GAME_ID, GAMEDAY_ID), game(GAME_ID + 1, GAMEDAY_ID + 1)]);
+      await store.saveGameEvents([event(GAME_ID, 1), event(GAME_ID + 1, 1)]);
+      await store.saveLiveGames([{
+        game_id: GAME_ID,
+        home_score: 6,
+        away_score: 0,
+        last_tick_at: null,
+        finished: false,
+      }]);
+
+      await store.deleteGamedays([GAMEDAY_ID]);
+
+      assertEquals((await store.select('results_gamedays', `id=eq.${GAMEDAY_ID}`)).length, 0);
+      assertEquals((await store.select('results_games', `id=eq.${GAME_ID}`)).length, 0);
+      assertEquals((await store.loadGameEvents([GAME_ID])).length, 0);
+      assertEquals((await store.select('results_live_games', `game_id=eq.${GAME_ID}`)).length, 0);
+      assertEquals((await store.loadGameEvents([GAME_ID + 1])).length, 1, 'the sibling survives');
+    }),
+});
+
+Deno.test({
+  name: 'deleteGames keeps the gameday and the sibling game',
+  ignore: !enabled,
+  fn: () =>
+    withStore(async (store) => {
+      await store.saveGamedays([gameday(GAMEDAY_ID)]);
+      await store.saveGames([game(GAME_ID, GAMEDAY_ID), game(GAME_ID + 1, GAMEDAY_ID)]);
+      await store.saveGameEvents([event(GAME_ID, 1), event(GAME_ID + 1, 1)]);
+
+      await store.deleteGames([GAME_ID]);
+
+      assertEquals((await store.select('results_games', `id=eq.${GAME_ID}`)).length, 0);
+      assertEquals((await store.loadGameEvents([GAME_ID])).length, 0);
+      assertEquals((await store.select('results_gamedays', `id=eq.${GAMEDAY_ID}`)).length, 1);
+      assertEquals((await store.select('results_games', `id=eq.${GAME_ID + 1}`)).length, 1);
+      assertEquals((await store.loadGameEvents([GAME_ID + 1])).length, 1);
+    }),
+});
+
+Deno.test({
+  name: 'loadStoredScope returns only gamedays from the given date on',
+  ignore: !enabled,
+  fn: () =>
+    withStore(async (store) => {
+      await store.saveGamedays([
+        { ...gameday(GAMEDAY_ID), date: '2025-08-02' },
+        { ...gameday(GAMEDAY_ID + 1), date: '2026-06-20', status: 'DRAFT' },
+      ]);
+      await store.saveGames([game(GAME_ID, GAMEDAY_ID), game(GAME_ID + 1, GAMEDAY_ID + 1)]);
+
+      const scope = await store.loadStoredScope('2026-01-01');
+
+      // Other rows may exist in a shared database, so look only at the reserved range.
+      assertEquals(
+        scope.gamedays.filter((row) => row.id >= RESERVED_GAMEDAYS_FROM),
+        [{ id: GAMEDAY_ID + 1, status: 'DRAFT', date: '2026-06-20' }],
+      );
+      assertEquals(
+        scope.games.filter((row) => row.id >= GAME_ID),
+        [{ id: GAME_ID + 1, gameday_id: GAMEDAY_ID + 1 }],
+      );
     }),
 });

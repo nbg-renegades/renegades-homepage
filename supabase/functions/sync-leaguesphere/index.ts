@@ -29,7 +29,6 @@ import {
   toGameEventRows,
   toLiveGameRows,
   toLiveTickRows,
-  involvesTrackedTeam,
   todaysTrackedGameIds,
   type ScoreDisagreement,
 } from '../_shared/leaguesphere/mappers.ts';
@@ -39,6 +38,17 @@ import {
   parseSnapshot,
   type UpstreamGameday,
 } from '../_shared/leaguesphere/schema.ts';
+import {
+  diffEvents,
+  gamesWithLogs,
+  livePruneAllowed,
+  MAX_PRUNED_GAMEDAYS_PER_RUN,
+  planPrune,
+  type EventDiff,
+  type PrunePlan,
+  type ScopeKind,
+  type ScopeResult,
+} from '../_shared/leaguesphere/reconcile.ts';
 import { whatIsDue, type ScheduleInput, type Task } from '../_shared/leaguesphere/schedule.ts';
 import {
   computeStandings,
@@ -282,9 +292,15 @@ async function syncTeamSnapshot(
   disagreements: string[],
 ): Promise<string> {
   const scopes = [
-    { source: SYNC_SOURCES.teamSnapshot, statuses: undefined },
-    { source: SYNC_SOURCES.draftSnapshot, statuses: ['DRAFT'] },
+    { kind: 'main', source: SYNC_SOURCES.teamSnapshot, statuses: undefined },
+    { kind: 'draft', source: SYNC_SOURCES.draftSnapshot, statuses: ['DRAFT'] },
   ] as const;
+  // What each scope told us, which is all pruning may go on. A scope that did not answer with a
+  // valid 200 stays `unknown` and proves nothing about what upstream still has.
+  const scopeResults: Record<ScopeKind, ScopeResult> = {
+    main: { outcome: 'unknown', gamedayIds: [] },
+    draft: { outcome: 'unknown', gamedayIds: [] },
+  };
 
   const gamedays: UpstreamGameday[] = [];
   const notes: string[] = [];
@@ -307,6 +323,7 @@ async function syncTeamSnapshot(
 
     if (result.kind === 'not-modified') {
       notes.push(`${scope.source}: 304`);
+      scopeResults[scope.kind] = { outcome: 'unchanged', gamedayIds: [] };
       // Still a success, and nothing to write: what we hold is already current.
       await store.recordSuccess(scope.source, now, state.get(scope.source)?.etag ?? null);
       continue;
@@ -340,6 +357,10 @@ async function syncTeamSnapshot(
     }
 
     gamedays.push(...parsed.value.gamedays);
+    scopeResults[scope.kind] = {
+      outcome: 'fresh',
+      gamedayIds: parsed.value.gamedays.map((gameday) => gameday.id),
+    };
     anyFresh = true;
     pendingSuccess.push({ source: scope.source, etag: unquoteEtag(result.etag) });
     notes.push(`${scope.source}: ${parsed.value.gamedays.length} gameday(s)`);
@@ -348,23 +369,50 @@ async function syncTeamSnapshot(
   if (!anyFresh) return notes.join(', ');
 
   const mapped = mapTeamSnapshot(gamedays, today);
+  let diff: EventDiff = { upsert: [], remove: [] };
+  let pruned: PrunePlan = { gamedayIds: [], gameIds: [], skipped: null };
 
   try {
+    // Read before anything is written: the prune compares the payload with the state it replaces.
+    const stored = await store.loadStoredScope(HISTORY_FROM);
+
     // Parents before children: a game row's foreign key needs its gameday to exist.
     await store.saveGamedays(mapped.gamedays);
     await store.saveGames(mapped.games);
 
-    // Play-by-play is replaced per game rather than upserted, because upstream can delete an
-    // entry and an upsert would leave the stale row behind.
-    for (const gameday of gamedays) {
-      for (const game of gameday.games.filter(involvesTrackedTeam)) {
-        if (game.log === null) continue;
-        await store.replaceGameEvents(game.id, toGameEventRows(game));
-      }
+    // Play-by-play is a diff against what is stored: a game that did not change writes nothing,
+    // a new or edited play is upserted, and a play upstream removed is deleted by its key.
+    const logged = gamesWithLogs(gamedays);
+    const existing = await store.loadGameEvents(logged.map((game) => game.id));
+    diff = diffEvents(existing, logged.flatMap(toGameEventRows));
+    await store.saveGameEvents(diff.upsert);
+    await store.deleteGameEvents(diff.remove);
+
+    // Remove what upstream deleted or re-published under new ids. Games first, then gamedays;
+    // the foreign keys take the plays and live rows along.
+    pruned = planPrune({
+      historyFrom: HISTORY_FROM,
+      stored,
+      scopes: scopeResults,
+      kept: {
+        gamedayIds: mapped.gamedays.map((gameday) => gameday.id),
+        gameIds: mapped.games.map((game) => game.id),
+      },
+      maxGamedays: MAX_PRUNED_GAMEDAYS_PER_RUN,
+    });
+    if (pruned.skipped !== null) {
+      // Reported, not failed: the data is fine, we just declined to delete on this evidence.
+      console.warn(`[sync] prune skipped: ${pruned.skipped}`);
+      notes.push(`prune skipped: ${pruned.skipped}`);
+    } else {
+      await store.deleteGames(pruned.gameIds);
+      await store.deleteGamedays(pruned.gamedayIds);
     }
 
-    // Keep the live tables to today's games only.
-    await store.pruneLiveGames([...todaysTrackedGameIds(gamedays, today)]);
+    // Keep the live tables to today's games only, but only when this run saw today's games.
+    if (livePruneAllowed(scopeResults)) {
+      await store.pruneLiveGames([...todaysTrackedGameIds(gamedays, today)]);
+    }
   } catch (cause) {
     // The fetch was fine and the data was valid; we could not store it. Leaving `last_ok_at`
     // and the ETag alone means the next tick retries with the same conditional request rather
@@ -384,7 +432,8 @@ async function syncTeamSnapshot(
     disagreements.push(describeDisagreement(disagreement));
   }
 
-  return `${notes.join(', ')} → ${mapped.gamedays.length} gameday(s), ${mapped.games.length} game(s), ${mapped.events.length} event(s)`;
+  return `${notes.join(', ')} → ${mapped.gamedays.length} gameday(s), ${mapped.games.length} game(s), ${mapped.events.length} event(s), ${diff.upsert.length} written, ${diff.remove.length} removed, ` +
+    `pruned ${pruned.gameIds.length} game(s), ${pruned.gamedayIds.length} gameday(s)`;
 }
 
 /**

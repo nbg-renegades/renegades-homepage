@@ -21,6 +21,7 @@ import type {
   LiveGameRow,
   LiveTickRow,
 } from './mappers.ts';
+import type { EventKey, StoredScope } from './reconcile.ts';
 import { persistedBackoffUntil } from './client.ts';
 import type { Endpoint, SnapshotBudget, SnapshotBucket } from './client.ts';
 import type { StandingsRow } from './standings.ts';
@@ -47,6 +48,10 @@ export interface StoreOptions {
 
 /** Rows per page of `selectAll`, below the 1000-row cap so a lower configured cap still works. */
 const PAGE_SIZE = 500;
+/** Ids per `in.(...)` filter, which keeps the URL far below any gateway limit. */
+const ID_CHUNK = 100;
+/** Keys per DELETE of play-by-play, about 1.5 KB of URL. */
+const EVENT_DELETE_CHUNK = 40;
 
 export class StoreError extends Error {
   constructor(message: string, readonly status: number | null) {
@@ -171,15 +176,89 @@ export class ResultsStore {
   }
 
   /**
-   * Replaces a game's play-by-play.
+   * The stored play-by-play of the given games, in key order.
    *
-   * Deleted and rewritten rather than upserted, because upstream can *remove* an entry: a
-   * mis-entered play is corrected by deleting it, and an upsert would leave the stale row
-   * behind for ever. Scoped to one game at a time so a failure cannot empty the table.
+   * Paged: a full history holds well over the 1000 rows PostgREST returns per response, and a
+   * silently truncated read would make the diff re-write the missing plays every run. Game ids
+   * go in chunks of 100 to keep the URL short.
    */
-  async replaceGameEvents(gameId: number, rows: readonly GameEventRow[]): Promise<void> {
-    await this.deleteWhere('results_game_events', `game_id=eq.${gameId}`);
+  async loadGameEvents(gameIds: readonly number[]): Promise<readonly GameEventRow[]> {
+    const rows: GameEventRow[] = [];
+    for (let index = 0; index < gameIds.length; index += ID_CHUNK) {
+      const ids = gameIds.slice(index, index + ID_CHUNK).join(',');
+      rows.push(...await this.selectAll<GameEventRow>(
+        'results_game_events',
+        `select=game_id,seq,half,side,text,points,score_home,score_away,is_deleted,is_marker` +
+          `&game_id=in.(${ids})&order=game_id,half,side,seq`,
+      ));
+    }
+    return rows;
+  }
+
+  /** Writes new and changed plays. Events carry no `updated_at`, so none is added. */
+  async saveGameEvents(rows: readonly GameEventRow[]): Promise<void> {
     await this.upsert('results_game_events', rows, 'game_id,half,side,seq');
+  }
+
+  /**
+   * Deletes plays by key, for the ones upstream removed: a mis-entered play is corrected by
+   * deleting it, and an upsert would leave the stale row behind for the rest of the season.
+   *
+   * One request per game and 40 keys at most, so the `or` filter stays a short URL. Every value
+   * is an integer or the `home`/`away` side, never an upstream string.
+   */
+  async deleteGameEvents(keys: readonly EventKey[]): Promise<void> {
+    const byGame = new Map<number, EventKey[]>();
+    for (const key of keys) byGame.set(key.game_id, [...byGame.get(key.game_id) ?? [], key]);
+
+    for (const [gameId, gameKeys] of byGame) {
+      for (let index = 0; index < gameKeys.length; index += EVENT_DELETE_CHUNK) {
+        const conditions = gameKeys
+          .slice(index, index + EVENT_DELETE_CHUNK)
+          .map((key) => `and(half.eq.${key.half},side.eq.${key.side},seq.eq.${key.seq})`)
+          .join(',');
+        await this.deleteWhere('results_game_events', `game_id=eq.${gameId}&or=(${conditions})`);
+      }
+    }
+  }
+
+  /**
+   * The gamedays from `from` on and their games, as stored now.
+   *
+   * Read before a run writes anything, so the prune compares against the state the payload is
+   * about to replace. Paged for the same reason as the plays: a truncated read would hide stored
+   * rows from the prune.
+   */
+  async loadStoredScope(from: string): Promise<StoredScope> {
+    const gamedays = await this.selectAll<StoredScope['gamedays'][number]>(
+      'results_gamedays',
+      `select=id,status,date&date=gte.${encodeURIComponent(from)}&order=id`,
+    );
+    const games: StoredScope['games'][number][] = [];
+    for (let index = 0; index < gamedays.length; index += ID_CHUNK) {
+      const ids = gamedays.slice(index, index + ID_CHUNK).map((gameday) => gameday.id).join(',');
+      games.push(...await this.selectAll<StoredScope['games'][number]>(
+        'results_games',
+        `select=id,gameday_id&gameday_id=in.(${ids})&order=id`,
+      ));
+    }
+    return { gamedays, games };
+  }
+
+  /** Deletes games by id; their plays and live rows follow through the foreign keys. */
+  async deleteGames(ids: readonly number[]): Promise<void> {
+    await this.#deleteByIds('results_games', ids);
+  }
+
+  /** Deletes gamedays by id; their games, plays and live rows follow through the foreign keys. */
+  async deleteGamedays(ids: readonly number[]): Promise<void> {
+    await this.#deleteByIds('results_gamedays', ids);
+  }
+
+  async #deleteByIds(table: string, ids: readonly number[]): Promise<void> {
+    for (let index = 0; index < ids.length; index += ID_CHUNK) {
+      await this.deleteWhere(table, `id=in.(${ids.slice(index, index + ID_CHUNK).join(',')})`);
+    }
   }
 
   /**
