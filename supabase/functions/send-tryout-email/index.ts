@@ -1,19 +1,10 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { verifyRecaptcha } from "../_shared/recaptcha.ts";
-
-export interface TryoutRequest {
-  name: string;
-  email: string;
-  phone: string;
-  age: string;
-  experience: string;
-  message: string;
-  recaptchaToken: string;
-}
+import { type TryoutRequest, tryoutEmailHtml } from "./email.ts";
 
 interface EmailData {
-  request: TryoutRequest;
+  request: TryoutRequest & { recaptchaToken: string };
 }
 
 serve(async (req) => {
@@ -76,15 +67,7 @@ serve(async (req) => {
           from: "info@nuernberg-renegades.de",
           to,
           subject: `New Tryout Request`,
-          html: `
-            <h2>New Tryout Request</h2>
-            <p><strong>From:</strong> ${request.name} (${request.email})</p>
-            <p><strong>Phone:</strong> ${request.phone}</p>
-            <p><strong>Age:</strong> ${request.age}</p>
-            <p><strong>Experience:</strong> ${request.experience}</p>
-            <p><strong>Message:</strong></p>
-            <p>${request.message.replace(/\n/g, "<br>")}</p>
-          `,
+          html: tryoutEmailHtml(request),
         }),
       });
 
