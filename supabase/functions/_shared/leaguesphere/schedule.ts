@@ -5,11 +5,12 @@
  * the whole decision, kept pure so the cadence can be tested against a clock instead of
  * observed over a weekend.
  *
- * The budget it is spending: `/api/snapshot/` allows 60 requests an hour per IP and the client
- * caps itself at 30. Two snapshot scopes (all statuses, then drafts) plus one per league season
- * means a full refresh is several calls, so "every 10 minutes" is about as fast as a gameday
- * can be polled while leaving headroom. The liveticker is far cheaper and is cached upstream
- * for 60 s, which is exactly the tick interval.
+ * The budgets it is spending: narrow `/api/snapshot/` scopes may rebuild 600 times an hour per
+ * IP and the client caps itself at 300; any request that includes standings is charged against
+ * upstream's 60 an hour and the client caps those at 20. Two snapshot scopes (all statuses,
+ * then drafts) plus one per league season means a full refresh is several calls, so "every 10
+ * minutes" is about as fast as a gameday can be polled while leaving headroom. The liveticker
+ * is far cheaper and is cached upstream for 60 s, which is exactly the tick interval.
  */
 
 import { clubInstant } from './time.ts';

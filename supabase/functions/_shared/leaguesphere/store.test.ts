@@ -1,13 +1,18 @@
 import { assert, assertEquals, assertRejects, assertStringIncludes } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 
+import { throttledError } from './client.ts';
 import {
+  BUDGET_SOURCES,
+  blocksFromPersistedState,
+  endpointForSource,
   ResultsStore,
-  SNAPSHOT_BUDGET_SOURCE,
   SYNC_SOURCES,
   StoreError,
   taskSource,
 } from './store.ts';
+import type { SyncStateRow } from './store.ts';
 import type { GamedayRow, GameEventRow } from './mappers.ts';
+import type { EventKey } from './reconcile.ts';
 import type { StandingsRow } from './standings.ts';
 
 interface Recorded {
@@ -111,33 +116,125 @@ Deno.test('a large batch is chunked rather than sent as one vast body', async ()
   assertEquals((calls[2].body as unknown[]).length, 200);
 });
 
-// ── Replace semantics ────────────────────────────────────────────────────────
+// ── Paged reads and play-by-play diff writes ─────────────────────────────────
 
-/**
- * Play-by-play is replaced, not merged. Upstream corrects a mis-entered play by deleting the
- * entry, and an upsert would leave that row in our table for the rest of the season.
- */
-Deno.test('game events are deleted before being written, scoped to one game', async () => {
-  const { store, calls } = storeWith();
-  const events: GameEventRow[] = [{
-    game_id: 7374,
-    seq: 1,
-    half: 1,
-    side: 'home',
+function jsonPage(rows: number): Response {
+  return new Response(JSON.stringify(Array.from({ length: rows }, (_, i) => ({ id: i }))), {
+    status: 200,
+  });
+}
+
+function eventRow(gameId: number, seq: number, half: 1 | 2 = 1, side: 'home' | 'away' = 'home') {
+  return {
+    game_id: gameId,
+    seq,
+    half,
+    side,
     text: 'Touchdown: #3',
     points: 6,
     score_home: 6,
     score_away: 0,
     is_deleted: false,
     is_marker: false,
-  }];
+  } satisfies GameEventRow;
+}
 
-  await store.replaceGameEvents(7374, events);
+Deno.test('selectAll pages until an empty page', async () => {
+  const { store, calls } = storeWith([jsonPage(500), jsonPage(500), jsonPage(274), jsonPage(0)]);
 
-  assertEquals(calls[0].method, 'DELETE');
-  assertEquals(calls[0].path, '/results_game_events?game_id=eq.7374');
-  assertEquals(calls[1].method, 'POST');
-  assertStringIncludes(calls[1].path, 'on_conflict=game_id%2Chalf%2Cside%2Cseq');
+  const rows = await store.selectAll('results_games', 'select=id&order=id');
+
+  assertEquals(rows.length, 1274);
+  assertEquals(calls.map((call) => call.method), ['GET', 'GET', 'GET', 'GET']);
+  assertEquals(calls.map((call) => call.path), [
+    '/results_games?select=id&order=id&limit=500&offset=0',
+    '/results_games?select=id&order=id&limit=500&offset=500',
+    '/results_games?select=id&order=id&limit=500&offset=1000',
+    '/results_games?select=id&order=id&limit=500&offset=1274',
+  ]);
+});
+
+Deno.test('selectAll keeps paging when the server caps below the page size', async () => {
+  const { store, calls } = storeWith([jsonPage(300), jsonPage(300), jsonPage(0)]);
+
+  const rows = await store.selectAll('results_games', 'select=id&order=id');
+
+  // A short page does not mean the last one: PostgREST may be configured with a lower cap.
+  assertEquals(rows.length, 600);
+  assertEquals(calls.length, 3);
+});
+
+Deno.test('selectAll fails loudly on a non-array page', async () => {
+  const { store } = storeWith([new Response('{"message":"nope"}', { status: 200 })]);
+
+  await assertRejects(() => store.selectAll('results_games', 'select=id&order=id'), StoreError);
+});
+
+Deno.test('play-by-play is loaded in chunks of 100 game ids, ordered by key', async () => {
+  const { store, calls } = storeWith([jsonPage(0), jsonPage(0)]);
+  const ids = Array.from({ length: 150 }, (_, i) => 1000 + i);
+
+  await store.loadGameEvents(ids);
+
+  assertEquals(calls.length, 2);
+  const lists = calls.map((call) => /game_id=in\.\(([^)]*)\)/.exec(call.path)?.[1].split(','));
+  assertEquals(lists[0]?.length, 100);
+  assertEquals(lists[1]?.length, 50);
+  assertEquals(lists[0]?.[0], '1000');
+  assertEquals(lists[1]?.[0], '1100');
+  for (const call of calls) {
+    assertStringIncludes(call.path, 'order=game_id,half,side,seq');
+    assertStringIncludes(
+      call.path,
+      'select=game_id,seq,half,side,text,points,score_home,score_away,is_deleted,is_marker',
+    );
+  }
+});
+
+Deno.test('loading play-by-play for no games makes no request', async () => {
+  const { store, calls } = storeWith();
+  assertEquals(await store.loadGameEvents([]), []);
+  assertEquals(calls.length, 0);
+});
+
+Deno.test('vanished plays are deleted per game by composite key, 40 at a time', async () => {
+  const { store, calls } = storeWith();
+  const keys: EventKey[] = [];
+  for (let seq = 1; seq <= 45; seq += 1) keys.push({ game_id: 7, half: 1, side: 'home', seq });
+  keys.push({ game_id: 8, half: 2, side: 'away', seq: 3 });
+
+  await store.deleteGameEvents(keys);
+
+  assertEquals(calls.length, 3);
+  assert(calls.every((call) => call.method === 'DELETE'));
+  const first = calls[0].path;
+  assert(
+    first.startsWith('/results_game_events?game_id=eq.7&or=(and(half.eq.1,side.eq.home,seq.eq.1),'),
+  );
+  assertEquals(first.split('and(').length - 1, 40);
+  assertEquals(calls[1].path.split('and(').length - 1, 5);
+  assertEquals(
+    calls[2].path,
+    '/results_game_events?game_id=eq.8&or=(and(half.eq.2,side.eq.away,seq.eq.3))',
+  );
+});
+
+Deno.test('changed plays are upserted on the composite key', async () => {
+  const { store, calls } = storeWith();
+
+  await store.saveGameEvents([eventRow(7, 1), eventRow(7, 2, 2, 'away')]);
+
+  assertEquals(calls.length, 1);
+  assertEquals(calls[0].method, 'POST');
+  assertEquals(calls[0].path, '/results_game_events?on_conflict=game_id%2Chalf%2Cside%2Cseq');
+  assertEquals((calls[0].body as unknown[]).length, 2);
+});
+
+Deno.test('an empty diff makes no request', async () => {
+  const { store, calls } = storeWith();
+  await store.saveGameEvents([]);
+  await store.deleteGameEvents([]);
+  assertEquals(calls.length, 0);
 });
 
 Deno.test('standings are replaced per league season, not globally', async () => {
@@ -255,16 +352,89 @@ Deno.test('a success stamps last_ok_at, stores the ETag and clears the error and
   assert(!('calls_last_hour' in row));
 });
 
-Deno.test('the snapshot budget is stored with the window it was spent in', async () => {
+Deno.test('each snapshot budget is stored on its own row', async () => {
   const { store, calls } = storeWith();
   const windowStartedAt = new Date('2026-09-30T09:15:00Z');
-  await store.recordSnapshotBudget({ calls: 7, windowStartedAt }, new Date('2026-09-30T09:40:00Z'));
+  const at = new Date('2026-09-30T09:40:00Z');
+  await store.recordSnapshotBudget(BUDGET_SOURCES['snapshot-standings'], { calls: 4, windowStartedAt }, at);
+  await store.recordSnapshotBudget(BUDGET_SOURCES.snapshot, { calls: 7, windowStartedAt }, at);
 
-  const row = (calls[0].body as Record<string, unknown>[])[0];
-  assertEquals(row['source'], SNAPSHOT_BUDGET_SOURCE);
-  assertEquals(row['calls_last_hour'], 7);
-  assertEquals(row['calls_window_started_at'], '2026-09-30T09:15:00.000Z');
-  assert(!('last_ok_at' in row), 'recording the budget is not a success');
+  const standings = (calls[0].body as Record<string, unknown>[])[0];
+  assertEquals(standings['source'], 'snapshot:standings');
+  assertEquals(standings['calls_last_hour'], 4);
+  assertEquals(standings['calls_window_started_at'], '2026-09-30T09:15:00.000Z');
+
+  const narrow = (calls[1].body as Record<string, unknown>[])[0];
+  assertEquals(narrow['source'], 'snapshot:teams');
+  assertEquals(narrow['calls_last_hour'], 7);
+
+  for (const row of [standings, narrow]) {
+    assert(!('etag' in row), 'recording the budget must not touch the ETag');
+    assert(!('last_ok_at' in row), 'recording the budget is not a success');
+    assert(!('last_error' in row), 'recording the budget must not clear a stored 429');
+  }
+});
+
+Deno.test('the two snapshot budgets live on the teams and standings rows', () => {
+  assertEquals(BUDGET_SOURCES, {
+    snapshot: 'snapshot:teams',
+    'snapshot-standings': 'snapshot:standings',
+  });
+});
+
+Deno.test('every sync-state row maps to the budget its calls spend', () => {
+  assertEquals(endpointForSource('snapshot:teams'), 'snapshot');
+  assertEquals(endpointForSource('snapshot:draft'), 'snapshot');
+  assertEquals(endpointForSource('snapshot:league:ff-bl:2026'), 'snapshot');
+  assertEquals(endpointForSource('snapshot:standings'), 'snapshot-standings');
+  assertEquals(endpointForSource('league-table:ff-bl:2026'), 'league-table');
+  assertEquals(endpointForSource('liveticker'), 'liveticker');
+  assertEquals(endpointForSource('something-else'), null);
+});
+
+function stateRow(source: string, lastError: string | null): SyncStateRow {
+  return {
+    source,
+    etag: null,
+    last_attempt_at: null,
+    last_ok_at: null,
+    last_error: lastError,
+    calls_last_hour: 0,
+    calls_window_started_at: null,
+    alerted_at: null,
+  };
+}
+
+Deno.test('a 429 stored on a row blocks the bucket of that row on the next tick', () => {
+  const now = 1_700_000_000_000;
+  // Written a minute ago with a ten-minute Retry-After: nine minutes are left.
+  const live = throttledError(600_000, now - 60_000);
+
+  const draft = blocksFromPersistedState([stateRow('snapshot:draft', live)], now);
+  assertEquals([...draft], [['snapshot', now + 540_000]]);
+
+  const standings = blocksFromPersistedState([stateRow('snapshot:standings', live)], now);
+  assertEquals([...standings], [['snapshot-standings', now + 540_000]]);
+
+  const ticker = blocksFromPersistedState([stateRow('liveticker', live)], now);
+  assertEquals([...ticker], [['liveticker', now + 540_000]]);
+
+  const expired = throttledError(60_000, now - 120_000);
+  assertEquals(blocksFromPersistedState([stateRow('snapshot:teams', expired)], now).size, 0);
+  assertEquals(
+    blocksFromPersistedState([stateRow('snapshot:teams', 'HTTP 500 — upstream down')], now).size,
+    0,
+  );
+  assertEquals(blocksFromPersistedState([stateRow('snapshot:teams', null)], now).size, 0);
+  assertEquals(blocksFromPersistedState([stateRow('something-else', live)], now).size, 0);
+
+  // Two rows of one bucket: the later instant wins.
+  const later = throttledError(600_000, now);
+  const both = blocksFromPersistedState([
+    stateRow('snapshot:teams', live),
+    stateRow('snapshot:draft', later),
+  ], now);
+  assertEquals(both.get('snapshot'), now + 600_000);
 });
 
 Deno.test('sync state loads into a map keyed by source', async () => {
@@ -338,4 +508,46 @@ Deno.test('a store error never contains the service role key', async () => {
 Deno.test('a 204 with no body is not treated as a parse failure', async () => {
   const { store } = storeWith([new Response(null, { status: 204 })]);
   await store.saveGamedays([gameday(1)]);
+});
+
+// ── Pruning ──────────────────────────────────────────────────────────────────
+
+Deno.test('the stored scope is read from historyFrom on, with each gameday’s games', async () => {
+  const gamedays = new Response(JSON.stringify(
+    Array.from({ length: 150 }, (_, i) => ({ id: i + 1, status: 'PUBLISHED', date: '2026-06-20' })),
+  ));
+  const games = new Response(JSON.stringify([{ id: 900, gameday_id: 1 }]));
+  const { store, calls } = storeWith([gamedays, jsonPage(0), games, jsonPage(0), jsonPage(0)]);
+
+  const scope = await store.loadStoredScope('2026-01-01');
+
+  assertEquals(scope.gamedays.length, 150);
+  assertEquals(scope.games, [{ id: 900, gameday_id: 1 }]);
+  assertStringIncludes(calls[0].path, '/results_gamedays?select=id,status,date&date=gte.2026-01-01');
+  assertStringIncludes(calls[0].path, 'order=id');
+  // Games come per 100 gamedays: chunks of 100 and 50 ids, each paged to its empty page.
+  const chunks = calls.slice(2).filter((call) => call.path.includes('offset=0'));
+  assertEquals(chunks.length, 2);
+  assertStringIncludes(chunks[0].path, '/results_games?select=id,gameday_id&gameday_id=in.(1,2,');
+  assertStringIncludes(chunks[1].path, 'gameday_id=in.(101,102,');
+});
+
+Deno.test('games and gamedays are deleted by id in chunks of 100', async () => {
+  const { store, calls } = storeWith();
+
+  await store.deleteGames(Array.from({ length: 150 }, (_, i) => i + 1));
+  await store.deleteGamedays([7, 8]);
+
+  assertEquals(calls.map((call) => call.method), ['DELETE', 'DELETE', 'DELETE']);
+  assertStringIncludes(calls[0].path, '/results_games?id=in.(1,2,');
+  assertEquals(calls[0].path.split(',').length, 100);
+  assertStringIncludes(calls[1].path, '/results_games?id=in.(101,');
+  assertEquals(calls[2].path, '/results_gamedays?id=in.(7,8)');
+});
+
+Deno.test('an empty delete list makes no request', async () => {
+  const { store, calls } = storeWith();
+  await store.deleteGames([]);
+  await store.deleteGamedays([]);
+  assertEquals(calls.length, 0);
 });

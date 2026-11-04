@@ -21,7 +21,9 @@ import type {
   LiveGameRow,
   LiveTickRow,
 } from './mappers.ts';
-import type { SnapshotBudget } from './client.ts';
+import type { EventKey, StoredScope } from './reconcile.ts';
+import { persistedBackoffUntil } from './client.ts';
+import type { Endpoint, SnapshotBudget, SnapshotBucket } from './client.ts';
 import type { StandingsRow } from './standings.ts';
 import type { Task } from './schedule.ts';
 
@@ -43,6 +45,13 @@ export interface StoreOptions {
   readonly fetchImpl?: typeof fetch;
   readonly log?: (message: string) => void;
 }
+
+/** Rows per page of `selectAll`, below the 1000-row cap so a lower configured cap still works. */
+const PAGE_SIZE = 500;
+/** Ids per `in.(...)` filter, which keeps the URL far below any gateway limit. */
+const ID_CHUNK = 100;
+/** Keys per DELETE of play-by-play, about 1.5 KB of URL. */
+const EVENT_DELETE_CHUNK = 40;
 
 export class StoreError extends Error {
   constructor(message: string, readonly status: number | null) {
@@ -126,6 +135,29 @@ export class ResultsStore {
     return Array.isArray(result) ? result as T[] : [];
   }
 
+  /**
+   * Every row a query matches, read in pages.
+   *
+   * PostgREST caps a response at its `max-rows` (1000 on hosted Supabase) and answers 200 with
+   * the first rows, so a plain `select` over a big table is silently short. `query` must carry
+   * an `order=` so the pages do not overlap. Stops on an empty page rather than a short one: a
+   * server capped below `pageSize` would otherwise look finished after its first page. A page
+   * that is not an array is an error here, unlike in `select`, because a diff or prune built on
+   * a read that quietly returned nothing would write or delete the wrong rows.
+   */
+  async selectAll<T>(table: string, query: string, pageSize = PAGE_SIZE): Promise<readonly T[]> {
+    const rows: T[] = [];
+    for (;;) {
+      const path = `/${table}?${query}&limit=${pageSize}&offset=${rows.length}`;
+      const page = await this.#request(path, { method: 'GET' });
+      if (!Array.isArray(page)) {
+        throw new StoreError(`GET ${path} → expected an array of rows`, null);
+      }
+      if (page.length === 0) return rows;
+      rows.push(...page as T[]);
+    }
+  }
+
   async deleteWhere(table: string, filter: string): Promise<void> {
     await this.#request(`/${table}?${filter}`, {
       method: 'DELETE',
@@ -144,15 +176,89 @@ export class ResultsStore {
   }
 
   /**
-   * Replaces a game's play-by-play.
+   * The stored play-by-play of the given games, in key order.
    *
-   * Deleted and rewritten rather than upserted, because upstream can *remove* an entry: a
-   * mis-entered play is corrected by deleting it, and an upsert would leave the stale row
-   * behind for ever. Scoped to one game at a time so a failure cannot empty the table.
+   * Paged: a full history holds well over the 1000 rows PostgREST returns per response, and a
+   * silently truncated read would make the diff re-write the missing plays every run. Game ids
+   * go in chunks of 100 to keep the URL short.
    */
-  async replaceGameEvents(gameId: number, rows: readonly GameEventRow[]): Promise<void> {
-    await this.deleteWhere('results_game_events', `game_id=eq.${gameId}`);
+  async loadGameEvents(gameIds: readonly number[]): Promise<readonly GameEventRow[]> {
+    const rows: GameEventRow[] = [];
+    for (let index = 0; index < gameIds.length; index += ID_CHUNK) {
+      const ids = gameIds.slice(index, index + ID_CHUNK).join(',');
+      rows.push(...await this.selectAll<GameEventRow>(
+        'results_game_events',
+        `select=game_id,seq,half,side,text,points,score_home,score_away,is_deleted,is_marker` +
+          `&game_id=in.(${ids})&order=game_id,half,side,seq`,
+      ));
+    }
+    return rows;
+  }
+
+  /** Writes new and changed plays. Events carry no `updated_at`, so none is added. */
+  async saveGameEvents(rows: readonly GameEventRow[]): Promise<void> {
     await this.upsert('results_game_events', rows, 'game_id,half,side,seq');
+  }
+
+  /**
+   * Deletes plays by key, for the ones upstream removed: a mis-entered play is corrected by
+   * deleting it, and an upsert would leave the stale row behind for the rest of the season.
+   *
+   * One request per game and 40 keys at most, so the `or` filter stays a short URL. Every value
+   * is an integer or the `home`/`away` side, never an upstream string.
+   */
+  async deleteGameEvents(keys: readonly EventKey[]): Promise<void> {
+    const byGame = new Map<number, EventKey[]>();
+    for (const key of keys) byGame.set(key.game_id, [...byGame.get(key.game_id) ?? [], key]);
+
+    for (const [gameId, gameKeys] of byGame) {
+      for (let index = 0; index < gameKeys.length; index += EVENT_DELETE_CHUNK) {
+        const conditions = gameKeys
+          .slice(index, index + EVENT_DELETE_CHUNK)
+          .map((key) => `and(half.eq.${key.half},side.eq.${key.side},seq.eq.${key.seq})`)
+          .join(',');
+        await this.deleteWhere('results_game_events', `game_id=eq.${gameId}&or=(${conditions})`);
+      }
+    }
+  }
+
+  /**
+   * The gamedays from `from` on and their games, as stored now.
+   *
+   * Read before a run writes anything, so the prune compares against the state the payload is
+   * about to replace. Paged for the same reason as the plays: a truncated read would hide stored
+   * rows from the prune.
+   */
+  async loadStoredScope(from: string): Promise<StoredScope> {
+    const gamedays = await this.selectAll<StoredScope['gamedays'][number]>(
+      'results_gamedays',
+      `select=id,status,date&date=gte.${encodeURIComponent(from)}&order=id`,
+    );
+    const games: StoredScope['games'][number][] = [];
+    for (let index = 0; index < gamedays.length; index += ID_CHUNK) {
+      const ids = gamedays.slice(index, index + ID_CHUNK).map((gameday) => gameday.id).join(',');
+      games.push(...await this.selectAll<StoredScope['games'][number]>(
+        'results_games',
+        `select=id,gameday_id&gameday_id=in.(${ids})&order=id`,
+      ));
+    }
+    return { gamedays, games };
+  }
+
+  /** Deletes games by id; their plays and live rows follow through the foreign keys. */
+  async deleteGames(ids: readonly number[]): Promise<void> {
+    await this.#deleteByIds('results_games', ids);
+  }
+
+  /** Deletes gamedays by id; their games, plays and live rows follow through the foreign keys. */
+  async deleteGamedays(ids: readonly number[]): Promise<void> {
+    await this.#deleteByIds('results_gamedays', ids);
+  }
+
+  async #deleteByIds(table: string, ids: readonly number[]): Promise<void> {
+    for (let index = 0; index < ids.length; index += ID_CHUNK) {
+      await this.deleteWhere(table, `id=in.(${ids.slice(index, index + ID_CHUNK).join(',')})`);
+    }
   }
 
   /**
@@ -264,12 +370,12 @@ export class ResultsStore {
   }
 
   /**
-   * The snapshot budget, spent across every snapshot scope, so it is kept on one row
-   * (`SNAPSHOT_BUDGET_SOURCE`) rather than on each scope's.
+   * One snapshot budget, on the row `BUDGET_SOURCES` names for it. Only the budget columns are
+   * written, so a stored ETag, success time or 429 on the same row survives.
    */
-  async recordSnapshotBudget(budget: SnapshotBudget, at: Date): Promise<void> {
+  async recordSnapshotBudget(source: string, budget: SnapshotBudget, at: Date): Promise<void> {
     await this.upsert('results_sync_state', [{
-      source: SNAPSHOT_BUDGET_SOURCE,
+      source,
       calls_last_hour: budget.calls,
       calls_window_started_at: budget.windowStartedAt.toISOString(),
       updated_at: at.toISOString(),
@@ -315,13 +421,56 @@ function toStandingsColumns(row: StandingsRow): Record<string, unknown> {
 export const SYNC_SOURCES = {
   teamSnapshot: 'snapshot:teams',
   draftSnapshot: 'snapshot:draft',
+  standingsSnapshot: 'snapshot:standings',
   liveticker: 'liveticker',
   leagueSnapshot: (key: string, season: string) => `snapshot:league:${key}:${season}`,
   leagueTable: (key: string, season: string) => `league-table:${key}:${season}`,
 } as const;
 
-/** The row that carries the shared snapshot budget between ticks. */
-export const SNAPSHOT_BUDGET_SOURCE = SYNC_SOURCES.teamSnapshot;
+/**
+ * The rows that carry the two snapshot budgets between ticks (D-15). Each budget lives on the
+ * row of the scope that spends it most, so no migration is needed: the narrow budget stays on
+ * `snapshot:teams`, and the standings budget gets a row of its own on its first call.
+ */
+export const BUDGET_SOURCES: Readonly<Record<SnapshotBucket, string>> = {
+  snapshot: SYNC_SOURCES.teamSnapshot,
+  'snapshot-standings': SYNC_SOURCES.standingsSnapshot,
+};
+
+/**
+ * The budget a sync-state row's calls are spent against, or null for a row we do not know.
+ * Routes a persisted 429 back to the bucket that received it. `snapshot:standings` is checked
+ * before the `snapshot:` prefix that every other snapshot scope shares.
+ */
+export function endpointForSource(source: string): Endpoint | null {
+  if (source === SYNC_SOURCES.standingsSnapshot) return 'snapshot-standings';
+  if (source.startsWith('snapshot:')) return 'snapshot';
+  if (source.startsWith('league-table')) return 'league-table';
+  if (source === SYNC_SOURCES.liveticker) return 'liveticker';
+  return null;
+}
+
+/**
+ * The 429 back-offs the last ticks left in `last_error`, per bucket (D-25).
+ *
+ * The client is rebuilt every tick, so without this a `Retry-After` of ten minutes would be
+ * forgotten after one. Per bucket, because a 429 on the standings budget must not stop a live
+ * poll. The latest instant wins when several rows of one bucket carry one.
+ */
+export function blocksFromPersistedState(
+  rows: Iterable<SyncStateRow>,
+  now: number,
+): ReadonlyMap<Endpoint, number> {
+  const blocks = new Map<Endpoint, number>();
+  for (const row of rows) {
+    const endpoint = endpointForSource(row.source);
+    if (endpoint === null) continue;
+    const until = persistedBackoffUntil(row.last_error, now);
+    if (until === null) continue;
+    blocks.set(endpoint, Math.max(blocks.get(endpoint) ?? 0, until));
+  }
+  return blocks;
+}
 
 /** Maps a task to the `source` whose `last_ok_at` gates it. */
 export function taskSource(task: Task): string {
