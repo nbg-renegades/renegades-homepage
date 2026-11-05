@@ -415,7 +415,8 @@ The function decides on each tick what is actually due, so most minutes it does 
 when there is no gameday, every ten minutes inside one, and the liveticker every minute while a
 gameday is running. Narrow `/api/snapshot/` scopes may rebuild 600 times an hour per IP and
 the client holds itself to 300; requests that include standings count against upstream's 60 an
-hour and the client holds itself to 20.
+hour and the client holds itself to 20. The league tables are one such request for both teams'
+leagues, so they spend that smaller budget.
 
 **Nothing upstream is trusted.** Every response is validated against a schema before anything is
 written. On a mismatch the sync records the error and writes nothing, so the site keeps serving
@@ -424,11 +425,6 @@ the other end.
 
 ### Things that will bite you
 
-- **`league` and `season` in `/api/snapshot/` are primary keys, not names.** `season=2026` is a
-  400; the 2026 season is id `6`. The league ids are in
-  `supabase/functions/_shared/leaguesphere/config.ts`.
-- **`/api/league-table/` takes slugs, and they are not our config keys.** The first team's league
-  is `dffl`; `dkb-dffl` is a 404.
 - **`final_score` is never null** — it is `{home: 0, away: 0}` for a game nobody has played. Use
   `status === 'beendet'`.
 - **`pa` is points *against*.** A team's own score is `fh + sh`, which is its opponent's `pa`.
@@ -438,37 +434,26 @@ the other end.
 
 ### Standings come from upstream, not from us
 
-`results_standings` stores `/api/league-table/` verbatim. The sync also computes the table itself
-on every run and logs the differences, but those numbers are never displayed.
+`results_standings` stores the `standings` of the snapshot for both teams' leagues, read in one
+request (`?team=159&team=287&year=<YYYY>&include=standings`) with upstream's own rank and group.
+The year is the one of the newest stored gameday, so January still shows last season's table. An
+empty answer, for example a new season nobody has played in yet, keeps the last good table and
+counts as a success. A team that left a league disappears from its table on the next write,
+which happens after the upsert, so the table is never empty for a reader.
 
-The reason is that the two leagues do not share a ruleset. FF BL divides win points by games
-played and our own computation reproduces the published table exactly, all 23 teams. DKB DFFL
-divides by a fixed 30 and weights a win by the opponent's league, using configuration no public
-endpoint exposes — we reproduce its games, W/D/L and points for and against exactly, but not its
-quotient. Publishing our own figures there would mean publishing wrong ones.
+We never compute the tables ourselves. The two leagues do not share a ruleset: FF BL divides win
+points by games played, DKB DFFL by a fixed 30 and weights a win by the opponent's league. Those
+rulesets and the per-team adjustments are admin configuration upstream that no public endpoint
+exposes, so figures of our own would be wrong for DKB DFFL.
 
-### Adding a league season
+### Adding a league
 
-Add an entry to `LEAGUE_SEASONS` in `supabase/functions/_shared/leaguesphere/config.ts`:
-
-```ts
-{
-  key: 'ff-bl',              // ours; appears in results_standings.league_key
-  season: '2027',
-  leaguePk: 18,              // /api/snapshot/?league=
-  seasonPk: 7,               // /api/snapshot/?season=  — a PK, not a year
-  leagueDisplay: 'FF BL',    // the only league name a gameday carries
-  tableSlug: 'ff-bl',        // /api/league-table/<slug>/<season>/
-  name: 'FF BL 2027',
-  excludeGamedayIds: [],     // playoff gamedays that must not count
-  promotionRestricted: [],   // second teams, greyed out in the table
-  standingsSource: 'official',
-}
-```
-
-Then map the team to it in `src/app/components/results/results.config.ts`. Find the primary keys
-by fetching one gameday of that league and reading its `league` and `season` fields. Deploy the
-function afterwards — the config ships inside it.
+Add the upstream league slug to `LEAGUE_KEY_BY_SLUG` in
+`supabase/functions/_shared/leaguesphere/config.ts`, with the key the frontend reads. The season
+needs no entry: it comes from the snapshot. List a league's second teams, which cannot be
+promoted, in `PROMOTION_RESTRICTED` under `<league_key>:<season>`. Then map the team to it in
+`src/app/components/results/results.config.ts` and deploy the function afterwards, because the
+config ships inside it.
 
 ### Team names and logos
 

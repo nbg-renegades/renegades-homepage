@@ -82,8 +82,14 @@ Deno.serve({ port }, (req) => {
   }
 
   if (url.pathname === '/api/liveticker/') return json([currentLiveGame()]);
-  if (url.pathname === '/api/snapshot/') return json(currentSnapshot());
-  if (url.pathname.startsWith('/api/league-table/')) return json(emptyTable(url.pathname));
+  if (url.pathname === '/api/snapshot/') {
+    // Empty on purpose: an empty standings payload keeps the stored tables, so a replay cannot
+    // wipe the standings it is not testing.
+    if (url.searchParams.get('include')?.split(',').includes('standings')) {
+      return json({ generated_at: new Date().toISOString(), gamedays: [], standings: [] });
+    }
+    return json(currentSnapshot());
+  }
 
   return new Response('not found', { status: 404 });
 });
@@ -186,17 +192,6 @@ function emptyLog() {
     secondhalf: { score: 0, entries: [] },
   });
   return { gameId, isFirstHalf: false, home: side(159, 'Nürn'), away: side(112, 'LLions') };
-}
-
-function emptyTable(pathname: string) {
-  const [, , , slug = 'dffl', season = '2026'] = pathname.split('/');
-  return {
-    league: { slug, name: slug },
-    season: { slug: season, name: season },
-    // Empty on purpose: the sync refuses to overwrite a good table with an empty one, so a
-    // replay cannot wipe the standings it is not testing.
-    standing: [],
-  };
 }
 
 /** Mirrors `tickPoints` in `_shared/leaguesphere/scoring.ts`. */

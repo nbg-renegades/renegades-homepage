@@ -262,25 +262,38 @@ export class ResultsStore {
   }
 
   /**
-   * Replaces a league season's table.
+   * Writes a league season's table without ever leaving it empty for a reader.
    *
-   * Also a delete-then-insert: a team can leave a league between syncs, and an upsert would
-   * keep it in the table at its last known rank for the rest of the season.
+   * A team can leave a league between syncs, so teams missing from the new set are removed,
+   * but only after the upsert: the old delete-then-insert showed an empty table in between.
+   * An empty list writes and deletes nothing. `season` arrives validated as four digits and
+   * is URI-encoded anyway.
    */
-  async replaceStandings(
+  async saveStandings(
     leagueKey: string,
     season: string,
     rows: readonly StandingsRow[],
   ): Promise<void> {
-    await this.deleteWhere(
-      'results_standings',
-      `league_key=eq.${encodeURIComponent(leagueKey)}&season=eq.${encodeURIComponent(season)}`,
-    );
+    if (rows.length === 0) return;
     await this.upsert(
       'results_standings',
       withTimestamp(rows.map(toStandingsColumns)),
       'league_key,season,team_id',
     );
+    await this.deleteWhere(
+      'results_standings',
+      `league_key=eq.${encodeURIComponent(leagueKey)}&season=eq.${encodeURIComponent(season)}` +
+        `&team_id=not.in.(${rows.map((row) => row.teamId).join(',')})`,
+    );
+  }
+
+  /** The date of the newest gameday we store, or null before the first sync. */
+  async newestGamedayDate(): Promise<string | null> {
+    const rows = await this.select<{ date: string }>(
+      'results_gamedays',
+      'select=date&order=date.desc&limit=1',
+    );
+    return rows[0]?.date ?? null;
   }
 
   async saveLiveGames(rows: readonly LiveGameRow[]): Promise<void> {
@@ -423,8 +436,6 @@ export const SYNC_SOURCES = {
   draftSnapshot: 'snapshot:draft',
   standingsSnapshot: 'snapshot:standings',
   liveticker: 'liveticker',
-  leagueSnapshot: (key: string, season: string) => `snapshot:league:${key}:${season}`,
-  leagueTable: (key: string, season: string) => `league-table:${key}:${season}`,
 } as const;
 
 /**
@@ -445,7 +456,6 @@ export const BUDGET_SOURCES: Readonly<Record<SnapshotBucket, string>> = {
 export function endpointForSource(source: string): Endpoint | null {
   if (source === SYNC_SOURCES.standingsSnapshot) return 'snapshot-standings';
   if (source.startsWith('snapshot:')) return 'snapshot';
-  if (source.startsWith('league-table')) return 'league-table';
   if (source === SYNC_SOURCES.liveticker) return 'liveticker';
   return null;
 }
@@ -479,9 +489,7 @@ export function taskSource(task: Task): string {
       return SYNC_SOURCES.teamSnapshot;
     case 'liveticker':
       return SYNC_SOURCES.liveticker;
-    case 'league-table':
-      return 'league-table';
-    case 'league-snapshot':
-      return 'snapshot:league';
+    case 'standings':
+      return SYNC_SOURCES.standingsSnapshot;
   }
 }

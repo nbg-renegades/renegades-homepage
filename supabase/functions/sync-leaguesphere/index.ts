@@ -23,7 +23,7 @@ import {
   unquoteEtag,
 } from '../_shared/leaguesphere/client.ts';
 import type { SnapshotBucket } from '../_shared/leaguesphere/client.ts';
-import { LEAGUE_SEASONS, TEAM_IDS } from '../_shared/leaguesphere/config.ts';
+import { TEAM_IDS } from '../_shared/leaguesphere/config.ts';
 import {
   mapTeamSnapshot,
   toGameEventRows,
@@ -33,9 +33,9 @@ import {
   type ScoreDisagreement,
 } from '../_shared/leaguesphere/mappers.ts';
 import {
-  parseLeagueTable,
   parseLiveticker,
   parseSnapshot,
+  parseStandings,
   type UpstreamGameday,
 } from '../_shared/leaguesphere/schema.ts';
 import {
@@ -51,10 +51,9 @@ import {
 } from '../_shared/leaguesphere/reconcile.ts';
 import { whatIsDue, type ScheduleInput, type Task } from '../_shared/leaguesphere/schedule.ts';
 import {
-  computeStandings,
-  diffStandings,
-  mapOfficialTable,
-  summariseCheck,
+  mapSnapshotStandings,
+  standingsOutcome,
+  standingsYear,
 } from '../_shared/leaguesphere/standings.ts';
 import {
   blocksFromPersistedState,
@@ -188,11 +187,8 @@ async function run(): Promise<RunReport> {
         case 'team-snapshot':
           outcomes[task] = await syncTeamSnapshot(store, client, state, now, today, disagreements);
           break;
-        case 'league-table':
-          outcomes[task] = await syncLeagueTables(store, client, state, now);
-          break;
-        case 'league-snapshot':
-          outcomes[task] = await crossCheckStandings(store, client, state, now, disagreements);
+        case 'standings':
+          outcomes[task] = await syncStandings(store, client, state, now, today);
           break;
       }
     } catch (cause) {
@@ -238,8 +234,7 @@ async function buildScheduleInput(
   const lastOkAt: Partial<Record<Task, Date | null>> = {
     'team-snapshot': toDate(state.get(SYNC_SOURCES.teamSnapshot)?.last_ok_at),
     liveticker: toDate(state.get(SYNC_SOURCES.liveticker)?.last_ok_at),
-    'league-table': earliestLeagueOk(state, SYNC_SOURCES.leagueTable),
-    'league-snapshot': earliestLeagueOk(state, SYNC_SOURCES.leagueSnapshot),
+    standings: toDate(state.get(SYNC_SOURCES.standingsSnapshot)?.last_ok_at),
   };
 
   return {
@@ -251,26 +246,6 @@ async function buildScheduleInput(
     gameInProgress: games.some((game) => !game.finished && game.status !== 'Geplant'),
     gamedayFinished: games.length > 0 && games.every((game) => game.finished),
   };
-}
-
-/**
- * The oldest success across every league season.
- *
- * Taking the oldest means one league season lagging pulls all of them forward. They are read
- * together anyway, and a table that is an hour older than its neighbour is the kind of
- * inconsistency nobody would think to look for.
- */
-function earliestLeagueOk(
-  state: ReadonlyMap<string, { last_ok_at: string | null }>,
-  source: (key: string, season: string) => string,
-): Date | null {
-  let earliest: Date | null = null;
-  for (const config of LEAGUE_SEASONS) {
-    const at = toDate(state.get(source(config.key, config.season))?.last_ok_at);
-    if (at === null) return null; // never run for this season: due now
-    if (earliest === null || at < earliest) earliest = at;
-  }
-  return earliest;
 }
 
 // ── Tasks ────────────────────────────────────────────────────────────────────
@@ -504,173 +479,74 @@ async function syncLiveticker(
   return `${rows.length} live game(s) of ${parsed.value.length} returned, ${ticks.length} tick(s)`;
 }
 
-/** The published tables — the standings we actually display. */
-async function syncLeagueTables(
-  store: ResultsStore,
-  client: LeagueSphereClient,
-  state: ReadonlyMap<string, { etag: string | null }>,
-  now: Date,
-): Promise<string> {
-  const notes: string[] = [];
-
-  for (const config of LEAGUE_SEASONS) {
-    const source = SYNC_SOURCES.leagueTable(config.key, config.season);
-    await store.recordAttempt(source, now);
-
-    // The slug is not our config key: DKB DFFL is `dffl`, and `dkb-dffl` is a 404.
-    const result = await client.leagueTable(
-      config.tableSlug,
-      config.season,
-      state.get(source)?.etag ?? null,
-    );
-
-    if (result.kind === 'not-modified') {
-      await store.recordSuccess(source, now, state.get(source)?.etag ?? null);
-      notes.push(`${config.key}: 304`);
-      continue;
-    }
-    if (result.kind === 'capped') {
-      notes.push(`${config.key}: deferred`);
-      continue;
-    }
-    if (result.kind === 'throttled') {
-      await store.recordFailure(source, now, throttledError(result.retryAfterMs, now.getTime()));
-      notes.push(`${config.key}: throttled`);
-      continue;
-    }
-    if (result.kind === 'error') {
-      await store.recordFailure(source, now, result.message);
-      notes.push(`${config.key}: ${result.message}`);
-      continue;
-    }
-
-    const parsed = parseLeagueTable(result.body);
-    if (!parsed.ok) {
-      const message = `schema mismatch: ${parsed.errors.slice(0, 5).join('; ')}`;
-      await store.recordFailure(source, now, message);
-      notes.push(`${config.key}: ${message}`);
-      continue;
-    }
-
-    const rows = mapOfficialTable(config, parsed.value);
-    // An empty table would blank the standings tab. Far more likely a mistake upstream than a
-    // league genuinely having no played games, so it is refused rather than written.
-    if (rows.length === 0) {
-      await store.recordFailure(source, now, 'published table held no played teams; keeping the last good one');
-      notes.push(`${config.key}: empty, kept`);
-      continue;
-    }
-
-    await store.replaceStandings(config.key, config.season, rows);
-    await store.recordSuccess(source, now, unquoteEtag(result.etag));
-    notes.push(`${config.key}: ${rows.length} row(s)`);
-  }
-
-  return notes.join(', ');
-}
-
 /**
- * Recomputes each league table ourselves and reports where it differs from the published one.
+ * Both league tables, from one team-scoped snapshot with `include=standings`.
  *
- * Nothing here is displayed. It exists so that a missing gameday, a stale exclusion list or a
- * rule change upstream shows up as a logged difference instead of as a table that is quietly
- * wrong. For FF BL the two agree exactly; for DKB DFFL the quotient cannot agree, because that
- * league divides win points by a fixed 30 and weights wins by the opponent's league using
- * configuration no public endpoint exposes — so those differences are reported separately from
- * differences in games, wins or points, which are always worth investigating.
+ * The year is the newest stored gameday's, not the clock's (D-18). Whether to keep the stored
+ * tables or write new ones is `standingsOutcome`'s decision (D-27); this only carries it out.
+ * An empty payload is a success: it stamps `last_ok_at`, so the task is not due again until its
+ * normal cadence.
  */
-async function crossCheckStandings(
+async function syncStandings(
   store: ResultsStore,
   client: LeagueSphereClient,
   state: ReadonlyMap<string, { etag: string | null }>,
   now: Date,
-  disagreements: string[],
+  today: string,
 ): Promise<string> {
-  const notes: string[] = [];
+  const source = SYNC_SOURCES.standingsSnapshot;
+  await store.recordAttempt(source, now);
 
-  for (const config of LEAGUE_SEASONS) {
-    const source = SYNC_SOURCES.leagueSnapshot(config.key, config.season);
-    await store.recordAttempt(source, now);
+  const year = standingsYear(await store.newestGamedayDate(), today);
+  const result = await client.snapshot({
+    teamIds: [...TEAM_IDS],
+    year,
+    include: ['standings'],
+    etag: state.get(source)?.etag ?? null,
+  });
 
-    // League-scoped, and without logs: standings need results, not play-by-play. Scoped by team
-    // it would only return gamedays our teams attended, leaving every other club short of games.
-    const result = await client.snapshot({
-      leaguePk: config.leaguePk,
-      seasonPk: config.seasonPk,
-      include: ['games'],
-      etag: state.get(source)?.etag ?? null,
-    });
-
-    if (result.kind === 'not-modified') {
-      await store.recordSuccess(source, now, state.get(source)?.etag ?? null);
-      notes.push(`${config.key}: 304`);
-      continue;
-    }
-    if (result.kind === 'capped') {
-      notes.push(`${config.key}: deferred`);
-      continue;
-    }
-    if (result.kind === 'throttled') {
-      await store.recordFailure(source, now, throttledError(result.retryAfterMs, now.getTime()));
-      notes.push(`${config.key}: throttled`);
-      continue;
-    }
-    if (result.kind === 'error') {
-      await store.recordFailure(source, now, result.message);
-      notes.push(`${config.key}: ${result.message}`);
-      continue;
-    }
-
-    const parsed = parseSnapshot(result.body);
-    if (!parsed.ok) {
-      await store.recordFailure(source, now, `schema mismatch: ${parsed.errors.slice(0, 5).join('; ')}`);
-      notes.push(`${config.key}: schema mismatch`);
-      continue;
-    }
-
-    const ours = computeStandings(config, parsed.value.gamedays);
-    const official = await store.select<{ team_id: number; sp: number; s: number; u: number; n: number; ep: number; gp: number; pd: number; sq: number }>(
-      'results_standings',
-      `select=team_id,sp,s,u,n,ep,gp,pd,sq&league_key=eq.${encodeURIComponent(config.key)}&season=eq.${encodeURIComponent(config.season)}`,
-    );
-
-    const check = diffStandings(
-      config,
-      ours,
-      official.map((row) => ({
-        leagueKey: config.key,
-        season: config.season,
-        teamId: row.team_id,
-        rank: 0,
-        group: '',
-        sp: row.sp,
-        s: row.s,
-        u: row.u,
-        n: row.n,
-        ep: Number(row.ep),
-        gp: Number(row.gp),
-        pd: Number(row.pd),
-        sq: Number(row.sq),
-        promotionRestricted: false,
-        mode: 'official' as const,
-      })),
-    );
-
-    const summary = summariseCheck(check);
-    console.log(`[sync] standings check ${summary}`);
-    if (check.recordDifferences.length > 0 || check.onlyOurs.length > 0) {
-      // A countable difference means our data is incomplete, not that the rules changed.
-      disagreements.push(`standings ${summary}`);
-      await store.recordFailure(source, now, `standings cross-check: ${summary}`);
-      notes.push(`${config.key}: ${summary}`);
-      continue;
-    }
-
-    await store.recordSuccess(source, now, unquoteEtag(result.etag));
-    notes.push(`${config.key}: agrees (${summary})`);
+  if (result.kind === 'not-modified') {
+    await store.recordSuccess(source, now, state.get(source)?.etag ?? null);
+    return '304';
+  }
+  if (result.kind === 'capped') return result.reason;
+  if (result.kind === 'throttled') {
+    await store.recordFailure(source, now, throttledError(result.retryAfterMs, now.getTime()));
+    return 'throttled';
+  }
+  if (result.kind === 'error') {
+    await store.recordFailure(source, now, result.message);
+    return result.message;
   }
 
-  return notes.join(', ');
+  const parsed = parseStandings(result.body);
+  if (!parsed.ok) {
+    const message = `schema mismatch: ${parsed.errors.slice(0, 5).join('; ')}`;
+    await store.recordFailure(source, now, message);
+    return message;
+  }
+
+  const outcome = standingsOutcome(mapSnapshotStandings(parsed.value));
+  if (outcome.kind === 'kept') {
+    await store.recordSuccess(source, now, unquoteEtag(result.etag));
+    return `${year}: empty, kept`;
+  }
+
+  try {
+    for (const table of outcome.tables) {
+      await store.saveStandings(table.leagueKey, table.season, table.rows);
+    }
+  } catch (cause) {
+    // Valid data we could not store: the ETag stays, so the next tick asks again.
+    const message = cause instanceof Error ? cause.message : String(cause);
+    await store.recordFailure(source, now, `write failed: ${message}`);
+    throw cause;
+  }
+
+  await store.recordSuccess(source, now, unquoteEtag(result.etag));
+  return outcome.tables
+    .map((table) => `${table.leagueKey} ${table.season}: ${table.rows.length} row(s)`)
+    .join(', ');
 }
 
 // ── Alerting ─────────────────────────────────────────────────────────────────

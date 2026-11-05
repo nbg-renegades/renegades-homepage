@@ -1,20 +1,5 @@
 /**
- * What we sync, and the identifiers each upstream endpoint wants for it.
- *
- * Three different identifier systems name the same league season, which is the single
- * most error-prone thing about this integration:
- *
- *  - `/api/snapshot/` filters on **primary keys** (`league=18`, `season=6`). A year is not
- *    a season id: `season=2026` is rejected with
- *    `400 {"season":"unknown Season ids: [2026]"}`.
- *  - Gamedays come back carrying only `league_display` ("FF BL", "DKB DFFL"), so matching a
- *    gameday to a league season is done on that string plus the year in `date`.
- *  - `/api/league-table/` takes **slugs**, and they do not match our own config keys: the
- *    1st team's league is `dffl`, while `dkb-dffl` returns
- *    `404 {"detail":"Unknown league or season."}`.
- *
- * All values below were verified against the live API on 2026-09-27; the recordings are in
- * `__fixtures__/`.
+ * What we sync: the two club teams, and how upstream's league names map onto ours.
  */
 
 /** The two club teams in scope. Upstream returns only short names, so we own the display ones. */
@@ -32,93 +17,25 @@ export function isTrackedTeam(teamId: number | null): teamId is TeamId {
 }
 
 /**
- * How a league season's standings are obtained.
+ * Our league key for each upstream league slug in the snapshot's `standings`.
  *
- * `official` stores `/api/league-table/` verbatim. That is the only way to match the
- * published table for leagues whose ruleset we cannot see: DKB DFFL divides win points by a
- * fixed 30 rather than by games played, and weights wins by the opponent's league, using
- * `LeagueRuleset` fields and per-team point adjustments that no public endpoint exposes.
- * Our own computation still runs on every sync as a cross-check and its differences are
- * recorded — for FF BL it reproduces the published table exactly, all 23 teams.
+ * Upstream slugs are set by hand and differ from our keys: the 1st team's league is `dffl`
+ * upstream, but the frontend reads `dkb-dffl`, so the key must not change. A league whose slug
+ * is missing here is not shown. The season is not configured: it comes from the snapshot.
  */
-export type StandingsSource = 'official';
-
-export interface LeagueSeasonConfig {
-  /** Our stable key. Appears in URLs and in the `standings` table; do not rename casually. */
-  readonly key: string;
-  readonly season: string;
-  /** Primary keys for `/api/snapshot/`. */
-  readonly leaguePk: number;
-  readonly seasonPk: number;
-  /** The only league identifier a gameday carries. Used to match gamedays to this season. */
-  readonly leagueDisplay: string;
-  /** Slug for `/api/league-table/<slug>/<season>/`. Often differs from `key`. */
-  readonly tableSlug: string;
-  /** Shown in the UI. */
-  readonly name: string;
-  /** Playoff or relegation gamedays that must not count towards the regular-season table. */
-  readonly excludeGamedayIds: readonly number[];
-  /** Second teams, which cannot be promoted. Greyed out in the table. */
-  readonly promotionRestricted: readonly number[];
-  readonly standingsSource: StandingsSource;
-}
+export const LEAGUE_KEY_BY_SLUG: Readonly<Record<string, string>> = {
+  dffl: 'dkb-dffl',
+  'ff-bl': 'ff-bl',
+};
 
 /**
- * Only the league seasons our teams actually play in.
- *
- * The reference widget's config also listed `rl-bayern` and `dffl2` for 2026. Neither has
- * any 2026 gameday for teams 159/287: no gameday upstream carries
- * `league_display == "RL Bayern"` at all, and `DFFL2` appears only in 2023. They are left
- * out rather than shipped as two permanently empty tables; adding a season back is one
- * entry here.
+ * Second teams, which cannot be promoted and are greyed out in the table. Upstream does not
+ * expose this. Keyed `<league_key>:<season>`; the 2026 FF BL entries are Munich Spatzen 4,
+ * Erding Bulls II and Regensburg Phoenix III.
  */
-export const LEAGUE_SEASONS: readonly LeagueSeasonConfig[] = [
-  {
-    key: 'dkb-dffl',
-    season: '2026',
-    leaguePk: 7,
-    seasonPk: 6,
-    leagueDisplay: 'DKB DFFL',
-    tableSlug: 'dffl',
-    name: 'DKB DFFL 2026',
-    // 2026-07-23 and 2026-07-24: the playoff gamedays. Upstream excludes them too — with
-    // them counted every team shows more games than the published table.
-    excludeGamedayIds: [887, 888],
-    promotionRestricted: [],
-    standingsSource: 'official',
-  },
-  {
-    key: 'ff-bl',
-    season: '2026',
-    leaguePk: 18,
-    seasonPk: 6,
-    leagueDisplay: 'FF BL',
-    tableSlug: 'ff-bl',
-    name: 'FF BL 2026',
-    excludeGamedayIds: [],
-    // Munich Spatzen 4, Erding Bulls II, Regensburg Phoenix III.
-    promotionRestricted: [254, 492, 505],
-    standingsSource: 'official',
-  },
-] as const;
-
-export function findLeagueSeason(key: string, season: string): LeagueSeasonConfig | undefined {
-  return LEAGUE_SEASONS.find((entry) => entry.key === key && entry.season === season);
-}
-
-/**
- * Matches a gameday to a league season the way the reference did: on `league_display` plus
- * the year in `date`, minus the exclusions. Doing it this way means a gameday published
- * upstream mid-season starts counting on the next sync with no config change.
- */
-export function belongsToLeagueSeason(
-  config: LeagueSeasonConfig,
-  gameday: { readonly id: number; readonly date: string; readonly league_display: string },
-): boolean {
-  return gameday.league_display === config.leagueDisplay &&
-    gameday.date.slice(0, 4) === config.season &&
-    !config.excludeGamedayIds.includes(gameday.id);
-}
+export const PROMOTION_RESTRICTED: Readonly<Record<string, readonly number[]>> = {
+  'ff-bl:2026': [254, 492, 505],
+};
 
 /**
  * Addresses upstream uses to mean "not decided yet". Stored as NULL so the UI can simply

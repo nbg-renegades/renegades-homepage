@@ -84,7 +84,7 @@ export type SnapshotInclude = 'games' | 'logs' | 'teams' | 'standings' | 'live';
 /** The two budgets snapshot calls are spent against. */
 export type SnapshotBucket = 'snapshot' | 'snapshot-standings';
 
-export type Endpoint = SnapshotBucket | 'liveticker' | 'league-table';
+export type Endpoint = SnapshotBucket | 'liveticker';
 
 /** `include` is always sent in this order, so the same request always looks the same. */
 const INCLUDE_ORDER: readonly SnapshotInclude[] = ['games', 'logs', 'teams', 'standings', 'live'];
@@ -206,13 +206,9 @@ export class LeagueSphereClient {
    * which is the only way to receive gamedays whose status is `""` —
    * `Gameday.STATUS_CHOICES` upstream has no empty member, so no filter value selects them.
    * Drafts then need a second call with `status=DRAFT`.
-   *
-   * `league` and `season` are **primary keys**. Passing a year as `season` is a 400.
    */
   snapshot(params: {
     readonly teamIds?: readonly number[];
-    readonly leaguePk?: number;
-    readonly seasonPk?: number;
     readonly year?: number;
     readonly dateFrom?: string;
     readonly dateTo?: string;
@@ -222,8 +218,6 @@ export class LeagueSphereClient {
   }): Promise<FetchResult<unknown>> {
     const query = new URLSearchParams();
     for (const teamId of params.teamIds ?? []) query.append('team', String(teamId));
-    if (params.leaguePk !== undefined) query.set('league', String(params.leaguePk));
-    if (params.seasonPk !== undefined) query.set('season', String(params.seasonPk));
     if (params.year !== undefined) query.set('year', String(params.year));
     if (params.dateFrom !== undefined) query.set('date_from', params.dateFrom);
     if (params.dateTo !== undefined) query.set('date_to', params.dateTo);
@@ -257,19 +251,6 @@ export class LeagueSphereClient {
     }
     const suffix = query.size > 0 ? `?${query}` : '';
     return this.#request('liveticker', `/api/liveticker/${suffix}`, params.etag ?? null);
-  }
-
-  /** The published table. `slug` is a league slug, not our config key: DKB DFFL is `dffl`. */
-  leagueTable(
-    slug: string,
-    season: string,
-    etag: string | null = null,
-  ): Promise<FetchResult<unknown>> {
-    return this.#request(
-      'league-table',
-      `/api/league-table/${encodeURIComponent(slug)}/${encodeURIComponent(season)}/`,
-      etag,
-    );
   }
 
   async #request(

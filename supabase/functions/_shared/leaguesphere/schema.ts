@@ -218,7 +218,7 @@ export interface UpstreamLiveGame {
   readonly ticks: readonly UpstreamTick[];
 }
 
-/** One row of `/api/league-table/<league>/<season>/`. */
+/** The columns of one standings row. */
 export interface UpstreamStandingRow {
   readonly team_id: number;
   readonly team__description: string;
@@ -233,12 +233,6 @@ export interface UpstreamStandingRow {
   readonly diff: number;
   readonly win_points: number;
   readonly win_quotient: number;
-}
-
-export interface UpstreamLeagueTable {
-  readonly league: { readonly slug: string; readonly name: string };
-  readonly season: { readonly slug: string; readonly name: string };
-  readonly standing: readonly UpstreamStandingRow[];
 }
 
 // ── Parsers ──────────────────────────────────────────────────────────────────
@@ -541,73 +535,133 @@ function num(v: Validation, path: string, value: unknown): number | null {
   return value;
 }
 
-export function parseLeagueTable(raw: unknown): ParseResult<UpstreamLeagueTable> {
-  const v = new Validation();
-  const obj = record(v, 'leagueTable', raw);
-  if (obj === null) return { ok: false, errors: v.errors };
+/** A row of the snapshot's `standings`: the table columns plus upstream's own order. */
+export interface UpstreamSnapshotStandingRow extends UpstreamStandingRow {
+  readonly group: string;
+  readonly rank: number;
+}
 
-  const league = record(v, 'leagueTable.league', obj['league']);
-  const season = record(v, 'leagueTable.season', obj['season']);
-  const rawRows = array(v, 'leagueTable.standing', obj['standing']);
-  if (league === null || season === null || rawRows === null) return { ok: false, errors: v.errors };
+/** One league season's table from `/api/snapshot/?include=standings`. */
+export interface UpstreamStandingsBlock {
+  readonly league: { readonly id: number; readonly slug: string; readonly name: string };
+  readonly season: { readonly id: number; readonly slug: string; readonly name: string };
+  readonly rows: readonly UpstreamSnapshotStandingRow[];
+}
 
-  const leagueSlug = nonEmptyStr(v, 'leagueTable.league.slug', league['slug']);
-  const leagueName = nonEmptyStr(v, 'leagueTable.league.name', league['name']);
-  const seasonSlug = nonEmptyStr(v, 'leagueTable.season.slug', season['slug']);
-  const seasonName = nonEmptyStr(v, 'leagueTable.season.name', season['name']);
-  if (leagueSlug === null || leagueName === null || seasonSlug === null || seasonName === null) {
-    return { ok: false, errors: v.errors };
+const SEASON_YEAR_PATTERN = /^\d{4}$/;
+
+function parseSnapshotStandingRow(
+  v: Validation,
+  path: string,
+  raw: unknown,
+): UpstreamSnapshotStandingRow | null {
+  const row = record(v, path, raw);
+  if (row === null) return null;
+
+  const teamId = int(v, `${path}.team_id`, row['team_id']);
+  const description = nonEmptyStr(v, `${path}.team__description`, row['team__description']);
+  const standing = str(v, `${path}.standing`, row['standing']);
+  const group = str(v, `${path}.group`, row['group']);
+  const rank = int(v, `${path}.rank`, row['rank']);
+  const wins = int(v, `${path}.wins`, row['wins']);
+  const draws = int(v, `${path}.draws`, row['draws']);
+  const losses = int(v, `${path}.losses`, row['losses']);
+  const gamesPlayed = int(v, `${path}.games_played`, row['games_played']);
+  const pf = num(v, `${path}.pf`, row['pf']);
+  const pa = num(v, `${path}.pa`, row['pa']);
+  const diff = num(v, `${path}.diff`, row['diff']);
+  const winPoints = num(v, `${path}.win_points`, row['win_points']);
+  const winQuotient = num(v, `${path}.win_quotient`, row['win_quotient']);
+  if (
+    teamId === null || description === null || standing === null || group === null ||
+    rank === null || wins === null || draws === null || losses === null ||
+    gamesPlayed === null || pf === null || pa === null || diff === null ||
+    winPoints === null || winQuotient === null
+  ) {
+    return null;
   }
 
-  const standing: UpstreamStandingRow[] = [];
-  for (const [i, rawRow] of rawRows.entries()) {
-    const path = `leagueTable.standing[${i}]`;
-    const row = record(v, path, rawRow);
-    if (row === null) return { ok: false, errors: v.errors };
+  return {
+    team_id: teamId,
+    team__description: description,
+    standing,
+    group,
+    rank,
+    wins,
+    draws,
+    losses,
+    games_played: gamesPlayed,
+    pf,
+    pa,
+    diff,
+    win_points: winPoints,
+    win_quotient: winQuotient,
+  };
+}
 
-    const teamId = int(v, `${path}.team_id`, row['team_id']);
-    const description = nonEmptyStr(v, `${path}.team__description`, row['team__description']);
-    const group = str(v, `${path}.standing`, row['standing']);
-    const wins = int(v, `${path}.wins`, row['wins']);
-    const draws = int(v, `${path}.draws`, row['draws']);
-    const losses = int(v, `${path}.losses`, row['losses']);
-    const gamesPlayed = int(v, `${path}.games_played`, row['games_played']);
-    const pf = num(v, `${path}.pf`, row['pf']);
-    const pa = num(v, `${path}.pa`, row['pa']);
-    const diff = num(v, `${path}.diff`, row['diff']);
-    const winPoints = num(v, `${path}.win_points`, row['win_points']);
-    const winQuotient = num(v, `${path}.win_quotient`, row['win_quotient']);
-    if (
-      teamId === null || description === null || group === null || wins === null ||
-      draws === null || losses === null || gamesPlayed === null || pf === null ||
-      pa === null || diff === null || winPoints === null || winQuotient === null
-    ) {
+/**
+ * Parses the `standings` blocks of a snapshot, all or nothing.
+ *
+ * Separate from `parseSnapshot` because the standings task needs nothing else from the body:
+ * a request with `include=standings` and no games is a valid body there, and a malformed
+ * gameday must not stop a table from being read. `season.slug` must be a four-digit year,
+ * which keeps the value safe to put into a PostgREST filter later (T-01-22); anything else
+ * rejects the whole payload. `ranking` and any other key are ignored.
+ */
+export function parseStandings(raw: unknown): ParseResult<readonly UpstreamStandingsBlock[]> {
+  const v = new Validation();
+  const obj = record(v, 'snapshot', raw);
+  if (obj === null) return { ok: false, errors: v.errors };
+
+  const rawBlocks = array(v, 'standings', obj['standings']);
+  if (rawBlocks === null) return { ok: false, errors: v.errors };
+
+  const blocks: UpstreamStandingsBlock[] = [];
+  for (const [i, rawBlock] of rawBlocks.entries()) {
+    const path = `standings[${i}]`;
+    const block = record(v, path, rawBlock);
+    if (block === null) return { ok: false, errors: v.errors };
+
+    const league = record(v, `${path}.league`, block['league']);
+    const season = record(v, `${path}.season`, block['season']);
+    const rawRows = array(v, `${path}.rows`, block['rows']);
+    if (league === null || season === null || rawRows === null) {
       return { ok: false, errors: v.errors };
     }
 
-    standing.push({
-      team_id: teamId,
-      team__description: description,
-      standing: group,
-      wins,
-      draws,
-      losses,
-      games_played: gamesPlayed,
-      pf,
-      pa,
-      diff,
-      win_points: winPoints,
-      win_quotient: winQuotient,
+    const leagueId = int(v, `${path}.league.id`, league['id']);
+    const leagueSlug = nonEmptyStr(v, `${path}.league.slug`, league['slug']);
+    const leagueName = nonEmptyStr(v, `${path}.league.name`, league['name']);
+    const seasonId = int(v, `${path}.season.id`, season['id']);
+    const seasonSlug = nonEmptyStr(v, `${path}.season.slug`, season['slug']);
+    const seasonName = nonEmptyStr(v, `${path}.season.name`, season['name']);
+    if (
+      leagueId === null || leagueSlug === null || leagueName === null || seasonId === null ||
+      seasonSlug === null || seasonName === null
+    ) {
+      return { ok: false, errors: v.errors };
+    }
+    if (!SEASON_YEAR_PATTERN.test(seasonSlug)) {
+      v.error(
+        `${path}.season.slug`,
+        `expected a four-digit year, got ${JSON.stringify(seasonSlug)}`,
+      );
+      return { ok: false, errors: v.errors };
+    }
+
+    const rows: UpstreamSnapshotStandingRow[] = [];
+    for (const [j, rawRow] of rawRows.entries()) {
+      const row = parseSnapshotStandingRow(v, `${path}.rows[${j}]`, rawRow);
+      if (row === null) return { ok: false, errors: v.errors };
+      rows.push(row);
+    }
+
+    blocks.push({
+      league: { id: leagueId, slug: leagueSlug, name: leagueName },
+      season: { id: seasonId, slug: seasonSlug, name: seasonName },
+      rows,
     });
   }
 
-  if (!v.ok) return { ok: false, errors: v.errors };
-  return {
-    ok: true,
-    value: {
-      league: { slug: leagueSlug, name: leagueName },
-      season: { slug: seasonSlug, name: seasonName },
-      standing,
-    },
-  };
+  return { ok: true, value: blocks };
 }

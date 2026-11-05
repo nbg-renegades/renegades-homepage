@@ -237,12 +237,12 @@ Deno.test('an empty diff makes no request', async () => {
   assertEquals(calls.length, 0);
 });
 
-Deno.test('standings are replaced per league season, not globally', async () => {
+Deno.test('standings are written before the teams that left are removed', async () => {
   const { store, calls } = storeWith();
-  const rows: StandingsRow[] = [{
+  const row = (teamId: number): StandingsRow => ({
     leagueKey: 'ff-bl',
     season: '2026',
-    teamId: 287,
+    teamId,
     rank: 3,
     group: 'FF BL',
     sp: 23,
@@ -255,22 +255,48 @@ Deno.test('standings are replaced per league season, not globally', async () => 
     sq: 0.783,
     promotionRestricted: false,
     mode: 'official',
-  }];
+  });
 
-  await store.replaceStandings('ff-bl', '2026', rows);
+  await store.saveStandings('ff-bl', '2026', [row(287), row(254)]);
 
-  assertEquals(calls[0].method, 'DELETE');
-  // Scoped: deleting the whole table would take the other league's standings with it.
-  assertStringIncludes(calls[0].path, 'league_key=eq.ff-bl');
-  assertStringIncludes(calls[0].path, 'season=eq.2026');
+  // Upsert first, so a reader never sees an empty table; then drop only what is missing.
+  assertEquals(calls.map((call) => call.method), ['POST', 'DELETE']);
+  assertStringIncludes(calls[0].path, 'on_conflict=league_key%2Cseason%2Cteam_id');
+  assertStringIncludes(calls[1].path, 'league_key=eq.ff-bl');
+  assertStringIncludes(calls[1].path, 'season=eq.2026');
+  assertStringIncludes(calls[1].path, 'team_id=not.in.(287,254)');
 
   // camelCase domain rows become snake_case columns.
-  const written = (calls[1].body as Record<string, unknown>[])[0];
+  const written = (calls[0].body as Record<string, unknown>[])[0];
   assertEquals(written['league_key'], 'ff-bl');
   assertEquals(written['team_id'], 287);
   assertEquals(written['group_name'], 'FF BL');
   assertEquals(written['promotion_restricted'], false);
   assert(!('leagueKey' in written), 'camelCase keys must not reach PostgREST');
+});
+
+Deno.test('an empty table is never written and never deletes anything', async () => {
+  const { store, calls } = storeWith();
+
+  await store.saveStandings('ff-bl', '2026', []);
+
+  assertEquals(calls.length, 0);
+});
+
+Deno.test('the newest stored gameday date is read in one request', async () => {
+  const json = (body: unknown) =>
+    new Response(JSON.stringify(body), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+
+  const found = storeWith([json([{ date: '2026-10-04' }])]);
+  assertEquals(await found.store.newestGamedayDate(), '2026-10-04');
+  assertEquals(found.calls.length, 1);
+  assertEquals(found.calls[0].path, '/results_gamedays?select=date&order=date.desc&limit=1');
+
+  const none = storeWith([json([])]);
+  assertEquals(await none.store.newestGamedayDate(), null);
 });
 
 Deno.test('pruning live games clears both live tables, keeping today’s', async () => {
@@ -387,7 +413,7 @@ Deno.test('every sync-state row maps to the budget its calls spend', () => {
   assertEquals(endpointForSource('snapshot:draft'), 'snapshot');
   assertEquals(endpointForSource('snapshot:league:ff-bl:2026'), 'snapshot');
   assertEquals(endpointForSource('snapshot:standings'), 'snapshot-standings');
-  assertEquals(endpointForSource('league-table:ff-bl:2026'), 'league-table');
+  assertEquals(endpointForSource('league-table:ff-bl:2026'), null);
   assertEquals(endpointForSource('liveticker'), 'liveticker');
   assertEquals(endpointForSource('something-else'), null);
 });
@@ -451,17 +477,11 @@ Deno.test('sync state loads into a map keyed by source', async () => {
   assertEquals(state.get('liveticker')?.last_ok_at, null);
 });
 
-Deno.test('the league-scoped sources are distinct per league season', () => {
-  assertEquals(SYNC_SOURCES.leagueTable('ff-bl', '2026'), 'league-table:ff-bl:2026');
-  assertEquals(SYNC_SOURCES.leagueSnapshot('dkb-dffl', '2026'), 'snapshot:league:dkb-dffl:2026');
-  // One league season failing must not look like another one succeeding.
-  assert(SYNC_SOURCES.leagueTable('ff-bl', '2026') !== SYNC_SOURCES.leagueTable('dkb-dffl', '2026'));
-});
-
 Deno.test('every task maps to a source', () => {
-  for (const task of ['team-snapshot', 'liveticker', 'league-table', 'league-snapshot'] as const) {
+  for (const task of ['team-snapshot', 'standings', 'liveticker'] as const) {
     assert(taskSource(task).length > 0);
   }
+  assertEquals(taskSource('standings'), 'snapshot:standings');
 });
 
 // ── Failures ─────────────────────────────────────────────────────────────────

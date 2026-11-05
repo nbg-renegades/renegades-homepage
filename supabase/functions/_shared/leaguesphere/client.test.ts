@@ -115,16 +115,6 @@ Deno.test('the two-call draft strategy sends exactly one status=DRAFT', async ()
   assertEquals(new URL(calls[1].url).searchParams.getAll('status'), ['DRAFT']);
 });
 
-Deno.test('league and season are sent as primary keys', async () => {
-  const { client, calls } = clientWith([json({ gamedays: [] })]);
-  await client.snapshot({ leaguePk: 18, seasonPk: 6, include: ['games'] });
-
-  const params = new URL(calls[0].url).searchParams;
-  assertEquals(params.get('league'), '18');
-  // A year here is a 400 upstream: season 2026 is primary key 6.
-  assertEquals(params.get('season'), '6');
-});
-
 Deno.test('the liveticker asks for full history only when game ids are given', async () => {
   const { client, calls } = clientWith([json([])]);
 
@@ -133,12 +123,6 @@ Deno.test('the liveticker asks for full history only when game ids are given', a
 
   await client.liveticker({ allTicksForGameIds: [9149, 9150] });
   assertEquals(new URL(calls[1].url).searchParams.get('getAllTicksFor'), '9149,9150');
-});
-
-Deno.test('the league table uses the slug, which differs from our config key', async () => {
-  const { client, calls } = clientWith([json({ standing: [] })]);
-  await client.leagueTable('dffl', '2026');
-  assertEquals(new URL(calls[0].url).pathname, '/api/league-table/dffl/2026/');
 });
 
 // ── Conditional requests ─────────────────────────────────────────────────────
@@ -416,21 +400,12 @@ Deno.test('a budget recorded without a window is not trusted to still be open', 
 
 Deno.test('a 400 is an error and keeps the body, which upstream makes useful', async () => {
   const { client } = clientWith([
-    new Response(JSON.stringify({ season: 'unknown Season ids: [2026]' }), { status: 400 }),
+    new Response(JSON.stringify({ status: "unknown statuses: ['BOGUS']" }), { status: 400 }),
   ]);
-  const result = await client.snapshot({ leaguePk: 18, seasonPk: 2026, include: ['games'] });
+  const result = await client.snapshot({ statuses: ['BOGUS'], include: ['games'] });
   assert(result.kind === 'error');
   assertEquals(result.status, 400);
-  assertStringIncludes(result.message, 'unknown Season ids');
-});
-
-Deno.test('a 404 from the league table is an error, not an empty table', async () => {
-  const { client } = clientWith([
-    new Response(JSON.stringify({ detail: 'Unknown league or season.' }), { status: 404 }),
-  ]);
-  const result = await client.leagueTable('dkb-dffl', '2026');
-  assert(result.kind === 'error');
-  assertEquals(result.status, 404);
+  assertStringIncludes(result.message, 'unknown statuses');
 });
 
 Deno.test('a transport failure is an error rather than a throw', async () => {

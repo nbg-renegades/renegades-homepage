@@ -34,22 +34,15 @@ Deno.serve({ port }, async (req) => {
   const url = new URL(req.url);
 
   if (url.pathname === '/api/snapshot/') {
-    const league = url.searchParams.get('league');
-    // League-scoped calls are the standings cross-check; team-scoped is the schedule.
-    if (league === '18') return json(await fixture('snapshot.league-ffbl-2026.json'));
-    if (league === '7') return json(await fixture('snapshot.league-dffl-2026.json'));
+    // The standings request: both tables of our teams' leagues in one answer.
+    if (url.searchParams.get('include')?.split(',').includes('standings')) {
+      return json(await fixture('snapshot.standings-teams-159-287-2026.json'));
+    }
     // The drafts call: real, and legitimately empty for our teams.
     if (url.searchParams.getAll('status').includes('DRAFT')) {
       return json(await fixture('snapshot.status-draft-empty.json'));
     }
     return json(await fixture('snapshot.teams-159-287.json'));
-  }
-
-  if (url.pathname.startsWith('/api/league-table/')) {
-    const slug = url.pathname.split('/')[3];
-    if (slug === 'ff-bl') return json(await fixture('league-table.ff-bl-2026.json'));
-    if (slug === 'dffl') return json(await fixture('league-table.dffl-2026.json'));
-    return new Response(JSON.stringify({ detail: 'Unknown league or season.' }), { status: 404 });
   }
 
   if (url.pathname === '/api/liveticker/') {

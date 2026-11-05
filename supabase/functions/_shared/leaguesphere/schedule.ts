@@ -8,7 +8,7 @@
  * The budgets it is spending: narrow `/api/snapshot/` scopes may rebuild 600 times an hour per
  * IP and the client caps itself at 300; any request that includes standings is charged against
  * upstream's 60 an hour and the client caps those at 20. Two snapshot scopes (all statuses,
- * then drafts) plus one per league season means a full refresh is several calls, so "every 10
+ * then drafts) plus one standings request mean a full refresh is a few calls, so "every 10
  * minutes" is about as fast as a gameday can be polled while leaving headroom. The liveticker
  * is far cheaper and is cached upstream for 60 s, which is exactly the tick interval.
  */
@@ -18,10 +18,8 @@ import { clubInstant } from './time.ts';
 export type Task =
   /** Both snapshot calls for our teams: everything but drafts, then drafts. */
   | 'team-snapshot'
-  /** One league-scoped snapshot per configured league season, for the standings cross-check. */
-  | 'league-snapshot'
-  /** The published tables. */
-  | 'league-table'
+  /** One team-scoped snapshot with `include=standings`: both league tables. */
+  | 'standings'
   /** Live ticks for today's games. */
   | 'liveticker';
 
@@ -129,14 +127,14 @@ export function whatIsDue(input: ScheduleInput): Due {
     );
   }
 
-  // Standings move only when a game finishes, so the league-wide scopes follow the slower
-  // cadence even during a gameday — and are pulled in immediately once it ends.
+  // Standings move only when a game finishes, so the standings request follows the slower
+  // cadence even during a gameday — and is pulled in immediately once it ends.
   const standingsDue = input.gamedayFinished
-    ? isDue(input, 'league-table', GAMEDAY_INTERVAL_MS)
-    : isDue(input, 'league-table', HOURLY_MS);
+    ? isDue(input, 'standings', GAMEDAY_INTERVAL_MS)
+    : isDue(input, 'standings', HOURLY_MS);
 
   if (standingsDue) {
-    tasks.push('league-table', 'league-snapshot');
+    tasks.push('standings');
     reasons.push(input.gamedayFinished ? 'gameday finished, standings settled' : 'hourly standings refresh');
   }
 
