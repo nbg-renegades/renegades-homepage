@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { verifyRecaptcha } from "../_shared/recaptcha.ts";
+import { escapeHtml } from "../_shared/html.ts";
 import {
   fillMembershipPdfForm,
   MEMBERSHIP_FEES,
@@ -169,12 +170,3 @@ serve(async (req) => {
     );
   }
 });
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}

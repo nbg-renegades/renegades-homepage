@@ -17,9 +17,9 @@
     "singleQuote": true
   },
   "tasks": {
-    "test": "deno test --allow-read _shared/leaguesphere/ send-membership-application/",
+    "test": "deno test --allow-read _shared/leaguesphere/ send-membership-application/ send-contact-email/ send-tryout-email/",
     "test:db": "deno test --allow-read --allow-env --allow-net _shared/leaguesphere/store.integration.test.ts",
-    "check": "deno check _shared/leaguesphere/*.ts sync-leaguesphere/index.ts send-membership-application/*.ts"
+    "check": "deno check _shared/leaguesphere/*.ts sync-leaguesphere/index.ts send-membership-application/*.ts send-contact-email/*.ts send-tryout-email/*.ts _shared/html.ts"
   },
   "exclude": ["node_modules"]
 }

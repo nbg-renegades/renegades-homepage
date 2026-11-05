@@ -1,17 +1,10 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { verifyRecaptcha } from "../_shared/recaptcha.ts";
-
-interface ContactMessage {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  recaptchaToken: string;
-}
+import { contactEmailHtml, type ContactMessage } from "./email.ts";
 
 interface EmailData {
-  message: ContactMessage;
+  message: ContactMessage & { recaptchaToken: string };
 }
 
 serve(async (req) => {
@@ -74,13 +67,7 @@ serve(async (req) => {
           from: "info@nuernberg-renegades.de",
           to,
           subject: `New Contact Form Submission: ${message.subject}`,
-          html: `
-            <h2>New Contact Form Submission</h2>
-            <p><strong>From:</strong> ${message.name} (${message.email})</p>
-            <p><strong>Subject:</strong> ${message.subject}</p>
-            <p><strong>Message:</strong></p>
-            <p>${message.message.replace(/\n/g, "<br>")}</p>
-          `,
+          html: contactEmailHtml(message),
         }),
       });
 
