@@ -39,3 +39,23 @@ Deno.test('the plain fields come through unchanged', () => {
   assertStringIncludes(html, 'Max Muster (max@example.com)');
   assertStringIncludes(html, '0911 123456');
 });
+
+Deno.test('a typed age arrives as a number and still makes it into the mail', () => {
+  // The age input is type="number", so Angular sends 24, not '24'.
+  const html = tryoutEmailHtml({ ...request, age: 24 });
+  assertStringIncludes(html, '<strong>Age:</strong> 24</p>');
+});
+
+Deno.test('fields the form sends as null come out empty', () => {
+  // A cleared number input is null, and so is every optional field after form.reset().
+  const html = tryoutEmailHtml({
+    ...request,
+    phone: null,
+    age: null,
+    experience: null,
+    message: null,
+  });
+  assertStringIncludes(html, '<strong>Phone:</strong> </p>');
+  assertStringIncludes(html, '<strong>Age:</strong> </p>');
+  assert(!html.includes('null'), html);
+});

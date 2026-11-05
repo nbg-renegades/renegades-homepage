@@ -1,12 +1,16 @@
-import { escapeHtml, escapeMultiline } from '../_shared/html.ts';
+import { escapeHtml, escapeMultiline, type FormValue } from '../_shared/html.ts';
 
+/**
+ * As the form sends it, not as the frontend's interface claims: the age input is
+ * `type="number"`, so Angular sends a number, and an optional field the form has reset is null.
+ */
 export interface TryoutRequest {
   name: string;
   email: string;
-  phone: string;
-  age: string;
-  experience: string;
-  message: string;
+  phone: FormValue;
+  age: FormValue;
+  experience: FormValue;
+  message: FormValue;
 }
 
 export function tryoutEmailHtml(request: TryoutRequest): string {
