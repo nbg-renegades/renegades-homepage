@@ -36,8 +36,11 @@ function redirect(location: string): Response {
  * index as two pages. Those URLs are indexed and linked, so move them onto the locale
  * paths instead of dropping the equity: `?lang=en` -> `/en/...`, `?lang=de` -> `/...`.
  *
- * Netlify re-appends the original query string to the Location header of a redirect, so
- * the redirect must explicitly strip `lang` and can no longer rely on a path-only change.
+ * Netlify re-appends the original query string to a redirect's Location when that Location
+ * has no query of its own, so stripping `lang` cannot remove it: `/en?lang=en` redirected
+ * to itself forever. Redirect only when the path has to change; once the path matches the
+ * language, serve the page. Its canonical link carries no query, so search engines still
+ * index the clean URL.
  */
 function legacyLangRedirect(request: Request): Response | null {
   const url = new URL(request.url);
@@ -54,9 +57,7 @@ function legacyLangRedirect(request: Request): Response | null {
     pathname = url.pathname.slice('/en'.length) || '/';
   }
 
-  const hadLangQuery = url.searchParams.has('lang');
-  const pathChanged = pathname !== url.pathname;
-  if (!hadLangQuery || (!pathChanged && !url.searchParams.get('lang'))) {
+  if (pathname === url.pathname) {
     return null;
   }
 
