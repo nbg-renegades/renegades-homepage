@@ -13,6 +13,14 @@ let angularAppEngine: AngularAppEngine | undefined;
  */
 const NO_STORE = 'private, no-store, must-revalidate';
 
+/**
+ * Netlify adds `x-forwarded-for` to every request it hands the SSR function. Since
+ * @angular/ssr 20.3.25, an untrusted `x-forwarded-*` header makes AngularAppEngine skip
+ * server rendering and serve the client-side shell, so it has to be trusted explicitly.
+ * Netlify's own runtime 4 trusts exactly this list.
+ */
+const NETLIFY_PROXY_HEADERS = ['x-forwarded-for'];
+
 /** Matches the marker MetaService emits for pages that need a non-200 status. */
 const RENDER_STATUS_PATTERN = /<meta name="x-render-status" content="(\d{3})">/;
 
@@ -87,7 +95,7 @@ export async function netlifyAppEngineHandler(request: Request): Promise<Respons
     return redirectResponse;
   }
 
-  angularAppEngine ??= new AngularAppEngine();
+  angularAppEngine ??= new AngularAppEngine({ trustProxyHeaders: NETLIFY_PROXY_HEADERS });
   const context = getContext();
   const result = await angularAppEngine.handle(request, context);
   if (!result) {
