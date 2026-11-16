@@ -88,6 +88,9 @@
             "scripts": [],
             "styles": ["src/global_styles.css"],
             "tsConfig": "tsconfig.app.json",
+            "define": {
+              "PREVIEW_HOSTS": "[]"
+            },
             "allowedCommonJsDependencies": [
               "@supabase/realtime-js",
               "@supabase/node-fetch",

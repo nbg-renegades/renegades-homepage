@@ -28,3 +28,9 @@
 
 # HTML is deliberately absent here: SSR responses set their own no-store header in
 # server.ts, and Netlify does not document how overlapping header rules resolve.
+
+# A deploy preview answers on its own Netlify hosts, which the SSR host check in
+# server.ts rejects unless they are compiled in. Only preview builds get them;
+# production keeps the empty list from angular.json.
+[context.deploy-preview]
+  command = 'ng build --define "PREVIEW_HOSTS=[\"${DEPLOY_PRIME_URL#https://}\",\"${DEPLOY_URL#https://}\"]"'

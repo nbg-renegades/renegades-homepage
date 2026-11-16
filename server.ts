@@ -21,6 +21,14 @@ const NO_STORE = 'private, no-store, must-revalidate';
  */
 const NETLIFY_PROXY_HEADERS = ['x-forwarded-for'];
 
+/**
+ * The hosts a Netlify deploy preview answers on: its `deploy-preview-<n>--` host and its
+ * unique deploy host. netlify.toml compiles them in with `ng build --define` for preview
+ * builds only; production keeps the `[]` from angular.json, so only its two
+ * `security.allowedHosts` pass the SSR host check there.
+ */
+declare const PREVIEW_HOSTS: readonly string[];
+
 /** Matches the marker MetaService emits for pages that need a non-200 status. */
 const RENDER_STATUS_PATTERN = /<meta name="x-render-status" content="(\d{3})">/;
 
@@ -96,7 +104,10 @@ export async function netlifyAppEngineHandler(request: Request): Promise<Respons
     return redirectResponse;
   }
 
-  angularAppEngine ??= new AngularAppEngine({ trustProxyHeaders: NETLIFY_PROXY_HEADERS });
+  angularAppEngine ??= new AngularAppEngine({
+    allowedHosts: [...PREVIEW_HOSTS],
+    trustProxyHeaders: NETLIFY_PROXY_HEADERS,
+  });
   const context = getContext();
   const result = await angularAppEngine.handle(request, context);
   if (!result) {
