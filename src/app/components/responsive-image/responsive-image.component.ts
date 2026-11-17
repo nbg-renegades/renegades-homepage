@@ -1,5 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 /**
  * Responsive Image Component
@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-responsive-image',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <picture>
       <!-- AVIF format (best compression) -->
