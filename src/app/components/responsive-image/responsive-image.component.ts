@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 
 
 /**
@@ -28,44 +28,44 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
       <!-- AVIF format (best compression) -->
       <source
         [srcset]="generateSrcset('avif')"
-        [sizes]="sizes"
+        [sizes]="sizes()"
         type="image/avif"
       />
       <!-- WebP format (good compression) -->
       <source
         [srcset]="generateSrcset('webp')"
-        [sizes]="sizes"
+        [sizes]="sizes()"
         type="image/webp"
       />
       <!-- JPEG fallback -->
       <img
         [src]="fallbackSrc"
-        [alt]="alt"
-        [class]="imageClass"
-        [attr.loading]="priority ? 'eager' : 'lazy'"
-        [attr.fetchpriority]="priority ? 'high' : 'auto'"
+        [alt]="alt()"
+        [class]="imageClass()"
+        [attr.loading]="priority() ? 'eager' : 'lazy'"
+        [attr.fetchpriority]="priority() ? 'high' : 'auto'"
         decoding="async"
         [srcset]="generateSrcset('jpg')"
-        [sizes]="sizes"
+        [sizes]="sizes()"
       />
     </picture>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResponsiveImageComponent {
-  @Input() src!: string; // Image name without extension (e.g., 'logo-avatar')
-  @Input() alt: string = 'Image';
-  @Input() sizes: string = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw';
-  @Input() imageClass: string = 'w-full h-auto';
-  @Input() basePath: string = '/assets/images/optimized'; // Path to optimized images
-  @Input() priority = false;
+  readonly src = input.required<string>(); // Image name without extension (e.g., 'logo-avatar')
+  readonly alt = input<string>('Image');
+  readonly sizes = input<string>('(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw');
+  readonly imageClass = input<string>('w-full h-auto');
+  readonly basePath = input<string>('/assets/images/optimized'); // Path to optimized images
+  readonly priority = input(false);
 
   // Responsive breakpoints — use a conservative set to avoid 404s for missing sizes.
   // We always generate a `-full` version; smaller breakpoint (640) covers mobile.
   private breakpoints = [640];
 
   get fallbackSrc(): string {
-    return `${this.basePath}/${this.src}-full.jpg`;
+    return `${this.basePath()}/${this.src()}-full.jpg`;
   }
 
   /**
@@ -74,11 +74,11 @@ export class ResponsiveImageComponent {
    */
   generateSrcset(format: 'avif' | 'webp' | 'jpg'): string {
     const srcsets = this.breakpoints
-      .map(bp => `${this.basePath}/${this.src}-${bp}w.${format} ${bp}w`)
+      .map(bp => `${this.basePath()}/${this.src()}-${bp}w.${format} ${bp}w`)
       .filter(Boolean)
       .join(', ');
 
     // Add full-size version as a fallback
-    return srcsets ? `${srcsets}, ${this.basePath}/${this.src}-full.${format} 2000w` : `${this.basePath}/${this.src}-full.${format} 2000w`;
+    return srcsets ? `${srcsets}, ${this.basePath()}/${this.src()}-full.${format} 2000w` : `${this.basePath()}/${this.src()}-full.${format} 2000w`;
   }
 }
