@@ -1,4 +1,4 @@
-import { Component, OnDestroy, effect, inject } from '@angular/core';
+import { Component, OnDestroy, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { MetaService } from '../../services/meta.service';
@@ -15,6 +15,7 @@ interface FaqItem {
   selector: 'app-faq',
   standalone: true,
   imports: [TranslatePipe, RouterLink, LocalePathPipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './faq.component.html'
 })
 export class FaqComponent implements OnDestroy {

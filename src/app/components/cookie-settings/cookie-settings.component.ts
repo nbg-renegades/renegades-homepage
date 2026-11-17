@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { CookieConsentService, CookieConsent } from '../../services/cookie-consent.service';
@@ -8,6 +8,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   selector: 'app-cookie-settings',
   standalone: true,
   imports: [FormsModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './cookie-settings.component.html'
 })
 export class CookieSettingsComponent implements OnInit {

@@ -5,6 +5,7 @@ import {
   provideClientHydration,
   withEventReplay,
   withHttpTransferCacheOptions,
+  withNoIncrementalHydration
 } from '@angular/platform-browser';
 import { routes } from './app.routes';
 
@@ -25,6 +26,7 @@ export const appConfig: ApplicationConfig = {
       // and is lost; with it, a small inline script records it and Angular replays it once
       // the page is hydrated.
       withEventReplay(),
+      withNoIncrementalHydration(),
     ),
   ],
 };
