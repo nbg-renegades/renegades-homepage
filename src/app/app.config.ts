@@ -5,7 +5,7 @@ import {
   provideClientHydration,
   withEventReplay,
   withHttpTransferCacheOptions,
-  withNoIncrementalHydration
+  withNoIncrementalHydration,
 } from '@angular/platform-browser';
 import { routes } from './app.routes';
 

@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 
-
 /**
  * Responsive Image Component
  * Automatically generates srcset for modern image formats (AVIF, WebP, JPEG)
@@ -22,7 +21,6 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 @Component({
   selector: 'app-responsive-image',
   standalone: true,
-  imports: [],
   template: `
     <picture>
       <!-- AVIF format (best compression) -->
