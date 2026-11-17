@@ -31,7 +31,7 @@
     "@angular/build": "22.2.7",
     "@angular/cli": "22.2.7",
     "@angular/compiler-cli": "22.2.6",
-    "@netlify/angular-runtime": "^3.0.0",
+    "@netlify/angular-runtime": "^4.0.0",
     "@types/node": "22.20.4",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.33",
