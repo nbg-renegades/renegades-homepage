@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, signal, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import {
   FormBuilder,
@@ -24,6 +24,10 @@ import { RecaptchaService } from "../../services/recaptcha.service";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MembershipFormComponent {
+  private fb = inject(FormBuilder);
+  private membershipService = inject(MembershipService);
+  protected recaptchaService = inject(RecaptchaService);
+
   membershipForm: FormGroup;
   isSubmitting = signal(false);
   submitSuccess = signal(false);
@@ -57,11 +61,7 @@ export class MembershipFormComponent {
     return membership_type === "youth" ? age >= 16 : age < 16;
   });
 
-  constructor(
-    private fb: FormBuilder, 
-    private membershipService: MembershipService,
-    protected recaptchaService: RecaptchaService
-  ) {
+  constructor() {
     this.membershipForm = this.fb.group({
       membership_type: ["", Validators.required],
       name: ["", Validators.required],

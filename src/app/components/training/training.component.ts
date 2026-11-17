@@ -14,6 +14,8 @@ import { MetaService } from '../../services/meta.service';
   templateUrl: './training.component.html'
 })
 export class TrainingComponent implements OnInit {
+  private cookieConsentService = inject(CookieConsentService);
+
   private currentMonth = signal(new Date().getMonth() + 1); // 1-12
 
   isOffSeason = computed(() => {
@@ -21,8 +23,6 @@ export class TrainingComponent implements OnInit {
     const month = this.currentMonth();
     return month >= 11 || month <= 3;
   });
-
-  constructor(private cookieConsentService: CookieConsentService) {}
 
   private meta = inject(MetaService);
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { CookieConsentService, CookieConsent } from '../../services/cookie-consent.service';
@@ -12,13 +12,13 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   templateUrl: './cookie-settings.component.html'
 })
 export class CookieSettingsComponent implements OnInit {
+  private cookieConsentService = inject(CookieConsentService);
+
   consent: CookieConsent = {
     necessary: true,
     preferences: false,
     maps: false
   };
-
-  constructor(private cookieConsentService: CookieConsentService) {}
 
   ngOnInit() {
     const savedConsent = this.cookieConsentService.getConsent();
