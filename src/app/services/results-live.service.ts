@@ -19,7 +19,7 @@
  * when being wrong matters.
  */
 
-import { NgZone, PLATFORM_ID, inject, Service } from '@angular/core';
+import { PLATFORM_ID, inject, Service } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
   Observable,
@@ -70,7 +70,6 @@ export class ResultsLiveService {
   #platformId = inject(PLATFORM_ID);
   #supabase = inject(SupabaseService);
   #results = inject(ResultsService);
-  #zone = inject(NgZone);
 
   /**
    * Today's games for one team, kept current.
@@ -96,41 +95,31 @@ export class ResultsLiveService {
       const changes = new Observable<LiveStatus>((statusSubscriber) => {
         statusSubscriber.next('static');
 
-        // Outside the Angular zone, and this is not an optimisation.
-        //
-        // zone.js counts an open WebSocket and its timers as pending work, so a subscribed
-        // channel keeps `ApplicationRef.isStable()` false for as long as the tab is open.
-        // Angular waits for stability to finish hydrating, so with the channel inside the zone
-        // hydration never completed and the console filled with NG0506. Emissions step back
-        // into the zone, which is what actually needs change detection.
-        this.#zone.runOutsideAngular(() => {
-          this.#supabase.getClient().then((client) => {
-            if (closed) return;
+        this.#supabase.getClient().then((client) => {
+          if (closed) return;
 
-            const signal = (status: LiveStatus) =>
-              this.#zone.run(() => statusSubscriber.next(status));
+          const signal = (status: LiveStatus) => statusSubscriber.next(status);
 
-            channel = client
-              .channel(`results-live-${teamId}`)
-              // No row filter: both tables only ever hold today's games — the sync prunes them —
-              // so the table is already the scope, and a filter would be one more thing to keep
-              // in step with the sync.
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'results_live_games' },
-                () => signal('live'))
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'results_live_ticks' },
-                () => signal('live'))
-              .subscribe((status) => {
-                if (closed) return;
-                if (status === 'SUBSCRIBED') signal('live');
-                // CHANNEL_ERROR, TIMED_OUT and CLOSED all mean the same thing to a visitor: the
-                // score is correct but will not move on its own.
-                else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                  signal('unavailable');
-                }
-              });
-          }).catch(() => {
-            if (!closed) this.#zone.run(() => statusSubscriber.next('unavailable'));
-          });
+          channel = client
+            .channel(`results-live-${teamId}`)
+            // No row filter: both tables only ever hold today's games — the sync prunes them —
+            // so the table is already the scope, and a filter would be one more thing to keep
+            // in step with the sync.
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'results_live_games' },
+              () => signal('live'))
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'results_live_ticks' },
+              () => signal('live'))
+            .subscribe((status) => {
+              if (closed) return;
+              if (status === 'SUBSCRIBED') signal('live');
+              // CHANNEL_ERROR, TIMED_OUT and CLOSED all mean the same thing to a visitor: the
+              // score is correct but will not move on its own.
+              else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                signal('unavailable');
+              }
+            });
+        }).catch(() => {
+          if (!closed) statusSubscriber.next('unavailable');
         });
 
         return () => {
