@@ -1,11 +1,9 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { PLATFORM_ID, inject, Service } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class SupabaseService {
   private platformId = inject(PLATFORM_ID);
   private _client: SupabaseClient | null = null;

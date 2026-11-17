@@ -20,7 +20,7 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { map, of, shareReplay, type Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LOGO_BASE_PATH } from '../components/results/results.config';
@@ -201,7 +201,7 @@ const GAME_COLUMNS =
   'id,scheduled,field,stage,group_name,finished,home_team_id,away_team_id,' +
   'home_name,away_name,home_score,away_score,home_ht,away_ht';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ResultsService {
   #http = inject(HttpClient);
 

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 
 export interface TryoutRequest {
@@ -11,9 +11,7 @@ export interface TryoutRequest {
   recaptchaToken: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class TryoutService {
   #supabaseService = inject(SupabaseService);
 

@@ -1,4 +1,4 @@
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { inject, PLATFORM_ID, Service } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../environments/environment';
 
@@ -11,9 +11,7 @@ declare global {
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class RecaptchaService {
   private readonly siteKey = environment.recaptcha.siteKey;
   private loaded = false;

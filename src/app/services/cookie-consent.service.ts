@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, signal, Service } from '@angular/core';
 import { StorageService } from './storage.service';
 
 export interface CookieConsent {
@@ -7,9 +7,7 @@ export interface CookieConsent {
   maps: boolean; // For Google Maps integration
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class CookieConsentService {
   readonly #COOKIE_CONSENT_KEY = 'cookie-consent';
   readonly #consent = signal<CookieConsent | null>(null);

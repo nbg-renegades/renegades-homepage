@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 
 export interface ContactMessage {
@@ -9,9 +9,7 @@ export interface ContactMessage {
   recaptchaToken: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class ContactService {
   #supabaseService = inject(SupabaseService);
 

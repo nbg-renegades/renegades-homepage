@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
 import { LanguageService } from './language.service';
@@ -30,9 +30,7 @@ export const RENDER_STATUS_META = 'x-render-status';
 
 const OG_LOCALES: Record<Lang, string> = { de: 'de_DE', en: 'en_US' };
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class MetaService {
   private meta = inject(Meta);
   private title = inject(Title);
