@@ -13,13 +13,13 @@
       </div>
     </section>
 
-    @if (isOffSeason()) {
+    <ng-template #offSeason>
       <!-- Off-Season Section -->
       <section class="mb-16">
         <div class="bg-secondary-dark dark:bg-dark-surface rounded-xl border border-gray-100 dark:border-white/8 p-8">
           <h2 class="text-3xl font-bold mb-4 tracking-tight text-primary dark:text-white">{{ 'training.offseason.title' | translate }}</h2>
           <p class="mb-8 text-primary/80 dark:text-white/80">{{ 'training.offseason.description' | translate }}</p>
-          
+
           <!-- Schedule -->
           <div class="mb-8">
             <h3 class="text-xl font-bold mb-4 text-primary dark:text-white">{{ 'training.offseason.schedule.title' | translate }}</h3>
@@ -29,80 +29,46 @@
             </ul>
           </div>
 
-          <!-- Locations -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Tuesday Location -->
-            <div class="bg-secondary dark:bg-dark-primary rounded-lg p-6">
-              <h3 class="text-xl font-bold mb-4 text-primary dark:text-white">{{ 'training.offseason.location.tuesday.title' | translate }}</h3>
-              <div class="mb-6">
-                <p class="text-primary/80 dark:text-white/80 font-bold">Adalbert-Stifter-Schule</p>
-                <p class="text-primary/80 dark:text-white/80">Julius-Leber-Straße 108</p>
-                <p class="text-primary/80 dark:text-white/80">90473 Nürnberg</p>
-              </div>
-              <div class="h-64 w-full rounded-lg overflow-hidden">
-                @if (showMap()) {
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2595.8123456789!2d11.123456!3d49.432109!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47a1fa5c5e3c9c6d%3A0x6c2c42b0f0a2b0a0!2sJulius-Leber-Stra%C3%9Fe%20108%2C%2090473%20N%C3%BCrnberg!5e0!3m2!1sen!2sde!4v1629789456789!5m2!1sen!2sde"
-                    width="100%"
-                    height="100%"
-                    style="border:0;"
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="strict-origin-when-cross-origin">
-                  </iframe>
-                } @else {
-                  <div class="h-full w-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 space-y-4">
-                    <p class="text-primary/80 dark:text-white/80 text-center px-4">
-                      {{ 'training.location.maps_consent' | translate }}
-                    </p>
-                    <button
-                      (click)="acceptCookies()"
-                      class="px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent-dark transition-colors duration-300"
-                    >
-                      {{ 'cookies.accept_all' | translate }}
-                    </button>
-                  </div>
-                }
-              </div>
+          <!-- Location -->
+          <div>
+            <h3 class="text-xl font-bold mb-4 text-primary dark:text-white">{{ 'training.offseason.location.title' | translate }}</h3>
+            <div class="mb-6">
+              <p class="text-primary/80 dark:text-white/80 font-bold">Nürnberger Hockey- und Tennis-Club (NHTC)</p>
+              <p class="text-primary/80 dark:text-white/80">Siedlerstr. 111</p>
+              <p class="text-primary/80 dark:text-white/80">90480 Nürnberg</p>
             </div>
-
-            <!-- Thursday Location -->
-            <div class="bg-secondary dark:bg-dark-primary rounded-lg p-6">
-              <h3 class="text-xl font-bold mb-4 text-primary dark:text-white">{{ 'training.offseason.location.thursday.title' | translate }}</h3>
-              <div class="mb-6">
-                <p class="text-primary/80 dark:text-white/80 font-bold">Sportanlage DJK BFC</p>
-                <p class="text-primary/80 dark:text-white/80">Hofer Str. 30</p>
-                <p class="text-primary/80 dark:text-white/80">90411 Nürnberg</p>
-              </div>
-              <div class="h-64 w-full rounded-lg overflow-hidden">
-                @if (showMap()) {
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2591.6315489053886!2d11.109809276832996!3d49.49146655594664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47a1fd001d8d9949%3A0x728d63c74a8de6d3!2sN%C3%BCrnberg%20Renegades%20e.V.%20-%20Flag%20Football%20Trainingsplatz!5e0!3m2!1sen!2sde!4v1786085110493!5m2!1sen!2sde"
-                    width="100%"
-                    height="100%"
-                    style="border:0;"
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="strict-origin-when-cross-origin">
-                  </iframe>
-                } @else {
-                  <div class="h-full w-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 space-y-4">
-                    <p class="text-primary/80 dark:text-white/80 text-center px-4">
-                      {{ 'training.location.maps_consent' | translate }}
-                    </p>
-                    <button
-                      (click)="acceptCookies()"
-                      class="px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent-dark transition-colors duration-300"
-                    >
-                      {{ 'cookies.accept_all' | translate }}
-                    </button>
-                  </div>
-                }
-              </div>
+            <div class="h-64 w-full rounded-lg overflow-hidden">
+              @if (showMap()) {
+                <iframe
+                  src="https://www.google.com/maps?q=Siedlerstra%C3%9Fe%20111%2C%2090480%20N%C3%BCrnberg&output=embed"
+                  width="100%"
+                  height="100%"
+                  style="border:0;"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin">
+                </iframe>
+              } @else {
+                <div class="h-full w-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 space-y-4">
+                  <p class="text-primary/80 dark:text-white/80 text-center px-4">
+                    {{ 'training.location.maps_consent' | translate }}
+                  </p>
+                  <button
+                    (click)="acceptCookies()"
+                    class="px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent-dark transition-colors duration-300"
+                  >
+                    {{ 'cookies.accept_all' | translate }}
+                  </button>
+                </div>
+              }
             </div>
           </div>
         </div>
       </section>
+    </ng-template>
+
+    @if (isOffSeason()) {
+      <ng-container *ngTemplateOutlet="offSeason" />
     }
 
     <!-- Regular Season Section -->
@@ -158,95 +124,7 @@
     </section>
 
     @if (!isOffSeason()) {
-      <!-- Off-Season Section -->
-      <section class="mb-16">
-        <div class="bg-secondary-dark dark:bg-dark-surface rounded-xl border border-gray-100 dark:border-white/8 p-8">
-          <h2 class="text-3xl font-bold mb-4 tracking-tight text-primary dark:text-white">{{ 'training.offseason.title' | translate }}</h2>
-          <p class="mb-8 text-primary/80 dark:text-white/80">{{ 'training.offseason.description' | translate }}</p>
-          
-          <!-- Schedule -->
-          <div class="mb-8">
-            <h3 class="text-xl font-bold mb-4 text-primary dark:text-white">{{ 'training.offseason.schedule.title' | translate }}</h3>
-            <ul class="space-y-2 text-primary/80 dark:text-white/80">
-              <li>{{ 'training.offseason.schedule.tuesday' | translate }}</li>
-              <li>{{ 'training.offseason.schedule.thursday' | translate }}</li>
-            </ul>
-          </div>
-
-          <!-- Locations -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Tuesday Location -->
-            <div class="bg-secondary dark:bg-dark-primary rounded-lg p-6">
-              <h3 class="text-xl font-bold mb-4 text-primary dark:text-white">{{ 'training.offseason.location.tuesday.title' | translate }}</h3>
-              <div class="mb-6">
-                <p class="text-primary/80 dark:text-white/80 font-bold">Adalbert-Stifter-Schule</p>
-                <p class="text-primary/80 dark:text-white/80">Julius-Leber-Straße 108</p>
-                <p class="text-primary/80 dark:text-white/80">90473 Nürnberg</p>
-              </div>
-              <div class="h-64 w-full rounded-lg overflow-hidden">
-                @if (showMap()) {
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2595.8123456789!2d11.123456!3d49.432109!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47a1fa5c5e3c9c6d%3A0x6c2c42b0f0a2b0a0!2sJulius-Leber-Stra%C3%9Fe%20108%2C%2090473%20N%C3%BCrnberg!5e0!3m2!1sen!2sde!4v1629789456789!5m2!1sen!2sde"
-                    width="100%"
-                    height="100%"
-                    style="border:0;"
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="strict-origin-when-cross-origin">
-                  </iframe>
-                } @else {
-                  <div class="h-full w-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 space-y-4">
-                    <p class="text-primary/80 dark:text-white/80 text-center px-4">
-                      {{ 'training.location.maps_consent' | translate }}
-                    </p>
-                    <button
-                      (click)="acceptCookies()"
-                      class="px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent-dark transition-colors duration-300"
-                    >
-                      {{ 'cookies.accept_all' | translate }}
-                    </button>
-                  </div>
-                }
-              </div>
-            </div>
-
-            <!-- Thursday Location -->
-            <div class="bg-secondary dark:bg-dark-primary rounded-lg p-6">
-              <h3 class="text-xl font-bold mb-4 text-primary dark:text-white">{{ 'training.offseason.location.thursday.title' | translate }}</h3>
-              <div class="mb-6">
-                <p class="text-primary/80 dark:text-white/80 font-bold">Sportanlage DJK BFC</p>
-                <p class="text-primary/80 dark:text-white/80">Hofer Str. 30</p>
-                <p class="text-primary/80 dark:text-white/80">90411 Nürnberg</p>
-              </div>
-              <div class="h-64 w-full rounded-lg overflow-hidden">
-                @if (showMap()) {
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2591.6315489053886!2d11.109809276832996!3d49.49146655594664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47a1fd001d8d9949%3A0x728d63c74a8de6d3!2sN%C3%BCrnberg%20Renegades%20e.V.%20-%20Flag%20Football%20Trainingsplatz!5e0!3m2!1sen!2sde!4v1786085110493!5m2!1sen!2sde"
-                    width="100%"
-                    height="100%"
-                    style="border:0;"
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="strict-origin-when-cross-origin">
-                  </iframe>
-                } @else {
-                  <div class="h-full w-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 space-y-4">
-                    <p class="text-primary/80 dark:text-white/80 text-center px-4">
-                      {{ 'training.location.maps_consent' | translate }}
-                    </p>
-                    <button
-                      (click)="acceptCookies()"
-                      class="px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent-dark transition-colors duration-300"
-                    >
-                      {{ 'cookies.accept_all' | translate }}
-                    </button>
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ng-container *ngTemplateOutlet="offSeason" />
     }
 
     <!-- Try-out Form -->

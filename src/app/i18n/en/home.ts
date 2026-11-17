@@ -46,6 +46,6 @@ export const home = {
   'home.news.season.description': 'Our 1st team finished the DFFL1 in 9th place out of 16 teams, while our 2nd team secured a strong 3rd place out of 23 teams in the Bayernliga.',
   'home.news.season.cta': 'See Results & Standings',
   'home.news.event.title': 'Off-Season: Practice, Fun & New Things',
-  'home.news.event.description': 'During the off-season, we\'re keeping things fun — trying new positions, running new drills, and building team chemistry ahead of next season. Practices currently take place Tuesdays (7–9 PM) and Thursdays (7–9 PM) at Sportanlage DJK BFC in Nürnberg.',
+  'home.news.event.description': 'During the off-season, we\'re keeping things fun — trying new positions, running new drills, and building team chemistry ahead of next season. Practices currently take place Tuesdays (7–9 PM) and Thursdays (7–9 PM) at Siedlerstr. 111 in Nürnberg.',
   'home.news.event.cta': 'See Training Times & Locations'
 };

@@ -1,4 +1,5 @@
 import { Component, computed, signal, OnInit, inject } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 
 import { TryoutFormComponent } from './tryout-form.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -8,7 +9,7 @@ import { MetaService } from '../../services/meta.service';
 @Component({
   selector: 'app-training',
   standalone: true,
-  imports: [TryoutFormComponent, TranslatePipe],
+  imports: [NgTemplateOutlet, TryoutFormComponent, TranslatePipe],
   templateUrl: './training.component.html'
 })
 export class TrainingComponent implements OnInit {
