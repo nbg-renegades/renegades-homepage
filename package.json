@@ -2,7 +2,7 @@
   "name": "nuernberg_renegades_e.v.-homepage",
   "private": true,
   "license": "MIT",
-  "packageManager": "pnpm@12.6.0",
+  "packageManager": "pnpm@12.20.0",
   "engines": {
     "node": ">=22"
   },
