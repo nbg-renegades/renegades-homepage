@@ -1,5 +1,5 @@
 import { AngularAppEngine, createRequestHandler } from '@angular/ssr';
-import { getContext } from '@netlify/angular-runtime/context.mjs';
+import { getContext, getTrustProxyHeaders } from '@netlify/angular-runtime/app-engine.js';
 
 let angularAppEngine: AngularAppEngine | undefined;
 
@@ -12,14 +12,6 @@ let angularAppEngine: AngularAppEngine | undefined;
  * anyway (theme cookie, locale path), so it must never be shared-cached.
  */
 const NO_STORE = 'private, no-store, must-revalidate';
-
-/**
- * Netlify adds `x-forwarded-for` to every request it hands the SSR function. Since
- * @angular/ssr 20.3.25, an untrusted `x-forwarded-*` header makes AngularAppEngine skip
- * server rendering and serve the client-side shell, so it has to be trusted explicitly.
- * Netlify's own runtime 4 trusts exactly this list.
- */
-const NETLIFY_PROXY_HEADERS = ['x-forwarded-for'];
 
 /**
  * The hosts a Netlify deploy preview answers on: its `deploy-preview-<n>--` host and its
@@ -106,7 +98,8 @@ export async function netlifyAppEngineHandler(request: Request): Promise<Respons
 
   angularAppEngine ??= new AngularAppEngine({
     allowedHosts: [...PREVIEW_HOSTS],
-    trustProxyHeaders: NETLIFY_PROXY_HEADERS,
+    // Trusts the x-forwarded-for header Netlify adds to every request it hands this function.
+    trustProxyHeaders: getTrustProxyHeaders(),
   });
   const context = getContext();
   const result = await angularAppEngine.handle(request, context);

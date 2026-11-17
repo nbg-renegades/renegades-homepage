@@ -14,6 +14,10 @@ import { RecaptchaService } from '../../services/recaptcha.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContactComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private contactService = inject(ContactService);
+  protected recaptchaService = inject(RecaptchaService);
+
   private meta = inject(MetaService);
 
   ngOnInit(): void {
@@ -28,11 +32,7 @@ export class ContactComponent implements OnInit {
   submitSuccess = signal(false);
   submitError = signal(false);
 
-  constructor(
-    private fb: FormBuilder,
-    private contactService: ContactService,
-    protected recaptchaService: RecaptchaService
-  ) {
+  constructor() {
     this.contactForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],

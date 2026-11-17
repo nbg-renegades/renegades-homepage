@@ -1,4 +1,4 @@
-import { Component, computed, signal, OnInit, inject } from '@angular/core';
+import { Component, computed, signal, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 
 import { TryoutFormComponent } from './tryout-form.component';
@@ -10,9 +10,12 @@ import { MetaService } from '../../services/meta.service';
   selector: 'app-training',
   standalone: true,
   imports: [NgTemplateOutlet, TryoutFormComponent, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './training.component.html'
 })
 export class TrainingComponent implements OnInit {
+  private cookieConsentService = inject(CookieConsentService);
+
   private currentMonth = signal(new Date().getMonth() + 1); // 1-12
 
   isOffSeason = computed(() => {
@@ -20,8 +23,6 @@ export class TrainingComponent implements OnInit {
     const month = this.currentMonth();
     return month >= 11 || month <= 3;
   });
-
-  constructor(private cookieConsentService: CookieConsentService) {}
 
   private meta = inject(MetaService);
 

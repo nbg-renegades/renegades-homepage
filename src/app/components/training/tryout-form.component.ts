@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, signal, inject } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -17,16 +17,16 @@ import { RecaptchaService } from "../../services/recaptcha.service";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TryoutFormComponent {
+  private fb = inject(FormBuilder);
+  private tryoutService = inject(TryoutService);
+  protected recaptchaService = inject(RecaptchaService);
+
   tryoutForm: FormGroup;
   isSubmitting = signal(false);
   submitSuccess = signal(false);
   submitError = signal(false);
 
-  constructor(
-    private fb: FormBuilder, 
-    private tryoutService: TryoutService,
-    protected recaptchaService: RecaptchaService
-  ) {
+  constructor() {
     this.tryoutForm = this.fb.group({
       name: ["", Validators.required],
       email: ["", [Validators.required, Validators.email]],

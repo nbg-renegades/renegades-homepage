@@ -19,7 +19,7 @@
  * when being wrong matters.
  */
 
-import { Injectable, NgZone, PLATFORM_ID, inject } from '@angular/core';
+import { NgZone, PLATFORM_ID, inject, Service } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
   Observable,
@@ -65,7 +65,7 @@ export interface LiveState {
  */
 const REFETCH_DEBOUNCE_MS = 250;
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ResultsLiveService {
   #platformId = inject(PLATFORM_ID);
   #supabase = inject(SupabaseService);

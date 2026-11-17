@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { Component, signal, OnInit, inject, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
 import { DOCUMENT, isPlatformServer } from '@angular/common';
 import { LocalePathPipe } from '../../pipes/locale-path.pipe';
 
@@ -23,6 +23,7 @@ const HERO_PRELOADS = [
   standalone: true,
   imports: [RouterLink, TranslatePipe, LocalePathPipe],
   templateUrl: './home.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {

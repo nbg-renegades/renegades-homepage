@@ -1,12 +1,4 @@
-import {
-  computed,
-  DOCUMENT,
-  effect,
-  inject,
-  Injectable,
-  PLATFORM_ID,
-  signal,
-} from '@angular/core';
+import { computed, DOCUMENT, effect, inject, PLATFORM_ID, signal, Service } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { StorageService } from './storage.service';
 
@@ -14,7 +6,7 @@ export type Theme = 'light' | 'dark';
 
 const THEME_STORAGE_KEY = 'preferredTheme';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ThemeService {
   #storageService = inject(StorageService);
   #document = inject(DOCUMENT);

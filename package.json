@@ -4,7 +4,7 @@
   "license": "MIT",
   "packageManager": "pnpm@12.20.0",
   "engines": {
-    "node": ">=22"
+    "node": "^22.22.3 || ^24.15.0 || >=26"
   },
   "scripts": {
     "ng": "ng",
@@ -14,29 +14,29 @@
     "optimize-images": "node scripts/optimize-images.js"
   },
   "dependencies": {
-    "@angular/common": "20.3.35",
-    "@angular/compiler": "20.3.35",
-    "@angular/core": "20.3.35",
-    "@angular/forms": "20.3.35",
-    "@angular/platform-browser": "20.3.35",
-    "@angular/platform-server": "20.3.35",
-    "@angular/router": "20.3.35",
-    "@angular/ssr": "20.3.42",
+    "@angular/common": "22.2.6",
+    "@angular/compiler": "22.2.6",
+    "@angular/core": "22.2.6",
+    "@angular/forms": "22.2.6",
+    "@angular/platform-browser": "22.2.6",
+    "@angular/platform-server": "22.2.6",
+    "@angular/router": "22.2.6",
+    "@angular/ssr": "22.2.7",
     "@supabase/supabase-js": "^2.39.3",
     "rxjs": "^7.8.1",
     "tslib": "^2.6.2",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "20.3.42",
-    "@angular/cli": "20.3.42",
-    "@angular/compiler-cli": "20.3.35",
-    "@netlify/angular-runtime": "^3.0.0",
+    "@angular/build": "22.2.7",
+    "@angular/cli": "22.2.7",
+    "@angular/compiler-cli": "22.2.6",
+    "@netlify/angular-runtime": "^4.0.0",
     "@types/node": "22.20.4",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.33",
     "sharp": "^0.34.5",
     "tailwindcss": "^3.4.1",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.3"
   }
 }

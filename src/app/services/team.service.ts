@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { inject, signal, computed, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 export interface TeamMember {
@@ -12,9 +12,7 @@ export interface TeamMember {
   updated_at?: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class TeamService {
   #http = inject(HttpClient);
   #teamMembers = signal<TeamMember[]>([]);

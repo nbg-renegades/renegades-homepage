@@ -1,5 +1,5 @@
 
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { MetaService } from '../../services/meta.service';
@@ -8,6 +8,7 @@ import { MetaService } from '../../services/meta.service';
   selector: 'app-impressum',
   standalone: true,
   imports: [TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './impressum.component.html'
 })
 export class ImpressumComponent implements OnInit {

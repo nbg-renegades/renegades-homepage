@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MetaService } from '../../services/meta.service';
 import { LanguageService } from '../../services/language.service';
 import { CookieSettingsComponent } from '../cookie-settings/cookie-settings.component';
@@ -9,6 +9,7 @@ import { privacyContent as en } from '../../i18n/en/privacy-content';
   selector: 'app-privacy',
   standalone: true,
   imports: [CookieSettingsComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './privacy.component.html'
 })
 export class PrivacyComponent implements OnInit {
