@@ -418,6 +418,11 @@ the client holds itself to 300; requests that include standings count against up
 hour and the client holds itself to 20. The league tables are one such request for both teams'
 leagues, so they spend that smaller budget.
 
+The team snapshot covers both teams back to 2023-01-01 (`HISTORY_FROM`), for head-to-heads and
+older game pages, while the schedule shows the configured season onward. The first run after the
+deploy that moves `HISTORY_FROM` back backfills 2023 to 2025 once; unchanged history is not written
+again.
+
 **Nothing upstream is trusted.** Every response is validated against a schema before anything is
 written. On a mismatch the sync records the error and writes nothing, so the site keeps serving
 the last good data with a visible "Stand:" timestamp rather than being emptied by a bad deploy at

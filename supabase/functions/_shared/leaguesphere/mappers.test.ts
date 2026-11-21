@@ -13,10 +13,17 @@ import {
   toLiveGameRows,
   toLiveTickRows,
 } from './mappers.ts';
+import { HISTORY_FROM } from './config.ts';
 import { loadFixture } from './__fixtures__/load.ts';
 
 async function teamSnapshot(): Promise<readonly UpstreamGameday[]> {
   const parsed = parseSnapshot(await loadFixture('snapshot.teams-159-287.json'));
+  assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
+  return parsed.value.gamedays;
+}
+
+async function historySnapshot(): Promise<readonly UpstreamGameday[]> {
+  const parsed = parseSnapshot(await loadFixture('snapshot.teams-159-287-since-2023.json'));
   assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
   return parsed.value.gamedays;
 }
@@ -461,4 +468,25 @@ Deno.test('a gameday returned by both snapshot scopes is written once, not twice
 
   assertEquals(new Set(mapped.gamedays.map((g) => g.id)).size, mapped.gamedays.length);
   assertEquals(new Set(mapped.games.map((g) => g.id)).size, mapped.games.length);
+});
+
+// Upstream charges a scope of more than 100 gamedays as a dump against 60 an hour
+// (`SNAPSHOT_LARGE_SCOPE_GAMEDAYS`, `gamedays/api/snapshot.py`). 36 as of 2026-10-29 at about
+// 16 a season, so revisit before about 2030.
+Deno.test('the history since 2023 maps to every tracked game', async () => {
+  const mapped = mapTeamSnapshot(await historySnapshot(), '2026-10-30');
+
+  assertEquals(mapped.gamedays.length, 36, 'gamedays');
+  assertEquals(mapped.games.length, 123, 'tracked games');
+  assertEquals(mapped.events.length, 1774, 'event rows');
+  assertEquals(mapped.events.filter((e) => e.is_marker).length, 707, 'possession markers');
+  assertEquals(mapped.events.filter((e) => e.is_deleted).length, 54, 'deleted entries');
+  assertEquals(mapped.disagreements, [], 'disagreements');
+});
+
+Deno.test('the history scope reaches the 2023 season', async () => {
+  const dates = (await historySnapshot()).map((gd) => gd.date).sort();
+
+  assert(dates.every((date) => date >= HISTORY_FROM), 'no gameday before HISTORY_FROM');
+  assertEquals(dates[0].slice(0, 4), '2023', 'the earliest gameday is in 2023');
 });
