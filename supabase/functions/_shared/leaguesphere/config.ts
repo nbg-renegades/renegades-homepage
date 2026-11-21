@@ -12,6 +12,15 @@ export type TeamId = keyof typeof TEAMS;
 
 export const TEAM_IDS: readonly TeamId[] = Object.keys(TEAMS).map(Number) as TeamId[];
 
+/**
+ * How far back the team snapshot and the prune scope reach. 2023 because head-to-heads and older
+ * game pages need it. Measured 2026-10-29: 36 gamedays and 745 KB raw, about 24 ms CPU and 8 MB
+ * heap to parse and map, far inside the Edge Function limits. It stays a narrow scope while it is
+ * under upstream's 100-gameday dump threshold, and diff writes keep unchanged runs free of play
+ * writes.
+ */
+export const HISTORY_FROM = '2023-01-01';
+
 export function isTrackedTeam(teamId: number | null): teamId is TeamId {
   return teamId !== null && teamId in TEAMS;
 }

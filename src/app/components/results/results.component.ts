@@ -87,7 +87,7 @@ export class ResultsComponent implements OnDestroy {
     toObservable(this.#scheduleWanted).pipe(
       switchMap((team) => team === null
         ? of(undefined)
-        : this.#results.gamedays(team.teamId).pipe(catchError(() => of(null)))),
+        : this.#results.gamedays(team.teamId, team.season).pipe(catchError(() => of(null)))),
     ),
     { initialValue: undefined },
   );

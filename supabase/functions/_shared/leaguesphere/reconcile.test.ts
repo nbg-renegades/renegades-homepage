@@ -8,8 +8,9 @@ import {
   planPrune,
 } from './reconcile.ts';
 import type { PruneInput, ScopeResult } from './reconcile.ts';
+import { HISTORY_FROM } from './config.ts';
 import type { GameEventRow } from './mappers.ts';
-import { toGameEventRows } from './mappers.ts';
+import { mapTeamSnapshot, toGameEventRows } from './mappers.ts';
 import { parseSnapshot } from './schema.ts';
 import type { UpstreamGame, UpstreamGameday } from './schema.ts';
 import { loadFixture } from './__fixtures__/load.ts';
@@ -295,4 +296,50 @@ Deno.test('a gameday before historyFrom is never touched', () => {
     kept: { gamedayIds: [10], gameIds: [] },
   }));
   assertEquals(plan.gamedayIds, []);
+});
+
+// ── The history since 2023 ───────────────────────────────────────────────────
+
+async function historyGamedays(): Promise<UpstreamGameday[]> {
+  const parsed = parseSnapshot(await loadFixture('snapshot.teams-159-287-since-2023.json'));
+  assert(parsed.ok, parsed.ok ? '' : parsed.errors.join('; '));
+  return [...parsed.value.gamedays];
+}
+
+Deno.test('a second run over unchanged history writes no play', async () => {
+  const first = await historyGamedays();
+  const second = await historyGamedays();
+
+  assertEquals(gamesWithLogs(first).length, 123, 'games with a log, first run');
+  assertEquals(gamesWithLogs(second).length, 123, 'games with a log, second run');
+
+  const stored = mapTeamSnapshot(first, '2026-10-30').events;
+  const fetched = mapTeamSnapshot(second, '2026-10-30').events;
+  const diff = diffEvents(stored, fetched);
+  assertEquals(diff.upsert, []);
+  assertEquals(diff.remove, []);
+});
+
+Deno.test('a full history run prunes nothing and never reaches before HISTORY_FROM', async () => {
+  const gamedays = await historyGamedays();
+  const mapped = mapTeamSnapshot(gamedays, '2026-10-30');
+  const ids = mapped.gamedays.map((gd) => gd.id);
+
+  const plan = planPrune(pruneInput({
+    historyFrom: HISTORY_FROM,
+    stored: {
+      gamedays: [
+        ...mapped.gamedays.map((gd) => stored(gd.id, gd.status, gd.date)),
+        stored(1, 'PUBLISHED', '2022-09-10'),
+      ],
+      games: [
+        ...mapped.games.map((game) => ({ id: game.id, gameday_id: game.gameday_id })),
+        { id: 2, gameday_id: 1 },
+      ],
+    },
+    scopes: { main: fresh(...ids), draft: fresh() },
+    kept: { gamedayIds: ids, gameIds: mapped.games.map((game) => game.id) },
+  }));
+
+  assertEquals(plan, { gamedayIds: [], gameIds: [], skipped: null });
 });

@@ -23,7 +23,7 @@ import {
   unquoteEtag,
 } from '../_shared/leaguesphere/client.ts';
 import type { SnapshotBucket } from '../_shared/leaguesphere/client.ts';
-import { TEAM_IDS } from '../_shared/leaguesphere/config.ts';
+import { HISTORY_FROM, TEAM_IDS } from '../_shared/leaguesphere/config.ts';
 import {
   mapTeamSnapshot,
   toGameEventRows,
@@ -63,9 +63,6 @@ import {
 } from '../_shared/leaguesphere/store.ts';
 import { clubToday } from '../_shared/leaguesphere/time.ts';
 import { sendStaleDataAlert } from '../_shared/leaguesphere/alert.ts';
-
-/** How far back the team snapshot reaches. Older seasons are history nobody is waiting for. */
-const HISTORY_FROM = '2026-01-01';
 
 interface RunReport {
   readonly ranAt: string;

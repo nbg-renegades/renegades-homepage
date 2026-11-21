@@ -247,15 +247,22 @@ export class ResultsService {
     );
 
   /**
-   * Every gameday one team plays in, newest first, with that team's games embedded.
+   * Every gameday one team plays in from the configured season onward, newest first, with that
+   * team's games embedded.
    *
    * One request rather than two: the embedded `!inner` join also drops gamedays where the team
    * has no game, which happens for a gameday our *other* team attended.
+   *
+   * The sync stores history back to 2023 for head-to-heads, while the schedule shows the
+   * configured season onward, exactly what it showed before. `gte` rather than a closed range so
+   * next season's gamedays keep appearing once they are published. SCHED-05 replaces the
+   * configured year.
    */
-  gamedays(teamId: number): Observable<readonly ResultsGameday[]> {
+  gamedays(teamId: number, season: string): Observable<readonly ResultsGameday[]> {
     const params = new URLSearchParams({
       select: `id,date,start_time,name,league_display,address,phase,games:results_games!inner(${GAME_COLUMNS})`,
       'games.or': `(home_team_id.eq.${teamId},away_team_id.eq.${teamId})`,
+      date: `gte.${season}-01-01`,
       order: 'date.desc',
     });
 
